@@ -6,14 +6,17 @@ import {
     Param,
     Post,
     Put,
+    UseGuards,
 } from "@nestjs/common";
 import { ListUsersDTO } from "./dto/ListUser.dto";
 import { CreateUserDTO } from "./dto/CreateUser.dto";
 import { UserService } from "./user.service";
 import { UpdateUserDTO } from "./dto/UpdateUser.dto";
 import { HashPasswordPipe } from "src/resources/pipes/hashPassword";
+import { AuthenticationGuard } from "../auth/authentication.guard";
 
 @Controller("/api/v1/users")
+@UseGuards(AuthenticationGuard)
 export class UserController {
 
     constructor(private userService: UserService) { }
@@ -32,7 +35,7 @@ export class UserController {
         });
 
         return {
-            message: "Usuário criado com sucesso.",
+            message: "User created successfully.",
             user: new ListUsersDTO(userCreated.id, userCreated.name),
         };
     }
@@ -42,7 +45,7 @@ export class UserController {
         const usersSaved = await this.userService.listUsers();
 
         return {
-            mensagem: "Usuários obtidos com sucesso.",
+            message: "Users successfully obtained.",
             users: usersSaved,
         };
     }
@@ -52,7 +55,7 @@ export class UserController {
         const userUpdated = await this.userService.updateUser(id, newData);
 
         return {
-            message: "Usuário atualizado com sucesso.",
+            message: "User updated successfully.",
             user: userUpdated,
         };
     }
@@ -62,7 +65,7 @@ export class UserController {
         const userRemoved = await this.userService.deleteUser(id);
 
         return {
-            message: "Usuário removido com suceso.",
+            message: "User removed successfully.",
             user: userRemoved,
         };
     }

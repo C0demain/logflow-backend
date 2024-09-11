@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { PostgresConfigService } from "./config/postgres.config.service";
 import { UserModule } from "./modules/user/user.module";
 import { ServiceOrderModule } from './modules/service-order/service-order.module';
+import { AuthenticationModule } from "./modules/auth/authentication.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ServiceOrderModule } from './modules/service-order/service-order.module
       useClass: PostgresConfigService,
       inject: [PostgresConfigService],
     }),
+    AuthenticationModule,
     ServiceOrderModule,
   ],
   controllers: [],
