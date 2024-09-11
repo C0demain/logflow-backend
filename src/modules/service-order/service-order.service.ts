@@ -1,26 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
+import { Repository } from "typeorm";
+import { InjectRepository } from '@nestjs/typeorm';
+import { ServiceOrder } from './entities/service-order.entity';
 
 @Injectable()
 export class ServiceOrderService {
-  create(createServiceOrderDto: CreateServiceOrderDto) {
-    return 'This action adds a new serviceOrder';
+
+  constructor(
+    @InjectRepository(ServiceOrder) private readonly serviceOrderRepository: Repository<ServiceOrder>
+  ){}
+
+  async create(createServiceOrderDto: CreateServiceOrderDto) {
+    const serviceDb = new ServiceOrder();
+
+    serviceDb.title = createServiceOrderDto.title;
+    serviceDb.clientRelated = createServiceOrderDto.clientRelated;
+    serviceDb.status = createServiceOrderDto.status;
+    serviceDb.expirationDate = createServiceOrderDto.expirationDate;
+
+    return await this.serviceOrderRepository.save(serviceDb);
+    
   }
 
   findAll() {
     return `This action returns all serviceOrder`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} serviceOrder`;
   }
 
-  update(id: number, updateServiceOrderDto: UpdateServiceOrderDto) {
+  update(id: string, updateServiceOrderDto: UpdateServiceOrderDto) {
     return `This action updates a #${id} serviceOrder`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} serviceOrder`;
   }
 }

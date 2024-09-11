@@ -2,14 +2,35 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ServiceOrderService } from './service-order.service';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
+import { ListServiceOrderDto } from './dto/list-service-order.dto';
+import { format } from 'date-fns';
 
-@Controller('service-order')
+@Controller('/api/v1/service-order')
 export class ServiceOrderController {
   constructor(private readonly serviceOrderService: ServiceOrderService) {}
 
   @Post()
-  create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    return this.serviceOrderService.create(createServiceOrderDto);
+  async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
+    const {title, clientRelated, expirationDate, status} = createServiceOrderDto;
+
+    const orderCreated = await this.serviceOrderService.create({
+      title: title,
+      clientRelated: clientRelated,
+      expirationDate: expirationDate,
+      status:status
+    })
+
+    const formattedExpirationDate = format(new Date(orderCreated.expirationDate), 'dd/MM/yyyy');
+
+    return{
+      message: "ordem de serviço cadastrada",
+      serviceOrder: new ListServiceOrderDto(
+        orderCreated.title, 
+        orderCreated.clientRelated, 
+        formattedExpirationDate, 
+        orderCreated.status
+      )
+    };
   }
 
   @Get()
@@ -19,16 +40,16 @@ export class ServiceOrderController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.serviceOrderService.findOne(+id);
+    return this.serviceOrderService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateServiceOrderDto: UpdateServiceOrderDto) {
-    return this.serviceOrderService.update(+id, updateServiceOrderDto);
+    return this.serviceOrderService.update(id, updateServiceOrderDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.serviceOrderService.remove(+id);
+    return this.serviceOrderService.remove(id);
   }
 }
