@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, InternalServerErrorException } from '@nestjs/common';
 import { ServiceOrderService } from './service-order.service';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
-import { format } from 'date-fns';
 
 @Controller('/api/v1/service-order')
 export class ServiceOrderController {
@@ -13,6 +12,7 @@ export class ServiceOrderController {
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
     const {title, clientRelated, expirationDate, status} = createServiceOrderDto;
 
+
     const orderCreated = await this.serviceOrderService.create({
       title: title,
       clientRelated: clientRelated,
@@ -20,36 +20,69 @@ export class ServiceOrderController {
       status:status
     })
 
-    const formattedExpirationDate = format(new Date(orderCreated.expirationDate), 'dd/MM/yyyy');
-
     return{
       message: "ordem de serviço cadastrada",
       serviceOrder: new ListServiceOrderDto(
+        orderCreated.id,
         orderCreated.title, 
         orderCreated.clientRelated, 
-        formattedExpirationDate, 
+        orderCreated.expirationDate, 
         orderCreated.status
       )
     };
   }
 
   @Get()
-  findAll() {
-    return this.serviceOrderService.findAll();
+  async findAll() {
+    const orders = await this.serviceOrderService.findAll();
+
+    if(!orders){
+      return new InternalServerErrorException()
+    }
+
+    return {
+      message: "Ordens de serviço encontradas",
+      orders: orders
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.serviceOrderService.findOne(id);
+  async findById(@Param('id') id: string) {
+    const orderFound = await this.serviceOrderService.findById(id);
+
+    return{
+      message: `ordem de serviço com id: ${id} encontrada`,
+      serviceOrder: orderFound
+    }
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateServiceOrderDto: UpdateServiceOrderDto) {
-    return this.serviceOrderService.update(id, updateServiceOrderDto);
+  @Get(':title')
+  async findByTitle(@Param('title') title: string) {
+    const orderFound = await this.serviceOrderService.findById(title);
+
+    return{
+      message: `ordem de serviço com titulo: ${title} encontrada`,
+      serviceOrder: orderFound
+    }
+  }
+
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() newData: UpdateServiceOrderDto) {
+    const orderUpdated = await this.serviceOrderService.update(id, newData);
+
+    return{
+      message: `ordem de serviço atualizada`,
+      serviceOrder: orderUpdated
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.serviceOrderService.remove(id);
+  async remove(@Param('id') id: string) {
+    const orderRemoved = await this.serviceOrderService.remove(id);
+
+    return{
+      message: `ordem de serviço deletada`,
+      serviceOrder: orderRemoved
+    }
   }
 }

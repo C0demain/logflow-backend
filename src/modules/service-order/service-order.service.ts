@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { Repository } from "typeorm";
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceOrder } from './entities/service-order.entity';
+import { ListServiceOrderDto } from './dto/list-service-order.dto';
 
 @Injectable()
 export class ServiceOrderService {
@@ -24,19 +25,71 @@ export class ServiceOrderService {
     
   }
 
-  findAll() {
-    return `This action returns all serviceOrder`;
+  async findAll() {
+    const orders = await this.serviceOrderRepository.find();
+
+    const ordersList = orders.map(
+      (serviceOrder) => new ListServiceOrderDto(
+        serviceOrder.id,
+        serviceOrder.title, 
+        serviceOrder.clientRelated, 
+        serviceOrder.expirationDate, 
+        serviceOrder.status
+      )
+    );
+
+    return ordersList;
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} serviceOrder`;
+  async findById(id: string) {
+    const orderFound = await this.serviceOrderRepository.findOne({
+      where:{id}
+    });
+
+    if(!orderFound){
+      throw new NotFoundException(`Ordem de serviço com id: ${id}, não encontrada`);
+    }
+
+    return orderFound;
   }
 
-  update(id: string, updateServiceOrderDto: UpdateServiceOrderDto) {
-    return `This action updates a #${id} serviceOrder`;
+  async findByTitle(title: string){
+    const orderFound = await this.serviceOrderRepository.findOne({
+      where:{title}
+    });
+
+    if(!orderFound){
+      throw new NotFoundException(`Ordem de serviço com titulo: ${title}, não encontrada`);
+    }
+
+    return orderFound;
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} serviceOrder`;
+  async update(id: string, newOrderData: UpdateServiceOrderDto) {
+    const orderFound = await this.serviceOrderRepository.findOne({
+      where:{id}
+    });
+
+    if(!orderFound){
+      throw new NotFoundException(`Ordem de serviço com id: ${id}, não encontrada`);
+    }
+
+    Object.assign(orderFound, newOrderData as ServiceOrder);
+
+    return await this.serviceOrderRepository.save(orderFound);
+  }
+
+  async remove(id: string) {
+    const orderFound = await this.serviceOrderRepository.findOne({
+      where:{id}
+    });
+
+    if(!orderFound){
+      throw new NotFoundException(`Ordem de serviço com id: ${id}, não encontrada`);
+    }
+
+    await this.serviceOrderRepository.delete(orderFound.id);
+
+    return orderFound;
   }
 }
