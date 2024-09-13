@@ -7,7 +7,9 @@ import {
     PrimaryGeneratedColumn,
 } from "typeorm";
 import { Exclude } from "class-transformer";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags("users")
 @Entity({ name: "users" })
 export class UserEntity {
     @PrimaryGeneratedColumn("uuid")
