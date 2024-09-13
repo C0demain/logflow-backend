@@ -1,5 +1,7 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { rejects } from 'assert';
 import { CreateUserDTO } from 'src/modules/user/dto/CreateUser.dto';
 import { UpdateUserDTO } from 'src/modules/user/dto/UpdateUser.dto';
 import { UserEntity } from 'src/modules/user/user.entity';
@@ -104,5 +106,23 @@ describe('ServiceOrderService', () => {
     expect(oldUser).toEqual(userMock)
     expect(repository.findOneBy).toHaveBeenCalledWith({ id: userMock.id})
     expect(repository.delete).toHaveBeenCalledWith(userMock.id)
+  })
+
+  it('should throw NotFoundException when user is not found in findByEmail', async ()=>{
+    repository.findOne = jest.fn().mockResolvedValue(null)
+
+    await expect(service.findByEmail('notvalidemail@gmail.com')).rejects.toThrow(NotFoundException)
+  })
+
+  it('should throw NotFoundException when user is not found in update', async ()=>{
+    repository.findOneBy = jest.fn().mockResolvedValue(null)
+
+    await expect(service.updateUser('uu1d-uu1d', userMock)).rejects.toThrow(NotFoundException)
+  })
+
+  it('should throw NotFoundException when user is not found in delete', async ()=>{
+    repository.findOneBy = jest.fn().mockResolvedValue(null)
+
+    await expect(service.deleteUser('uu1d-uu1d')).rejects.toThrow(NotFoundException)
   })
 });
