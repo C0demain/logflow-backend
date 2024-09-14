@@ -1,36 +1,43 @@
 import {
-    Entity,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    DeleteDateColumn,
-    PrimaryGeneratedColumn,
-} from "typeorm";
-import { Exclude } from "class-transformer";
-import { ApiTags } from "@nestjs/swagger";
+  Entity,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+  PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { ApiTags } from '@nestjs/swagger';
+import { RoleEntity } from '../roles/roles.entity';
 
-@ApiTags("users")
-@Entity({ name: "users" })
+@ApiTags('users')
+@Entity({ name: 'users' })
 export class UserEntity {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({ name: "name", length: 100, nullable: false })
-    name: string;
+  @Column({ name: 'name', length: 100, nullable: false })
+  name: string;
 
-    @Column({ name: "email", length: 70, nullable: false })
-    email: string;
+  @Column({ name: 'email', length: 70, nullable: false })
+  email: string;
 
-    @Exclude()
-    @Column({ name: "password", length: 255, nullable: false })
-    password: string;
+  @Exclude()
+  @Column({ name: 'password', length: 255, nullable: false })
+  password: string;
 
-    @CreateDateColumn({ name: "created_at" })
-    createdAt: string;
+  @ManyToMany(() => RoleEntity)
+  @JoinTable()
+  roles: RoleEntity[];
 
-    @UpdateDateColumn({ name: "updated_at" })
-    updatedAt: string;
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: string;
 
-    @DeleteDateColumn({ name: "deleted_at" })
-    deletedAt: string;
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: string;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt: string;
 }
