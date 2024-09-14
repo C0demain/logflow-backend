@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 
 describe('UserController', () => {
   let controller: UserController;
-  const hashPasswordPipe = new HashPasswordPipe(new ConfigService())
+  const hashPasswordPipe = new HashPasswordPipe(new ConfigService());
   const userMock: UserEntity = {
     id: 'uuid-uuid',
     name: 'test-username',
@@ -18,22 +18,28 @@ describe('UserController', () => {
     password: '123456',
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
-    deletedAt: '2024-01-01'
-  }
+    deletedAt: '2024-01-01',
+    roles: [],
+  };
 
   const createUserMock: CreateUserDTO = {
     name: 'test-username',
     email: 'testuser@gmail.com',
-    password: '123456'
-  }
+    password: '123456',
+  };
 
   beforeEach(async () => {
     const userServiceMock: Partial<UserService> = {
       createUser: jest.fn().mockResolvedValue(userMock),
       listUsers: jest.fn().mockResolvedValue([userMock]),
-      updateUser: jest.fn().mockResolvedValue({...userMock, ...{name: 'test-username-updated'} }),
-      deleteUser: jest.fn().mockResolvedValue(userMock)
-    }
+      updateUser: jest
+        .fn()
+        .mockResolvedValue({
+          ...userMock,
+          ...{ name: 'test-username-updated' },
+        }),
+      deleteUser: jest.fn().mockResolvedValue(userMock),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
@@ -44,13 +50,13 @@ describe('UserController', () => {
           provide: getRepositoryToken(UserEntity),
           useValue: {
             save: jest.fn().mockResolvedValue(UserEntity),
-            find: jest.fn().mockResolvedValue([new UserEntity])
-          }
+            find: jest.fn().mockResolvedValue([new UserEntity()]),
+          },
         },
         {
           provide: UserService,
-          useValue: userServiceMock
-        }
+          useValue: userServiceMock,
+        },
       ],
     }).compile();
 
@@ -61,35 +67,35 @@ describe('UserController', () => {
     expect(controller).toBeDefined();
   });
 
-  
-  it('should create user', async ()=>{
+  it('should create user', async () => {
+    const result = await controller.createUser(
+      userMock,
+      await hashPasswordPipe.transform(userMock.password),
+    );
+    expect(result.user).toBeDefined();
+    expect(result.user.id).toBeDefined();
+    expect(result.user.name).toBe('test-username');
+  });
 
-      const result = await controller.createUser(userMock, await hashPasswordPipe.transform(userMock.password))
-      expect(result.user).toBeDefined()
-      expect(result.user.id).toBeDefined()
-      expect(result.user.name).toBe('test-username')
-  })
+  it('should get all users', async () => {
+    const result = await controller.listUsers();
 
-  it('should get all users', async ()=>{
-    const result = await controller.listUsers()
+    expect(result.users).toBeDefined();
+    expect(result.users).toHaveLength(1);
+  });
 
-    expect(result.users).toBeDefined()
-    expect(result.users).toHaveLength(1)
-  })
+  it('should update user', async () => {
+    const result = await controller.updateUser(userMock.id, userMock);
 
-  it('should update user', async ()=>{
-    const result = await controller.updateUser(userMock.id, userMock)
+    expect(result.user).toBeDefined();
+    expect(result.user.id).toBe(userMock.id);
+    expect(result.user.name).toBe('test-username-updated');
+  });
 
-    expect(result.user).toBeDefined()
-    expect(result.user.id).toBe(userMock.id)
-    expect(result.user.name).toBe('test-username-updated')
-  })
+  it('should delete user', async () => {
+    const result = await controller.removeUser(userMock.id);
 
-  it('should delete user', async ()=>{
-    const result = await controller.removeUser(userMock.id)
-
-    expect(result.user).toBeDefined()
-    expect(result.user.id).toBe(userMock.id)
-  })
-
+    expect(result.user).toBeDefined();
+    expect(result.user.id).toBe(userMock.id);
+  });
 });

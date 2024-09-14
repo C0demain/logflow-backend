@@ -6,7 +6,7 @@ import { CreateUserDTO } from 'src/modules/user/dto/CreateUser.dto';
 import { UpdateUserDTO } from 'src/modules/user/dto/UpdateUser.dto';
 import { UserEntity } from 'src/modules/user/user.entity';
 import { UserService } from 'src/modules/user/user.service';
-import { Repository } from "typeorm";
+import { Repository } from 'typeorm';
 
 describe('ServiceOrderService', () => {
   let service: UserService;
@@ -19,20 +19,21 @@ describe('ServiceOrderService', () => {
     password: '123456',
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
-    deletedAt: '2024-01-01'
-  }
+    deletedAt: '2024-01-01',
+    roles: [],
+  };
 
   const createUserMock: CreateUserDTO = {
     name: 'test-username',
     email: 'testuser@gmail.com',
-    password: '123456'
-  }
+    password: '123456',
+  };
 
   const updateUserMock: UpdateUserDTO = {
     name: 'test-username-updated',
     email: 'testuser@gmail.com',
-    password: '123456'
-  }
+    password: '123456',
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -42,87 +43,94 @@ describe('ServiceOrderService', () => {
           provide: getRepositoryToken(UserEntity),
           useValue: {
             save: jest.fn().mockResolvedValue(userMock),
-            find: jest.fn().mockResolvedValue([userMock])
-          }
-        }
+            find: jest.fn().mockResolvedValue([userMock]),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<UserService>(UserService);
-    repository = module.get<Repository<UserEntity>>(getRepositoryToken(UserEntity));
+    repository = module.get<Repository<UserEntity>>(
+      getRepositoryToken(UserEntity),
+    );
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should create user', async ()=>{
+  it('should create user', async () => {
     repository.save = jest.fn().mockResolvedValue(userMock);
-    const newUser = await service.createUser(createUserMock)
+    const newUser = await service.createUser(createUserMock);
 
     expect(newUser).toEqual(userMock);
-    expect(repository.save).toHaveBeenCalled()
-  })
+    expect(repository.save).toHaveBeenCalled();
+  });
 
-  it('should list all users', async ()=>{
-    repository.find = jest.fn().mockResolvedValue([userMock])
+  it('should list all users', async () => {
+    repository.find = jest.fn().mockResolvedValue([userMock]);
 
-    const userList = await service.listUsers()
-    
+    const userList = await service.listUsers();
 
-    expect(userList).toEqual([{id: 'uuid-uuid', name: 'test-username'}])
-    expect(repository.find).toHaveBeenCalled()
-  })
+    expect(userList).toEqual([{ id: 'uuid-uuid', name: 'test-username' }]);
+    expect(repository.find).toHaveBeenCalled();
+  });
 
-  it('should return user by email', async ()=>{
-    repository.findOne = jest.fn().mockResolvedValue(userMock)
+  it('should return user by email', async () => {
+    repository.findOne = jest.fn().mockResolvedValue(userMock);
 
-    const userList = await service.findByEmail(userMock.email)
-    
+    const userList = await service.findByEmail(userMock.email);
 
-    expect(userList).toEqual(userMock)
-    expect(repository.findOne).toHaveBeenCalledWith({where: {email: userMock.email} })
-  })
+    expect(userList).toEqual(userMock);
+    expect(repository.findOne).toHaveBeenCalledWith({
+      where: { email: userMock.email },
+    });
+  });
 
-  it('should update user', async ()=>{
-    repository.findOneBy = jest.fn().mockResolvedValue(userMock)
+  it('should update user', async () => {
+    repository.findOneBy = jest.fn().mockResolvedValue(userMock);
 
-    const updatedUser = await service.updateUser(userMock.id, updateUserMock)
-    const newUser = userMock
-    newUser.name = 'test-username-updated'
-    
+    const updatedUser = await service.updateUser(userMock.id, updateUserMock);
+    const newUser = userMock;
+    newUser.name = 'test-username-updated';
 
-    expect(updatedUser).toEqual(newUser)
-    expect(repository.findOneBy).toHaveBeenCalledWith({ id: userMock.id})
-    expect(repository.save).toHaveBeenCalledWith(newUser)
-  })
+    expect(updatedUser).toEqual(newUser);
+    expect(repository.findOneBy).toHaveBeenCalledWith({ id: userMock.id });
+    expect(repository.save).toHaveBeenCalledWith(newUser);
+  });
 
-  it('should delete user', async ()=>{
-    repository.delete = jest.fn().mockResolvedValue(userMock)
-    repository.findOneBy = jest.fn().mockResolvedValue(userMock)
+  it('should delete user', async () => {
+    repository.delete = jest.fn().mockResolvedValue(userMock);
+    repository.findOneBy = jest.fn().mockResolvedValue(userMock);
 
-    const oldUser = await service.deleteUser(userMock.id)
+    const oldUser = await service.deleteUser(userMock.id);
 
-    expect(oldUser).toEqual(userMock)
-    expect(repository.findOneBy).toHaveBeenCalledWith({ id: userMock.id})
-    expect(repository.delete).toHaveBeenCalledWith(userMock.id)
-  })
+    expect(oldUser).toEqual(userMock);
+    expect(repository.findOneBy).toHaveBeenCalledWith({ id: userMock.id });
+    expect(repository.delete).toHaveBeenCalledWith(userMock.id);
+  });
 
-  it('should throw NotFoundException when user is not found in findByEmail', async ()=>{
-    repository.findOne = jest.fn().mockResolvedValue(null)
+  it('should throw NotFoundException when user is not found in findByEmail', async () => {
+    repository.findOne = jest.fn().mockResolvedValue(null);
 
-    await expect(service.findByEmail('notvalidemail@gmail.com')).rejects.toThrow(NotFoundException)
-  })
+    await expect(
+      service.findByEmail('notvalidemail@gmail.com'),
+    ).rejects.toThrow(NotFoundException);
+  });
 
-  it('should throw NotFoundException when user is not found in update', async ()=>{
-    repository.findOneBy = jest.fn().mockResolvedValue(null)
+  it('should throw NotFoundException when user is not found in update', async () => {
+    repository.findOneBy = jest.fn().mockResolvedValue(null);
 
-    await expect(service.updateUser('uu1d-uu1d', userMock)).rejects.toThrow(NotFoundException)
-  })
+    await expect(service.updateUser('uu1d-uu1d', userMock)).rejects.toThrow(
+      NotFoundException,
+    );
+  });
 
-  it('should throw NotFoundException when user is not found in delete', async ()=>{
-    repository.findOneBy = jest.fn().mockResolvedValue(null)
+  it('should throw NotFoundException when user is not found in delete', async () => {
+    repository.findOneBy = jest.fn().mockResolvedValue(null);
 
-    await expect(service.deleteUser('uu1d-uu1d')).rejects.toThrow(NotFoundException)
-  })
+    await expect(service.deleteUser('uu1d-uu1d')).rejects.toThrow(
+      NotFoundException,
+    );
+  });
 });
