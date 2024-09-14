@@ -39,7 +39,7 @@ export class ServiceOrderController {
     const orders = await this.serviceOrderService.findAll();
 
     if(!orders){
-      return new InternalServerErrorException()
+      throw new InternalServerErrorException()
     }
 
     return {
