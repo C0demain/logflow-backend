@@ -1,7 +1,7 @@
 export enum Status{
-    PENDENTE = 'pendente',
-    FINANCEIRO = 'financeiro',
-    ADMINISTRATIVO = 'administrativo',
-    OPERACIONAL = 'operacional',
-    FINALIZADO = 'finalizado'
+    PENDENTE = 'PENDENTE',
+    FINANCEIRO = 'FINANCEIRO',
+    ADMINISTRATIVO = 'ADMINISTRATIVO',
+    OPERACIONAL = 'OPERACIONAL',
+    FINALIZADO = 'FINALIZADO'
 }

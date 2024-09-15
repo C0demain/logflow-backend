@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { Repository } from "typeorm";
@@ -27,6 +27,10 @@ export class ServiceOrderService {
 
   async findAll() {
     const orders = await this.serviceOrderRepository.find();
+
+    if(!orders){
+      throw new InternalServerErrorException();
+    }
 
     const ordersList = orders.map(
       (serviceOrder) => new ListServiceOrderDto(
