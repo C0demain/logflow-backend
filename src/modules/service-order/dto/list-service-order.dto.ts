@@ -6,6 +6,11 @@ export class ListServiceOrderDto{
         readonly title: string,
         readonly clientRelated: string,
         readonly expirationDate: Date,
-        readonly status: Status
+        readonly status: Status,
+        readonly user: {
+            id: string,
+            name: string,
+            email: string
+        }
     ){};
 }

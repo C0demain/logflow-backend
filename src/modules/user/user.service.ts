@@ -24,9 +24,11 @@ export class UserService {
     }
 
     async listUsers() {
-        const usersSaved = await this.userRepository.find();
+        const usersSaved = await this.userRepository.find({
+            relations: ['orders']
+        });
         const usersList = usersSaved.map(
-            (user) => new ListUsersDTO(user.id, user.name),
+            (user) => new ListUsersDTO(user.id, user.name, user.orders),
         );
         return usersList;
     }
@@ -40,6 +42,17 @@ export class UserService {
             throw new NotFoundException("O email não foi encontrado.");
 
         return checkEmail;
+    }
+
+    async findById(id: string) {
+        const checkId = await this.userRepository.findOne({
+            where: { id },
+        });
+
+        if (checkId === null)
+            throw new NotFoundException("O email não foi encontrado.");
+
+        return checkId;
     }
 
     async updateUser(id: string, newData: UpdateUserDTO) {

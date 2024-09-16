@@ -46,6 +46,7 @@ describe('ServiceOrderService', () => {
         clientRelated: 'Client A',
         expirationDate: new Date('2024-12-31'),
         status: Status.PENDENTE,
+        userId: ""
       };
 
       const savedOrder = {

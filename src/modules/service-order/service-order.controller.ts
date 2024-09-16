@@ -3,24 +3,28 @@ import { ServiceOrderService } from './service-order.service';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { UserService } from '../user/user.service';
 
 @ApiTags("service-order")
 @Controller('/api/v1/service-order')
 export class ServiceOrderController {
-  constructor(private readonly serviceOrderService: ServiceOrderService) {}
+  constructor(
+    private readonly serviceOrderService: ServiceOrderService,
+  ) {}
 
   @Post()
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    const {title, clientRelated, expirationDate, status} = createServiceOrderDto;
-
+    const {title, clientRelated, expirationDate, status, userId} = createServiceOrderDto;
 
     const orderCreated = await this.serviceOrderService.create({
       title: title,
       clientRelated: clientRelated,
       expirationDate: expirationDate,
-      status:status
-    })
+      status:status,
+      userId: userId
+
+    });
 
     return{
       message: "ordem de serviço cadastrada",
@@ -29,7 +33,12 @@ export class ServiceOrderController {
         orderCreated.title, 
         orderCreated.clientRelated, 
         orderCreated.expirationDate, 
-        orderCreated.status
+        orderCreated.status,
+        {
+          id: orderCreated.user.id,
+          name: orderCreated.user.name,
+          email: orderCreated.user.email
+        }
       )
     };
   }

@@ -19,7 +19,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 @ApiTags("users")
 @ApiBearerAuth()
 @Controller("/api/v1/users")
-@UseGuards(AuthenticationGuard)
+//@UseGuards(AuthenticationGuard)
 export class UserController {
 
     constructor(private userService: UserService) { }
@@ -40,7 +40,7 @@ export class UserController {
 
         return {
             message: "Usuário criado com sucesso.",
-            user: new ListUsersDTO(userCreated.id, userCreated.name),
+            user: new ListUsersDTO(userCreated.id, userCreated.name, userCreated.orders),
         };
     }
 

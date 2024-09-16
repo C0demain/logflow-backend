@@ -5,21 +5,26 @@ import { Repository } from "typeorm";
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceOrder } from './entities/service-order.entity';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class ServiceOrderService {
 
   constructor(
-    @InjectRepository(ServiceOrder) private readonly serviceOrderRepository: Repository<ServiceOrder>
+    @InjectRepository(ServiceOrder) private readonly serviceOrderRepository: Repository<ServiceOrder>,
+    private readonly userService: UserService
   ){}
 
   async create(createServiceOrderDto: CreateServiceOrderDto) {
     const serviceDb = new ServiceOrder();
 
+    const user = await this.userService.findById(createServiceOrderDto.userId);
+
     serviceDb.title = createServiceOrderDto.title;
     serviceDb.clientRelated = createServiceOrderDto.clientRelated;
     serviceDb.status = createServiceOrderDto.status;
     serviceDb.expirationDate = createServiceOrderDto.expirationDate;
+    serviceDb.user = user;
 
     return await this.serviceOrderRepository.save(serviceDb);
     
@@ -38,7 +43,12 @@ export class ServiceOrderService {
         serviceOrder.title, 
         serviceOrder.clientRelated, 
         serviceOrder.expirationDate, 
-        serviceOrder.status
+        serviceOrder.status,
+        {
+          id: serviceOrder.user.id,
+          name: serviceOrder.user.name,
+          email: serviceOrder.user.email
+        }
       )
     );
 

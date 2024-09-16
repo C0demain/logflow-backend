@@ -7,10 +7,12 @@ import {
   PrimaryGeneratedColumn,
   ManyToMany,
   JoinTable,
+  OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiTags } from '@nestjs/swagger';
 import { RoleEntity } from '../roles/roles.entity';
+import { ServiceOrder } from '../service-order/entities/service-order.entity';
 
 @ApiTags('users')
 @Entity({ name: 'users' })
@@ -31,6 +33,9 @@ export class UserEntity {
   @ManyToMany(() => RoleEntity)
   @JoinTable()
   roles: RoleEntity[];
+
+  @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {eager: false})
+  orders: ServiceOrder[];
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
