@@ -6,6 +6,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Role } from './enums/roles.enum';
 
 @ApiTags('roles')
 @Entity({ name: 'roles' })
@@ -14,7 +15,7 @@ export class RoleEntity {
   id: number;
 
   @Column({ name: 'name', length: 100, nullable: false })
-  name: string;
+  name: Role;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
