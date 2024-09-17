@@ -21,6 +21,7 @@ describe('ServiceOrderService', () => {
     updatedAt: '2024-01-01',
     deletedAt: '2024-01-01',
     roles: [],
+    orders: []
   };
 
   const createUserMock: CreateUserDTO = {

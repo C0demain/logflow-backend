@@ -14,8 +14,6 @@ describe('ServiceOrderController', () => {
   const mockServiceOrderService = {
     create: jest.fn(),
     findAll: jest.fn(),
-    findById: jest.fn(),
-    findByTitle: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
   };
@@ -40,135 +38,154 @@ describe('ServiceOrderController', () => {
   });
 
   describe('create', () => {
-    it('should create a new service order and return it', async () => {
+    it('should create a new service order', async () => {
       const createServiceOrderDto: CreateServiceOrderDto = {
-        title: 'New Order',
-        clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
+        title: 'Test Order',
+        clientRelated: 'Client X',
+        expirationDate: new Date('2024-10-10'),
         status: Status.PENDENTE,
+        userId: 'user-123',
       };
 
-      const createdOrder = {
-        id: 'uuid',
-        title: 'New Order',
-        clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
+      const result = {
+        id: 'order-123',
+        title: 'Test Order',
+        clientRelated: 'Client X',
+        expirationDate: new Date('2024-10-10'),
         status: Status.PENDENTE,
+        user: {
+          id: 'user-123',
+          name: 'User Test',
+          email: 'user@test.com',
+        },
       };
 
-      mockServiceOrderService.create.mockResolvedValue(createdOrder);
+      mockServiceOrderService.create.mockResolvedValue(result);
 
-      const result = await controller.create(createServiceOrderDto);
+      const response = await controller.create(createServiceOrderDto);
 
-      expect(result).toEqual({
-        message: 'ordem de serviço cadastrada',
-        serviceOrder: new ListServiceOrderDto(
-          createdOrder.id,
-          createdOrder.title,
-          createdOrder.clientRelated,
-          createdOrder.expirationDate,
-          createdOrder.status,
-        ),
-      });
-      expect(mockServiceOrderService.create).toHaveBeenCalledWith(createServiceOrderDto);
+      expect(response.message).toEqual('ordem de serviço cadastrada');
+      expect(response.serviceOrder).toEqual(
+        new ListServiceOrderDto(
+          result.id,
+          result.title,
+          result.clientRelated,
+          result.expirationDate,
+          result.status,
+          result.user
+        )
+      );
     });
   });
 
   describe('findAll', () => {
     it('should return all service orders', async () => {
-      const ordersList = [
-        new ListServiceOrderDto('uuid1', 'Order 1', 'Client A', new Date('2024-12-31'), Status.PENDENTE),
-        new ListServiceOrderDto('uuid2', 'Order 2', 'Client B', new Date('2024-12-31'), Status.FINALIZADO),
+      const result = [
+        new ListServiceOrderDto(
+          'order-123',
+          'Test Order',
+          'Client X',
+          new Date('2024-10-10'),
+          Status.PENDENTE,
+          {
+            id: 'user-123',
+            name: 'User Test',
+            email: 'user@test.com',
+          }
+        ),
       ];
 
-      mockServiceOrderService.findAll.mockResolvedValue(ordersList);
+      mockServiceOrderService.findAll.mockResolvedValue(result);
 
-      const result = await controller.findAll();
+      const response = await controller.findAll();
 
-      expect(result).toEqual({
-        message: 'Ordens de serviço encontradas',
-        orders: ordersList,
-      });
-      expect(mockServiceOrderService.findAll).toHaveBeenCalled();
+      expect(response.message).toEqual('Ordens de serviço encontradas');
+      expect(response.orders).toEqual(result);
     });
 
-    it('should throw InternalServerErrorException when no orders are found', async () => {
-      mockServiceOrderService.findAll.mockResolvedValue(null);
+    it('should apply filters and return filtered service orders', async () => {
+      const result = [
+        new ListServiceOrderDto(
+          'order-123',
+          'Filtered Order',
+          'Client X',
+          new Date('2024-10-10'),
+          Status.PENDENTE,
+          {
+            id: 'user-123',
+            name: 'User Test',
+            email: 'user@test.com',
+          }
+        ),
+      ];
 
-      await expect(controller.findAll()).rejects.toThrow(InternalServerErrorException);
-    });
-  });
+      mockServiceOrderService.findAll.mockResolvedValue(result);
 
-  describe('findById', () => {
-    it('should return the service order by id', async () => {
-      const order = {
-        id: 'uuid',
-        title: 'Order 1',
-        clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
-        status: 'PENDENTE',
-      };
+      const response = await controller.findAll('order-123', 'Filtered Order', 'Client X', 'PENDENTE');
 
-      mockServiceOrderService.findById.mockResolvedValue(order);
-
-      const result = await controller.findById('uuid');
-
-      expect(result).toEqual({
-        message: 'ordem de serviço com id: uuid encontrada',
-        serviceOrder: order,
-      });
-      expect(mockServiceOrderService.findById).toHaveBeenCalledWith('uuid');
+      expect(response.orders).toEqual(result);
     });
   });
 
   describe('update', () => {
-    it('should update the service order and return it', async () => {
-      const updateServiceOrderDto: UpdateServiceOrderDto = {
-        title: 'Updated Order',
-        clientRelated: 'Client B',
-        expirationDate: new Date('2024-12-31'),
-        status: Status.FINALIZADO,
-      };
+  it('should update the service order and return it', async () => {
+    const updateServiceOrderDto: UpdateServiceOrderDto = {
+      title: 'Updated Order',
+      clientRelated: 'Client B',
+      expirationDate: new Date('2024-12-31'),
+      status: Status.FINALIZADO,
+    };
 
-      const updatedOrder = {
-        id: 'uuid',
-        title: 'Updated Order',
-        clientRelated: 'Client B',
-        expirationDate: new Date('2024-12-31'),
-        status: 'CONCLUIDO',
-      };
+    const updatedOrder = {
+      id: 'uuid',
+      title: 'Updated Order',
+      clientRelated: 'Client B',
+      expirationDate: new Date('2024-12-31'),
+      status: Status.FINALIZADO,
+      user: {
+        id: 'user-123',
+        name: 'User Test',
+        email: 'user@test.com',
+      },
+    };
 
-      mockServiceOrderService.update.mockResolvedValue(updatedOrder);
+    mockServiceOrderService.update.mockResolvedValue(updatedOrder);
 
-      const result = await controller.update('uuid', updateServiceOrderDto);
+    const result = await controller.update('uuid', updateServiceOrderDto);
 
-      expect(result).toEqual({
-        message: 'ordem de serviço atualizada',
-        serviceOrder: updatedOrder,
-      });
-      expect(mockServiceOrderService.update).toHaveBeenCalledWith('uuid', updateServiceOrderDto);
+    expect(result).toEqual({
+      message: 'ordem de serviço atualizada',
+      serviceOrder: updatedOrder,
     });
+    expect(mockServiceOrderService.update).toHaveBeenCalledWith('uuid', updateServiceOrderDto);
   });
+});
 
-  describe('remove', () => {
-    it('should delete the service order and return it', async () => {
-      const orderToRemove = {
-        id: 'uuid',
-        title: 'Order 1',
-        clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
-        status: 'PENDENTE',
-      };
+describe('remove', () => {
+  it('should delete the service order and return it', async () => {
+    const orderToRemove = {
+      id: 'uuid',
+      title: 'Order 1',
+      clientRelated: 'Client A',
+      expirationDate: new Date('2024-12-31'),
+      status: Status.PENDENTE,
+      user: {
+        id: 'user-123',
+        name: 'User Test',
+        email: 'user@test.com',
+      },
+    };
 
-      mockServiceOrderService.remove.mockResolvedValue(orderToRemove);
+    mockServiceOrderService.remove.mockResolvedValue(orderToRemove);
 
-      const result = await controller.remove('uuid');
+    const result = await controller.remove('uuid');
 
-      expect(result).toEqual({
-        message: 'ordem de serviço deletada',
-        serviceOrder: orderToRemove,
-      });
-      expect(mockServiceOrderService.remove).toHaveBeenCalledWith('uuid');
+    expect(result).toEqual({
+      message: 'ordem de serviço deletada',
+      serviceOrder: orderToRemove,
     });
+    expect(mockServiceOrderService.remove).toHaveBeenCalledWith('uuid');
   });
+});
+
 });

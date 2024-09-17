@@ -20,7 +20,7 @@ describe('UserController', () => {
     updatedAt: '2024-01-01',
     deletedAt: '2024-01-01',
     roles: [],
-    serviceOrders:[],
+    orders:[],
   };
 
   const createUserMock: CreateUserDTO = {
