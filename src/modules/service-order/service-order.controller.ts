@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, InternalServerErrorException, Query } from '@nestjs/common';
 import { ServiceOrderService } from './service-order.service';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
@@ -44,38 +44,20 @@ export class ServiceOrderController {
   }
 
   @Get()
-  async findAll() {
-    const orders = await this.serviceOrderService.findAll();
-
-    if(!orders){
-      throw new InternalServerErrorException()
+  async findAll(@Query('id') id?: string, @Query('title') title?: string, @Query('clientRelated') clientRelated?: string, @Query('status') status?: string) {
+    // Passa os filtros para o service
+    const orders = await this.serviceOrderService.findAll({ id, title, clientRelated, status });
+  
+    if (!orders) {
+      throw new InternalServerErrorException();
     }
-
+  
     return {
       message: "Ordens de serviço encontradas",
-      orders: orders
+      orders: orders,
     };
   }
 
-  @Get(':id')
-  async findById(@Param('id') id: string) {
-    const orderFound = await this.serviceOrderService.findById(id);
-
-    return{
-      message: `ordem de serviço com id: ${id} encontrada`,
-      serviceOrder: orderFound
-    }
-  }
-
-  @Get(':title')
-  async findByTitle(@Param('title') title: string) {
-    const orderFound = await this.serviceOrderService.findById(title);
-
-    return{
-      message: `ordem de serviço com titulo: ${title} encontrada`,
-      serviceOrder: orderFound
-    }
-  }
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() newData: UpdateServiceOrderDto) {
