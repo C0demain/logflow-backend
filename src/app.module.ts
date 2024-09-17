@@ -8,6 +8,7 @@ import { AuthenticationModule } from "./modules/auth/authentication.module";
 import { RedirectController } from "./redirect.controller";
 import { FilterGlobalException } from "./resources/filters/filter-global-exception";
 import { APP_FILTER } from "@nestjs/core";
+import { SeederModule } from "./db/seeds/seeder.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { APP_FILTER } from "@nestjs/core";
     }),
     AuthenticationModule,
     ServiceOrderModule,
+    SeederModule
   ],
   controllers: [RedirectController],
   providers: [

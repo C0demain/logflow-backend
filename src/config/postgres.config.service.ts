@@ -17,9 +17,8 @@ export class PostgresConfigService implements TypeOrmOptionsFactory {
       entities: [__dirname + "/../**/*.entity.{js,ts}"],
       synchronize: false,
       migrationsRun: true,
-      logging: true,
       autoLoadEntities: true,
-      cache: true
+      cache: true,
     };
   }
 }
