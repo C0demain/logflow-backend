@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 
 describe('UserController', () => {
   let controller: UserController;
-  const hashPasswordPipe = new HashPasswordPipe(new ConfigService());
+  const hashPasswordPipe = new HashPasswordPipe();
   const userMock: UserEntity = {
     id: 'uuid-uuid',
     name: 'test-username',
