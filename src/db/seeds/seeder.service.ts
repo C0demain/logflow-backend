@@ -16,6 +16,8 @@ export class SeederService {
 
     async run(): Promise<void> {
         try {
+            await this.userRepository.count();
+            
             const usersCount = await this.userRepository.count();
             if (usersCount > 0) {
                 console.log('Usuário padrão já foi adicionado como seeder.');
@@ -41,8 +43,12 @@ export class SeederService {
 
             console.log('Usuário Padrão criado com sucesso');
         } catch (error) {
-            console.error('Erro ao criar o usuário padrão', error.stack);
-            throw new Error('Erro ao criar o usuário padrão'); 
+            if (error.message.includes('relation "users" does not exist')) {
+                console.log('Tabela de users ainda não existe. Seeders não serão executados.');
+            } else {
+                console.error('Erro ao criar o usuário padrão:', error.stack);
+                throw new Error('Erro ao criar o usuário padrão'); 
+            }
         }
     }
 }
