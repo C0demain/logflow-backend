@@ -8,39 +8,32 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ListUsersDTO } from './dto/ListUser.dto';
+import { CreateUserDTO } from './dto/CreateUser.dto';
+import { UserService } from './user.service';
+import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { AuthenticationGuard } from '../auth/authentication.guard';
-import { Role } from '../roles/enums/roles.enum';
-import { Roles } from '../roles/roles.decorator';
-import { RolesGuard } from '../roles/roles.guard';
-import { CreateUserDTO } from './dto/CreateUser.dto';
-import { ListUsersDTO } from './dto/ListUser.dto';
-import { UpdateUserDTO } from './dto/UpdateUser.dto';
-import { UserService } from './user.service';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('/api/v1/users')
-@UseGuards(AuthenticationGuard, RolesGuard)
-@Roles(Role.MANAGER)
+@UseGuards(AuthenticationGuard)
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post()
   @ApiOperation({ summary: 'Criar usuário' })
   async createUser(
-    @Body() createUserDTO: CreateUserDTO,
+    @Body() { name, email }: CreateUserDTO,
     @Body('password', HashPasswordPipe) hashedPassword: string,
   ) {
-    const { name, email } = createUserDTO;
-
-    @Post()
-    @ApiOperation({ summary: "Criar usuário" })
-    async createUser(
-        @Body() { name, email }: CreateUserDTO,
-        @Body("password", HashPasswordPipe) hashedPassword: string,
-    ) {
+    const userCreated = await this.userService.createUser({
+      name: name,
+      email: email,
+      password: hashedPassword,
+    });
 
     return {
       message: 'Usuário criado com sucesso.',
@@ -50,25 +43,12 @@ export class UserController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os usuários' })
-  @Roles(Role.MANAGER)
   async listUsers() {
     const usersSaved = await this.userService.listUsers();
 
     return {
       message: 'Usuários obtidos com sucesso.',
       users: usersSaved,
-    };
-  }
-
-  @Get('/:id')
-  @ApiOperation({ summary: 'Listar um usuário' })
-  @Roles(Role.USER)
-  async listUser(@Param('id') id: string) {
-    const usersSaved = await this.userService.listUsers();
-
-    return {
-      message: 'Usuários obtidos com sucesso.',
-      users: usersSaved[0],
     };
   }
 
