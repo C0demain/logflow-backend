@@ -10,7 +10,6 @@ import { FilterGlobalException } from "./resources/filters/filter-global-excepti
 import { APP_FILTER, APP_INTERCEPTOR } from "@nestjs/core";
 import { SeederModule } from "./db/seeds/seeder.module";
 import { LoggerGlobalInterceptor } from "./resources/interceptors/logger-global-interceptors";
-
 @Module({
   imports: [
     UserModule,
@@ -23,7 +22,8 @@ import { LoggerGlobalInterceptor } from "./resources/interceptors/logger-global-
     }),
     AuthenticationModule,
     ServiceOrderModule,
-    SeederModule
+    SeederModule,
+    RolesModule,
   ],
   controllers: [RedirectController],
   providers: [
@@ -42,5 +42,4 @@ import { LoggerGlobalInterceptor } from "./resources/interceptors/logger-global-
     ConsoleLogger,
   ],
 })
-
 export class AppModule {}
