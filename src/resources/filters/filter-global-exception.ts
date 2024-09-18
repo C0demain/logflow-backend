@@ -1,6 +1,5 @@
 import { ArgumentsHost, Catch, ConsoleLogger, ExceptionFilter, HttpException, HttpStatus } from "@nestjs/common";
 import { HttpAdapterHost } from "@nestjs/core";
-import { timeStamp } from "console";
 
 @Catch()
 export class FilterGlobalException implements ExceptionFilter {
@@ -18,7 +17,7 @@ export class FilterGlobalException implements ExceptionFilter {
         const response = context.getResponse();
         const request = context.getRequest();
 
-        if("user" in request){
+        if("usuario" in request){
             this.logger.log(
                 `Rota acessada pelo usuário ${request.user.id}`
             )

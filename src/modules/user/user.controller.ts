@@ -27,10 +27,9 @@ export class UserController {
     @Post()
     @ApiOperation({ summary: "Criar usuário" })
     async createUser(
-        @Body() createUserDTO: CreateUserDTO,
+        @Body() { name, email }: CreateUserDTO,
         @Body("password", HashPasswordPipe) hashedPassword: string,
     ) {
-        const { name, email } = createUserDTO;
 
         const userCreated = await this.userService.createUser({
             name: name,
