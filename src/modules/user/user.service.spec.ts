@@ -7,6 +7,7 @@ import { UpdateUserDTO } from 'src/modules/user/dto/UpdateUser.dto';
 import { UserEntity } from 'src/modules/user/user.entity';
 import { UserService } from 'src/modules/user/user.service';
 import { Repository } from 'typeorm';
+import { Role } from '../roles/enums/roles.enum';
 
 describe('ServiceOrderService', () => {
   let service: UserService;
@@ -20,19 +21,21 @@ describe('ServiceOrderService', () => {
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
     deletedAt: '2024-01-01',
-    roles: [],
+    role: Role.MANAGER,
   };
 
   const createUserMock: CreateUserDTO = {
     name: 'test-username',
     email: 'testuser@gmail.com',
     password: '123456',
+    role: Role.MANAGER,
   };
 
   const updateUserMock: UpdateUserDTO = {
     name: 'test-username-updated',
     email: 'testuser@gmail.com',
     password: '123456',
+    role: Role.USER,
   };
 
   beforeEach(async () => {
@@ -72,7 +75,7 @@ describe('ServiceOrderService', () => {
 
     const userList = await service.listUsers();
 
-    expect(userList).toEqual([{ id: 'uuid-uuid', name: 'test-username' }]);
+    expect(userList).toEqual([{ id: 'uuid-uuid', name: 'test-username', role: Role.MANAGER }]);
     expect(repository.find).toHaveBeenCalled();
   });
 

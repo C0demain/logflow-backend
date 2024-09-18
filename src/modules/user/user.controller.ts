@@ -15,29 +15,38 @@ import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { AuthenticationGuard } from '../auth/authentication.guard';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { RolesGuard } from '../roles/roles.guard';
+import { Roles } from '../roles/roles.decorator';
+import { Role } from '../roles/enums/roles.enum';
 
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('/api/v1/users')
-@UseGuards(AuthenticationGuard)
+@UseGuards(AuthenticationGuard, RolesGuard)
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post()
+  @Roles(Role.MANAGER)
   @ApiOperation({ summary: 'Criar usuário' })
   async createUser(
-    @Body() { name, email }: CreateUserDTO,
+    @Body() { name, email, role }: CreateUserDTO,
     @Body('password', HashPasswordPipe) hashedPassword: string,
   ) {
     const userCreated = await this.userService.createUser({
       name: name,
       email: email,
       password: hashedPassword,
+      role: role,
     });
 
     return {
       message: 'Usuário criado com sucesso.',
-      user: new ListUsersDTO(userCreated.id, userCreated.name),
+      user: new ListUsersDTO(
+        userCreated.id,
+        userCreated.name,
+        userCreated.role,
+      ),
     };
   }
 

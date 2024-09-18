@@ -14,7 +14,6 @@ import { FilterGlobalException } from './resources/filters/filter-global-excepti
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { SeederModule } from './db/seeds/seeder.module';
 import { LoggerGlobalInterceptor } from './resources/interceptors/logger-global-interceptors';
-import { RolesModule } from './modules/roles/roles.module';
 @Module({
   imports: [
     UserModule,
@@ -28,17 +27,12 @@ import { RolesModule } from './modules/roles/roles.module';
     AuthenticationModule,
     ServiceOrderModule,
     SeederModule,
-    RolesModule,
   ],
   controllers: [RedirectController],
   providers: [
     {
       provide: APP_FILTER,
       useClass: FilterGlobalException,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ClassSerializerInterceptor,
     },
     {
       provide: APP_INTERCEPTOR,

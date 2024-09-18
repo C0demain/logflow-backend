@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/modules/user/user.entity';
 import { Repository } from 'typeorm';
 import "dotenv/config";
+import { Role } from 'src/modules/roles/enums/roles.enum';
 
 @Injectable()
 export class SeederService {
@@ -36,6 +37,7 @@ export class SeederService {
             const user = new UserEntity();
             user.name = userName;
             user.email = userEmail;
+            user.role = Role.MANAGER;
 
             user.password = await this.hashPasswordPipe.transform(userPassword);
 

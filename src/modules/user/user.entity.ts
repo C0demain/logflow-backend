@@ -10,8 +10,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiTags } from '@nestjs/swagger';
-import { RoleEntity } from '../roles/roles.entity';
-
+import { Role } from '../roles/enums/roles.enum';
 @ApiTags('users')
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -28,9 +27,8 @@ export class UserEntity {
   @Column({ name: 'password', length: 255, nullable: false })
   password: string;
 
-  @ManyToMany(() => RoleEntity)
-  @JoinTable()
-  roles: RoleEntity[];
+  @Column({ name: 'role', type: 'enum', enum: Role, default: Role.USER })
+  role: Role;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;

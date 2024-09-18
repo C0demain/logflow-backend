@@ -7,6 +7,7 @@ import { CreateUserDTO } from './dto/CreateUser.dto';
 import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from '../roles/enums/roles.enum';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -19,13 +20,14 @@ describe('UserController', () => {
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
     deletedAt: '2024-01-01',
-    roles: [],
+    role: Role.MANAGER,
   };
 
   const createUserMock: CreateUserDTO = {
     name: 'test-username',
     email: 'testuser@gmail.com',
     password: '123456',
+    role: Role.MANAGER,
   };
 
   beforeEach(async () => {

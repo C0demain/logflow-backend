@@ -7,7 +7,7 @@ import { UserService } from '../user/user.service';
 export interface UserPayload {
   sub: string;
   username: string;
-  roles: Role[];
+  roles: Role;
 }
 
 @Injectable()
@@ -29,7 +29,7 @@ export class AuthenticationService {
     const payload: UserPayload = {
       sub: user.id,
       username: user.name,
-      roles: [Role.USER], //TODO: Relacionar com o banco
+      roles: user.role, //TODO: Relacionar com o banco
     };
 
     console.log(payload);
