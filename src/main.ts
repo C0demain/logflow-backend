@@ -3,9 +3,19 @@ import { NestFactory } from "@nestjs/core";
 import { useContainer } from "class-validator";
 import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { SeederService } from "./db/seeds/seeder.service";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const seeder = app.get(SeederService);
+  try {
+    await seeder.run();
+  } catch (error) {
+    console.error('Erro ao rodar os seeders:', error);
+    process.exit(1);
+  }
+  
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -13,6 +23,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
   app.enableCors({
     // definir endpoint do frontend aqui
     origin: "*",

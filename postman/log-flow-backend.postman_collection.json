@@ -1,0 +1,313 @@
+{
+	"info": {
+		"_postman_id": "6de11e13-ea7f-4361-a169-76e4fc1a0255",
+		"name": "log-flow-backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33811269",
+		"_collection_link": "https://codemain-9113.postman.co/workspace/CodeMain-Workspace~e26de95a-419c-42d2-93f4-42e937757808/collection/33811269-6de11e13-ea7f-4361-a169-76e4fc1a0255?action=share&source=collection_link&creator=33811269"
+	},
+	"item": [
+		{
+			"name": "ordem-de-serviço",
+			"item": [
+				{
+					"name": "get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/service-order",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"service-order"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "teste de criação",
+									"disabled": true
+								},
+								{
+									"key": "clientRelated",
+									"value": "jose1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cadastro",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"teste de criação\",\r\n    \"clientRelated\": \"jose\",\r\n    \"status\": \"PENDENTE\",\r\n    \"expirationDate\": \"10/10/2024\",\r\n    \"userId\" : \"39a5b0fb-36d9-46c8-80b8-6bafb81bcc32\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/service-order",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"service-order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"teste de update\",\r\n    \"clientRelated\": \"jose\",\r\n    \"status\": \"pendente\",\r\n    \"expirationDate\": \"10/10/2024\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/service-order/id",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"service-order",
+								"id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/service-order/20a5225a-5f12-4628-bf9e-f71334092a64",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"service-order",
+								"20a5225a-5f12-4628-bf9e-f71334092a64"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "requisições para a entidade ordem de serviço"
+		},
+		{
+			"name": "usuario",
+			"item": [
+				{
+					"name": "cadastro de usuário",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NzA1NGNkNy1jZTY0LTRjMWYtOTY4ZC05NjkyNDg4YTlmMTYiLCJ1c2VybmFtZSI6ImpqbSBhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzI2NjE4MjA5LCJleHAiOjE3MjY3MDQ2MDl9.wLXyOqXFuJwkB_ljfVE9vvuOamkIU4p9GuYkmnEJXro",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"ronielson\",\r\n    \"email\":\"ronielson2@gmail.com\",\r\n    \"password\": \"rony123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "listar usuários",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNWVlMTNkYi03MmVhLTQ0NjUtOTE0ZC1mMmZmNmM1MzMxYjIiLCJ1c2VybmFtZSI6ImpqbSBhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzI2NjE1MDE1LCJleHAiOjE3MjY3MDE0MTV9.8LMkefXuA_TUR1RFM_abRSJswogRNYMm18PQQ0dRYuA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"jjm@gmail.com\",\r\n    \"password\": \"jjm\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "editar usuário",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzI2YWY3Zi01M2RmLTQ4MjktODJmNi0xNWVlMDE1ZTJmODciLCJ1c2VybmFtZSI6InJvbmllbHNvbiIsImlhdCI6MTcyNjA5NDUzNCwiZXhwIjoxNzI2MTgwOTM0fQ.oWzXInWB1fZGXoCQ7bxPbf6lzHxTcyahkKTeYn3OVMk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"\",\r\n    \"email\": \"\",\r\n    \"password\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/users/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "excluir usuário",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzI2YWY3Zi01M2RmLTQ4MjktODJmNi0xNWVlMDE1ZTJmODciLCJ1c2VybmFtZSI6InJvbmllbHNvbiIsImlhdCI6MTcyNjA5NDUzNCwiZXhwIjoxNzI2MTgwOTM0fQ.oWzXInWB1fZGXoCQ7bxPbf6lzHxTcyahkKTeYn3OVMk",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/users/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"users",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
