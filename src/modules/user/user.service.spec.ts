@@ -22,6 +22,7 @@ describe('ServiceOrderService', () => {
     updatedAt: '2024-01-01',
     deletedAt: '2024-01-01',
     role: Role.MANAGER,
+    orders: []
   };
 
   const createUserMock: CreateUserDTO = {
@@ -75,7 +76,8 @@ describe('ServiceOrderService', () => {
 
     const userList = await service.listUsers();
 
-    expect(userList).toEqual([{ id: 'uuid-uuid', name: 'test-username', role: Role.MANAGER }]);
+    expect(userList).toEqual([{ id: 'uuid-uuid', name: 'test-username', role: Role.MANAGER, orders: []}]);
+
     expect(repository.find).toHaveBeenCalled();
   });
 

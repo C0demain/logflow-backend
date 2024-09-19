@@ -5,7 +5,11 @@ export class ListServiceOrderDto{
         readonly id: string,
         readonly title: string,
         readonly clientRelated: string,
-        readonly expirationDate: Date,
-        readonly status: Status
+        readonly status: Status,
+        readonly user: {
+            id: string,
+            name: string,
+            email: string
+        }
     ){};
 }

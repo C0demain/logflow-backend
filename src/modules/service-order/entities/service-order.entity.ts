@@ -4,8 +4,11 @@ import {
     CreateDateColumn,
     PrimaryGeneratedColumn,
     BeforeInsert,
+    ManyToMany,
+    ManyToOne,
 } from "typeorm";
 import { Status } from "../enums/status.enum";
+import { UserEntity } from "src/modules/user/user.entity";
 
 @Entity({name: 'service-order'})
 export class ServiceOrder {
@@ -18,12 +21,12 @@ export class ServiceOrder {
   
     @Column({name: 'clientRelated', length: 50, nullable:false})
     clientRelated: string
+
+    @ManyToOne(() => UserEntity, (user) => user.orders, {eager:true})
+    user: UserEntity;
     
     @CreateDateColumn({ name: 'creationDate', type:'date'})
     creationDate: Date;
-
-    @Column({name : 'expirationDate', type:'date'})
-    expirationDate: Date;
 
     @Column({name: 'status', type: 'enum', enum: Status, default: Status.PENDENTE})
     status: Status;

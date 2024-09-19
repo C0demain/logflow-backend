@@ -55,6 +55,7 @@ export class UserController {
   async listUsers() {
     const usersSaved = await this.userService.listUsers();
 
+
     return {
       message: 'Usuários obtidos com sucesso.',
       users: usersSaved,

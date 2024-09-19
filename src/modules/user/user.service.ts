@@ -23,18 +23,23 @@ export class UserService {
     return this.userRepository.save(userEntity);
   }
 
-  async listUsers() {
-    const usersSaved = await this.userRepository.find();
-    const usersList = usersSaved.map(
-      (user) => new ListUsersDTO(user.id, user.name, user.role),
-    );
-    return usersList;
-  }
+
+
+    async listUsers() {
+        const usersSaved = await this.userRepository.find({
+            relations: ['orders']
+        });
+        const usersList = usersSaved.map(
+            (user) => new ListUsersDTO(user.id, user.name, user.role, user.orders),
+        );
+        return usersList;
+    }
 
   async findByEmail(email: string) {
     const checkEmail = await this.userRepository.findOne({
       where: { email },
     });
+
 
     if (checkEmail === null)
       throw new NotFoundException('O email não foi encontrado.');
@@ -44,6 +49,20 @@ export class UserService {
 
   async updateUser(id: string, newData: UpdateUserDTO) {
     const user = await this.userRepository.findOneBy({ id });
+
+    async findById(id: string) {
+        const checkId = await this.userRepository.findOne({
+            where: { id },
+        });
+
+        if (checkId === null)
+            throw new NotFoundException("O email não foi encontrado.");
+
+        return checkId;
+    }
+
+    async updateUser(id: string, newData: UpdateUserDTO) {
+        const user = await this.userRepository.findOneBy({ id });
 
     if (user === null)
       throw new NotFoundException('O usuário não foi encontrado.');

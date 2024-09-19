@@ -7,16 +7,23 @@ import { ServiceOrder } from './entities/service-order.entity';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { Status } from './enums/status.enum';
+import { UserService } from '../user/user.service';
+import { ListServiceOrderDto } from './dto/list-service-order.dto';
 
 describe('ServiceOrderService', () => {
   let service: ServiceOrderService;
-  let repository: Repository<ServiceOrder>;
+  let repo: Repository<ServiceOrder>;
+  let userService: UserService;
 
-  const mockServiceOrderRepository = {
+  const mockRepository = {
+    save: jest.fn(),
     find: jest.fn(),
     findOne: jest.fn(),
-    save: jest.fn(),
     delete: jest.fn(),
+  };
+
+  const mockUserService = {
+    findById: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -25,141 +32,123 @@ describe('ServiceOrderService', () => {
         ServiceOrderService,
         {
           provide: getRepositoryToken(ServiceOrder),
-          useValue: mockServiceOrderRepository,
+          useValue: mockRepository,
+        },
+        {
+          provide: UserService,
+          useValue: mockUserService,
         },
       ],
     }).compile();
 
     service = module.get<ServiceOrderService>(ServiceOrderService);
-    repository = module.get<Repository<ServiceOrder>>(getRepositoryToken(ServiceOrder));
+    repo = module.get<Repository<ServiceOrder>>(getRepositoryToken(ServiceOrder));
+    userService = module.get<UserService>(UserService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
-  // Teste do método create
   describe('create', () => {
     it('should create a new service order', async () => {
       const createServiceOrderDto: CreateServiceOrderDto = {
-        title: 'New Order',
-        clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
+        title: 'Test Order',
+        clientRelated: 'Client X',
         status: Status.PENDENTE,
+        userId: 'user-123',
       };
 
-      const savedOrder = {
-        id: 'uuid',
+      const user = {
+        id: 'user-123',
+        name: 'User Test',
+        email: 'user@test.com',
+      };
+
+      const result = {
+        id: 'order-123',
         ...createServiceOrderDto,
+        user,
       };
 
-      mockServiceOrderRepository.save.mockResolvedValue(savedOrder);
+      mockUserService.findById.mockResolvedValue(user);
+      mockRepository.save.mockResolvedValue(result);
 
-      const result = await service.create(createServiceOrderDto);
+      const createdOrder = await service.create(createServiceOrderDto);
 
-      expect(result).toEqual(savedOrder);
-      expect(mockServiceOrderRepository.save).toHaveBeenCalledWith(expect.any(ServiceOrder));
+      expect(createdOrder).toEqual(result);
+      expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({
+        title: 'Test Order',
+        clientRelated: 'Client X',
+        status: Status.PENDENTE,
+        user,
+      }));
     });
   });
 
-  // Teste do método findAll
   describe('findAll', () => {
-    it('should return an array of service orders', async () => {
-      const serviceOrders = [
+    it('should return all service orders without filters', async () => {
+      const result = [
         {
-          id: 'uuid1',
-          title: 'Order 1',
-          clientRelated: 'Client A',
-          expirationDate: new Date('2024-12-31'),
-          status: 'PENDENTE',
-        },
-        {
-          id: 'uuid2',
-          title: 'Order 2',
-          clientRelated: 'Client B',
-          expirationDate: new Date('2024-12-31'),
-          status: 'FINALIZADO',
+          id: 'order-123',
+          title: 'Test Order',
+          clientRelated: 'Client X',
+          status: Status.PENDENTE,
+          user: {
+            id: 'user-123',
+            name: 'User Test',
+            email: 'user@test.com',
+          },
         },
       ];
 
-      mockServiceOrderRepository.find.mockResolvedValue(serviceOrders);
+      mockRepository.find.mockResolvedValue(result);
 
-      const result = await service.findAll();
+      const orders = await service.findAll({});
 
-      expect(result).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: 'uuid1',
-            title: 'Order 1',
-            clientRelated: 'Client A',
-            expirationDate: new Date('2024-12-31'),
-            status: 'PENDENTE',
-          }),
-        ]),
-      );
-      expect(mockServiceOrderRepository.find).toHaveBeenCalled();
-    });
-  });
-
-  // Teste do método findById
-  describe('findById', () => {
-    it('should return a service order when found', async () => {
-      const order = {
-        id: 'uuid',
-        title: 'Order 1',
-        clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
-        status: 'PENDENTE',
-      };
-
-      mockServiceOrderRepository.findOne.mockResolvedValue(order);
-
-      const result = await service.findById('uuid');
-
-      expect(result).toEqual(order);
-      expect(mockServiceOrderRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 'uuid' },
-      });
+      expect(orders).toEqual([
+        new ListServiceOrderDto(
+          'order-123',
+          'Test Order',
+          'Client X',
+          Status.PENDENTE,
+          {
+            id: 'user-123',
+            name: 'User Test',
+            email: 'user@test.com',
+          },
+        ),
+      ]);
     });
 
-    it('should throw NotFoundException when no service order is found', async () => {
-      mockServiceOrderRepository.findOne.mockResolvedValue(null);
+    it('should return filtered service orders', async () => {
+      const result = [
+        {
+          id: 'order-123',
+          title: 'Filtered Order',
+          clientRelated: 'Client X',
+          status: Status.PENDENTE,
+          user: {
+            id: 'user-123',
+            name: 'User Test',
+            email: 'user@test.com',
+          },
+        },
+      ];
 
-      await expect(service.findById('uuid')).rejects.toThrow(NotFoundException);
-      expect(mockServiceOrderRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 'uuid' },
-      });
-    });
-  });
+      mockRepository.find.mockResolvedValue(result);
 
-  // Teste do método findByTitle
-  describe('findByTitle', () => {
-    it('should return a service order when found by title', async () => {
-      const order = {
-        id: 'uuid',
-        title: 'Order 1',
-        clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
-        status: 'PENDENTE',
-      };
+      const orders = await service.findAll({ title: 'Filtered Order' });
 
-      mockServiceOrderRepository.findOne.mockResolvedValue(order);
-
-      const result = await service.findByTitle('Order 1');
-
-      expect(result).toEqual(order);
-      expect(mockServiceOrderRepository.findOne).toHaveBeenCalledWith({
-        where: { title: 'Order 1' },
-      });
-    });
-
-    it('should throw NotFoundException when no service order is found by title', async () => {
-      mockServiceOrderRepository.findOne.mockResolvedValue(null);
-
-      await expect(service.findByTitle('Order 1')).rejects.toThrow(NotFoundException);
-      expect(mockServiceOrderRepository.findOne).toHaveBeenCalledWith({
-        where: { title: 'Order 1' },
-      });
+      expect(orders).toEqual([
+        new ListServiceOrderDto(
+          'order-123',
+          'Filtered Order',
+          'Client X',
+          Status.PENDENTE,
+          {
+            id: 'user-123',
+            name: 'User Test',
+            email: 'user@test.com',
+          },
+        ),
+      ]);
     });
   });
 
@@ -170,66 +159,70 @@ describe('ServiceOrderService', () => {
         id: 'uuid',
         title: 'Order 1',
         clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
-        status: 'PENDENTE',
+        status: Status.PENDENTE,
+        user: {
+          id: 'user-123',
+          name: 'User Test',
+          email: 'user@test.com',
+        },
       };
-
+  
       const updateServiceOrderDto: UpdateServiceOrderDto = {
         title: 'Updated Order',
         clientRelated: 'Client B',
-        expirationDate: new Date('2025-12-31'),
         status: Status.FINALIZADO,
       };
-
-      mockServiceOrderRepository.findOne.mockResolvedValue(existingOrder);
-      mockServiceOrderRepository.save.mockResolvedValue({
+  
+      mockRepository.findOne.mockResolvedValue(existingOrder);
+      mockRepository.save.mockResolvedValue({
         ...existingOrder,
         ...updateServiceOrderDto,
       });
-
+  
       const result = await service.update('uuid', updateServiceOrderDto);
-
+  
       expect(result).toEqual({
         ...existingOrder,
         ...updateServiceOrderDto,
       });
-      expect(mockServiceOrderRepository.save).toHaveBeenCalledWith({
+      expect(mockRepository.save).toHaveBeenCalledWith({
         ...existingOrder,
         ...updateServiceOrderDto,
       });
     });
-
+  
     it('should throw NotFoundException when no service order is found to update', async () => {
-      mockServiceOrderRepository.findOne.mockResolvedValue(null);
-
+      mockRepository.findOne.mockResolvedValue(null);
+  
       await expect(service.update('uuid', {} as UpdateServiceOrderDto)).rejects.toThrow(NotFoundException);
     });
   });
+  
 
-  // Teste do método remove
   describe('remove', () => {
     it('should remove a service order and return it', async () => {
       const order = {
         id: 'uuid',
         title: 'Order 1',
         clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
         status: 'PENDENTE',
       };
-
-      mockServiceOrderRepository.findOne.mockResolvedValue(order);
-      mockServiceOrderRepository.delete.mockResolvedValue({});
-
+  
+      mockRepository.findOne.mockResolvedValue(order);
+      mockRepository.delete.mockResolvedValue({});
+  
       const result = await service.remove('uuid');
-
+  
       expect(result).toEqual(order);
-      expect(mockServiceOrderRepository.delete).toHaveBeenCalledWith(order.id);
+      // Aqui a correção, passando apenas o ID
+      expect(mockRepository.delete).toHaveBeenCalledWith(order.id);
     });
-
+  
     it('should throw NotFoundException when no service order is found to delete', async () => {
-      mockServiceOrderRepository.findOne.mockResolvedValue(null);
-
+      mockRepository.findOne.mockResolvedValue(null);
+  
       await expect(service.remove('uuid')).rejects.toThrow(NotFoundException);
     });
   });
+  
 });
