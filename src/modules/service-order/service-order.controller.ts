@@ -3,8 +3,7 @@ import { ServiceOrderService } from './service-order.service';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserService } from '../user/user.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags("service-order")
 @Controller('/api/v1/service-order')

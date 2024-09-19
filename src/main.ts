@@ -25,8 +25,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    // definir endpoint do frontend aqui
-    origin: "*",
+    origin: "http://localhost:3000",
   });
 
   const config = new DocumentBuilder()

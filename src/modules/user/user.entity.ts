@@ -5,8 +5,6 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   PrimaryGeneratedColumn,
-  ManyToMany,
-  JoinTable,
   OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';

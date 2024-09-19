@@ -1,7 +1,5 @@
-import { IsDate, IsEnum, IsNotEmpty, IsString, IsUUID} from "class-validator";
+import { IsEnum, IsNotEmpty, IsString, IsUUID} from "class-validator";
 import { Status } from "../enums/status.enum";
-import { IsFutureDate } from "src/resources/pipes/futureDateValidator";
-import { Transform } from "class-transformer";
 
 export class CreateServiceOrderDto {
 

@@ -1,7 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { rejects } from 'assert';
 import { CreateUserDTO } from 'src/modules/user/dto/CreateUser.dto';
 import { UpdateUserDTO } from 'src/modules/user/dto/UpdateUser.dto';
 import { UserEntity } from 'src/modules/user/user.entity';

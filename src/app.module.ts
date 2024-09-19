@@ -1,5 +1,4 @@
 import {
-  ClassSerializerInterceptor,
   ConsoleLogger,
   Module,
 } from '@nestjs/common';

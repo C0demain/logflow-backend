@@ -3,8 +3,6 @@ import {
     Column,
     CreateDateColumn,
     PrimaryGeneratedColumn,
-    BeforeInsert,
-    ManyToMany,
     ManyToOne,
 } from "typeorm";
 import { Status } from "../enums/status.enum";
