@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class ServiceOrder1726059355770 implements MigrationInterface {
-    name = 'ServiceOrder1726059355770'
+export class CreateServiceOrderTable1726059355770 implements MigrationInterface {
+    name = 'CreateServiceOrderTable1726059355770'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(
@@ -26,6 +26,7 @@ export class ServiceOrder1726059355770 implements MigrationInterface {
                 PRIMARY KEY ("id")
             )`
         );
+
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
