@@ -46,6 +46,7 @@ export class UserController {
         userCreated.id,
         userCreated.name,
         userCreated.role,
+        userCreated.orders
       ),
     };
   }
