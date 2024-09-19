@@ -6,11 +6,11 @@ export class CreateServiceOrderTable1726059355770 implements MigrationInterface 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(
             `CREATE TYPE "public"."service-order_status_enum" AS ENUM(
-                'pendente', 
-                'financeiro', 
-                'administrativo', 
-                'operacional', 
-                'finalizado'
+                'PENDENTE', 
+                'FINANCEIRO', 
+                'ADMINISTRATIVO', 
+                'OPERACIONAL', 
+                'FINALIZADO'
             )`
         );
 
@@ -18,10 +18,10 @@ export class CreateServiceOrderTable1726059355770 implements MigrationInterface 
             `CREATE TABLE "service-order" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(), 
                 "title" character varying(50) NOT NULL, 
-                "clientRelated" character varying(50) NOT NULL,
-                "creationDate" DATE NOT NULL DEFAULT now(), 
-                "expirationDate" DATE NOT NULL DEFAULT now(), 
-                "status" "public"."service-order_status_enum" NOT NULL DEFAULT 'pendente', 
+                "clientRelated" character varying(50) NOT NULL, 
+                "creationDate" date NOT NULL DEFAULT now(), 
+                "status" "public"."service-order_status_enum" NOT NULL DEFAULT 'PENDENTE', 
+                "userId" uuid, 
                 CONSTRAINT "PK_042fac11eaef5eec1b6a455123c" 
                 PRIMARY KEY ("id")
             )`
