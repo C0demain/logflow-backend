@@ -51,7 +51,6 @@ describe('ServiceOrderService', () => {
       const createServiceOrderDto: CreateServiceOrderDto = {
         title: 'Test Order',
         clientRelated: 'Client X',
-        expirationDate: new Date('2024-10-10'),
         status: Status.PENDENTE,
         userId: 'user-123',
       };
@@ -77,7 +76,6 @@ describe('ServiceOrderService', () => {
       expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({
         title: 'Test Order',
         clientRelated: 'Client X',
-        expirationDate: expect.any(Date),
         status: Status.PENDENTE,
         user,
       }));
@@ -91,7 +89,6 @@ describe('ServiceOrderService', () => {
           id: 'order-123',
           title: 'Test Order',
           clientRelated: 'Client X',
-          expirationDate: new Date('2024-10-10'),
           status: Status.PENDENTE,
           user: {
             id: 'user-123',
@@ -110,7 +107,6 @@ describe('ServiceOrderService', () => {
           'order-123',
           'Test Order',
           'Client X',
-          new Date('2024-10-10'),
           Status.PENDENTE,
           {
             id: 'user-123',
@@ -127,7 +123,6 @@ describe('ServiceOrderService', () => {
           id: 'order-123',
           title: 'Filtered Order',
           clientRelated: 'Client X',
-          expirationDate: new Date('2024-10-10'),
           status: Status.PENDENTE,
           user: {
             id: 'user-123',
@@ -146,7 +141,6 @@ describe('ServiceOrderService', () => {
           'order-123',
           'Filtered Order',
           'Client X',
-          new Date('2024-10-10'),
           Status.PENDENTE,
           {
             id: 'user-123',
@@ -165,7 +159,6 @@ describe('ServiceOrderService', () => {
         id: 'uuid',
         title: 'Order 1',
         clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
         status: Status.PENDENTE,
         user: {
           id: 'user-123',
@@ -177,7 +170,6 @@ describe('ServiceOrderService', () => {
       const updateServiceOrderDto: UpdateServiceOrderDto = {
         title: 'Updated Order',
         clientRelated: 'Client B',
-        expirationDate: new Date('2025-12-31'),
         status: Status.FINALIZADO,
       };
   
@@ -213,7 +205,6 @@ describe('ServiceOrderService', () => {
         id: 'uuid',
         title: 'Order 1',
         clientRelated: 'Client A',
-        expirationDate: new Date('2024-12-31'),
         status: 'PENDENTE',
       };
   

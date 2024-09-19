@@ -28,9 +28,6 @@ export class ServiceOrder {
     @CreateDateColumn({ name: 'creationDate', type:'date'})
     creationDate: Date;
 
-    @Column({name : 'expirationDate', type:'date'})
-    expirationDate: Date;
-
     @Column({name: 'status', type: 'enum', enum: Status, default: Status.PENDENTE})
     status: Status;
 }

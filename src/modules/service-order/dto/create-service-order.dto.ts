@@ -12,14 +12,6 @@ export class CreateServiceOrderDto {
     @IsString()
     clientRelated: string;
 
-    @IsDate()
-    @Transform(({ value }) => {
-        const [day, month, year] = value.split('/');
-        return new Date(`${year}-${month}-${day}`);
-      })
-    @IsFutureDate({message:"a data de expiração precisa ser no futuro"})
-    expirationDate: Date;
-
     @IsEnum(Status, {message: 'o status precisa estar dentro dos padrões pré-definidos'})
     status: Status;
 

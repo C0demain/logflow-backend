@@ -15,12 +15,11 @@ export class ServiceOrderController {
 
   @Post()
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    const {title, clientRelated, expirationDate, status, userId} = createServiceOrderDto;
+    const {title, clientRelated, status, userId} = createServiceOrderDto;
 
     const orderCreated = await this.serviceOrderService.create({
       title: title,
       clientRelated: clientRelated,
-      expirationDate: expirationDate,
       status:status,
       userId: userId
 
@@ -31,8 +30,7 @@ export class ServiceOrderController {
       serviceOrder: new ListServiceOrderDto(
         orderCreated.id,
         orderCreated.title, 
-        orderCreated.clientRelated, 
-        orderCreated.expirationDate, 
+        orderCreated.clientRelated,
         orderCreated.status,
         {
           id: orderCreated.user.id,

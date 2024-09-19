@@ -24,7 +24,6 @@ export class ServiceOrderService {
     serviceDb.title = createServiceOrderDto.title;
     serviceDb.clientRelated = createServiceOrderDto.clientRelated;
     serviceDb.status = createServiceOrderDto.status;
-    serviceDb.expirationDate = createServiceOrderDto.expirationDate;
     serviceDb.user = user;
 
     return await this.serviceOrderRepository.save(serviceDb);
@@ -63,7 +62,6 @@ export class ServiceOrderService {
           serviceOrder.id,
           serviceOrder.title,
           serviceOrder.clientRelated,
-          serviceOrder.expirationDate,
           serviceOrder.status,
           {
             id: serviceOrder.user.id,

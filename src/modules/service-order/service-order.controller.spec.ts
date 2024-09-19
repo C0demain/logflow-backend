@@ -42,7 +42,6 @@ describe('ServiceOrderController', () => {
       const createServiceOrderDto: CreateServiceOrderDto = {
         title: 'Test Order',
         clientRelated: 'Client X',
-        expirationDate: new Date('2024-10-10'),
         status: Status.PENDENTE,
         userId: 'user-123',
       };
@@ -51,7 +50,6 @@ describe('ServiceOrderController', () => {
         id: 'order-123',
         title: 'Test Order',
         clientRelated: 'Client X',
-        expirationDate: new Date('2024-10-10'),
         status: Status.PENDENTE,
         user: {
           id: 'user-123',
@@ -70,7 +68,6 @@ describe('ServiceOrderController', () => {
           result.id,
           result.title,
           result.clientRelated,
-          result.expirationDate,
           result.status,
           result.user
         )
@@ -85,7 +82,6 @@ describe('ServiceOrderController', () => {
           'order-123',
           'Test Order',
           'Client X',
-          new Date('2024-10-10'),
           Status.PENDENTE,
           {
             id: 'user-123',
@@ -109,7 +105,6 @@ describe('ServiceOrderController', () => {
           'order-123',
           'Filtered Order',
           'Client X',
-          new Date('2024-10-10'),
           Status.PENDENTE,
           {
             id: 'user-123',
@@ -132,7 +127,6 @@ describe('ServiceOrderController', () => {
     const updateServiceOrderDto: UpdateServiceOrderDto = {
       title: 'Updated Order',
       clientRelated: 'Client B',
-      expirationDate: new Date('2024-12-31'),
       status: Status.FINALIZADO,
     };
 
@@ -140,7 +134,6 @@ describe('ServiceOrderController', () => {
       id: 'uuid',
       title: 'Updated Order',
       clientRelated: 'Client B',
-      expirationDate: new Date('2024-12-31'),
       status: Status.FINALIZADO,
       user: {
         id: 'user-123',
@@ -167,7 +160,6 @@ describe('remove', () => {
       id: 'uuid',
       title: 'Order 1',
       clientRelated: 'Client A',
-      expirationDate: new Date('2024-12-31'),
       status: Status.PENDENTE,
       user: {
         id: 'user-123',

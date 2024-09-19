@@ -73,7 +73,7 @@ describe('ServiceOrderService', () => {
 
     const userList = await service.listUsers();
 
-    expect(userList).toEqual([{ id: 'uuid-uuid', name: 'test-username' }]);
+    expect(userList).toEqual([{ id: 'uuid-uuid', name: 'test-username', orders:[] }]);
     expect(repository.find).toHaveBeenCalled();
   });
 
