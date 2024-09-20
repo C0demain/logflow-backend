@@ -9,6 +9,8 @@ import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { Status } from './enums/status.enum';
 import { UserService } from '../user/user.service';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
+import { Sector } from './enums/sector.enum';
+import { Role } from '../roles/enums/roles.enum';
 
 describe('ServiceOrderService', () => {
   let service: ServiceOrderService;
@@ -52,6 +54,7 @@ describe('ServiceOrderService', () => {
         title: 'Test Order',
         clientRelated: 'Client X',
         status: Status.PENDENTE,
+        sector: Sector.ADMINISTRATIVO,
         userId: 'user-123',
       };
 
@@ -77,6 +80,7 @@ describe('ServiceOrderService', () => {
         title: 'Test Order',
         clientRelated: 'Client X',
         status: Status.PENDENTE,
+        sector: Sector.ADMINISTRATIVO,
         user,
       }));
     });
@@ -108,10 +112,12 @@ describe('ServiceOrderService', () => {
           'Test Order',
           'Client X',
           Status.PENDENTE,
+          Sector.ADMINISTRATIVO,
           {
             id: 'user-123',
             name: 'User Test',
             email: 'user@test.com',
+            role: Role.MANAGER
           },
         ),
       ]);
@@ -128,6 +134,7 @@ describe('ServiceOrderService', () => {
             id: 'user-123',
             name: 'User Test',
             email: 'user@test.com',
+            sector: Sector.ADMINISTRATIVO,
           },
         },
       ];
@@ -142,10 +149,12 @@ describe('ServiceOrderService', () => {
           'Filtered Order',
           'Client X',
           Status.PENDENTE,
+          Sector.ADMINISTRATIVO,
           {
             id: 'user-123',
             name: 'User Test',
             email: 'user@test.com',
+            role: Role.EMPLOYEE
           },
         ),
       ]);

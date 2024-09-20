@@ -20,7 +20,6 @@ describe('UserController', () => {
     password: '123456',
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
-    deletedAt: '2024-01-01',
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
     orders:[],
@@ -31,6 +30,7 @@ describe('UserController', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     role: Role.MANAGER,
+    sector: Sector.ADMINISTRATIVO,
   };
 
   beforeEach(async () => {

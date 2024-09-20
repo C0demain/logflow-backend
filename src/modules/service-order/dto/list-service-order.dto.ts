@@ -11,7 +11,8 @@ export class ListServiceOrderDto{
         readonly user: {
             id: string,
             name: string,
-            email: string
+            email: string,
+            role: string,
         }
     ){};
 }

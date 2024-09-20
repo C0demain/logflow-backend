@@ -35,7 +35,7 @@ export class UserEntity {
   @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {eager: false})
   orders: ServiceOrder[];
 
-  @Column({ name: 'sector', type: 'enum', enum: Sector})
+  @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
   sector: Sector;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -43,7 +43,4 @@ export class UserEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: string;
-
-  @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt: string;
 }

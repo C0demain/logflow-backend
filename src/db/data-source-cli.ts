@@ -12,6 +12,7 @@ const dataSourceOptions: DataSourceOptions & SeederOptions = {
   entities: [__dirname + "/../**/*.entity.{js,ts}"],
   migrations: [__dirname + "/migrations/*.{js,ts}"],
   seeds: [__dirname + "/seeds/**/*.ts"],
+  synchronize: true,
 };
 
 const dataSource = new DataSource(dataSourceOptions);

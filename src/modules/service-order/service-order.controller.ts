@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, InternalServerErrorException, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, InternalServerErrorException, Query, NotFoundException } from '@nestjs/common';
 import { ServiceOrderService } from './service-order.service';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
@@ -21,7 +21,7 @@ export class ServiceOrderController {
     const orderCreated = await this.serviceOrderService.create({
       title: title,
       clientRelated: clientRelated,
-      status:status,
+      status: status,
       sector: sector,
       userId: userId
     });
@@ -37,40 +37,47 @@ export class ServiceOrderController {
         {
           id: orderCreated.user.id,
           name: orderCreated.user.name,
-          email: orderCreated.user.email
+          email: orderCreated.user.email,
+          role: orderCreated.user.role,
         }
       )
     };
   }
 
+  //busca todas as ordens de serviço existentes no banco
   @Get()
   async findAll(@Query('id') id?: string, @Query('title') title?: string, @Query('clientRelated') clientRelated?: string, @Query('status') status?: string) {
     // Passa os filtros para o service
     const orders = await this.serviceOrderService.findAll({ id, title, clientRelated, status });
   
-    if (!orders) {
-      throw new InternalServerErrorException();
+    if (!orders || orders.length === 0) {
+      throw new InternalServerErrorException('Nenhuma ordem de serviço encontrada');
     }
-  
+    
     return {
       message: "Ordens de serviço encontradas",
       orders: orders,
     };
   }
 
-  @Get(':id')
-  async findSolicitacoesBySector(@Param('id') id: string) {
+  //busca ordens de serviço relacionadas ao id de um usuário e retorna apenas aquelas relacionadas ao seu setor
+  @Get('/:idUser')
+  async findOrdersBySector(@Param('idUser') idUser: string) {
   
-    const user = await this.userService.findById(id);
+    const user = await this.userService.findById(idUser);
     
     const userSector = user?.sector; 
+
+    if (!userSector) {
+      throw new NotFoundException('Setor do usuário não encontrado.');
+    }
   
     const orders = await this.serviceOrderService.findAll({
-      status: userSector, 
+      sector: userSector, 
     });
   
-    if (!orders) {
-      throw new InternalServerErrorException('Nenhuma solicitação encontrada');
+    if (!orders || orders.length === 0) {
+      throw new NotFoundException('Nenhuma solicitação encontrada para o setor do usuário.');
     }
   
     return {

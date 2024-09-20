@@ -30,6 +30,6 @@ export class ServiceOrder {
     @Column({name: 'status', type: 'enum', enum: Status, default: Status.PENDENTE})
     status: Status;
 
-    @Column({name: 'sector', type: 'enum', enum: Sector})
+    @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
     sector: Sector;
 }

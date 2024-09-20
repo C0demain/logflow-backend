@@ -22,7 +22,6 @@ export class CreateUserTable1725495238772 implements MigrationInterface {
                 "sector" "public"."users_sector_enum" NOT NULL,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(), 
                 "updated_at" TIMESTAMP NOT NULL DEFAULT now(), 
-                "deleted_at" TIMESTAMP, CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" 
                 PRIMARY KEY ("id")
             )`
         );

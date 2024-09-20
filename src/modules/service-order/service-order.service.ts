@@ -25,13 +25,14 @@ export class ServiceOrderService {
     serviceDb.title = createServiceOrderDto.title;
     serviceDb.clientRelated = createServiceOrderDto.clientRelated;
     serviceDb.status = createServiceOrderDto.status;
+    serviceDb.sector = createServiceOrderDto.sector;
     serviceDb.user = user;
 
     return await this.serviceOrderRepository.save(serviceDb);
     
   }
 
-  async findAll(filters: { id?: string ,title?: string; clientRelated?: string; status?: string, sector?: string }) {
+  async findAll(filters: { id?: string ,title?: string, clientRelated?: string, status?: string, sector?: string }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<ServiceOrder> = {};
   
@@ -57,25 +58,26 @@ export class ServiceOrderService {
   
     const orders = await this.serviceOrderRepository.find({ where });
   
-    if (!orders) {
-      throw new InternalServerErrorException();
-    }
+    if (!orders || orders.length === 0) {
+      throw new InternalServerErrorException('Nenhuma ordem de serviço encontrada');
+    }    
   
-    const ordersList = orders.map(
-      (serviceOrder) =>
-        new ListServiceOrderDto(
-          serviceOrder.id,
-          serviceOrder.title,
-          serviceOrder.clientRelated,
-          serviceOrder.status,
-          serviceOrder.sector,
-          {
-            id: serviceOrder.user.id,
-            name: serviceOrder.user.name,
-            email: serviceOrder.user.email,
-          },
-        ),
-    );
+    const ordersList = orders.map((serviceOrder) => {
+      const user = serviceOrder.user;
+      return new ListServiceOrderDto(
+        serviceOrder.id,
+        serviceOrder.title,
+        serviceOrder.clientRelated,
+        serviceOrder.status,
+        serviceOrder.sector,
+        {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        } 
+      );
+    });
   
     return ordersList;
   }

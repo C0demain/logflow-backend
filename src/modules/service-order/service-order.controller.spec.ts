@@ -6,6 +6,8 @@ import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Status } from './enums/status.enum';
+import { Sector } from './enums/sector.enum';
+import { Role } from '../roles/enums/roles.enum';
 
 describe('ServiceOrderController', () => {
   let controller: ServiceOrderController;
@@ -43,6 +45,7 @@ describe('ServiceOrderController', () => {
         title: 'Test Order',
         clientRelated: 'Client X',
         status: Status.PENDENTE,
+        sector: Sector.ADMINISTRATIVO,
         userId: 'user-123',
       };
 
@@ -51,10 +54,12 @@ describe('ServiceOrderController', () => {
         title: 'Test Order',
         clientRelated: 'Client X',
         status: Status.PENDENTE,
+        sector: Sector.ADMINISTRATIVO,
         user: {
           id: 'user-123',
           name: 'User Test',
           email: 'user@test.com',
+          role : Role.EMPLOYEE
         },
       };
 
@@ -69,6 +74,7 @@ describe('ServiceOrderController', () => {
           result.title,
           result.clientRelated,
           result.status,
+          result.sector,
           result.user
         )
       );
@@ -83,10 +89,12 @@ describe('ServiceOrderController', () => {
           'Test Order',
           'Client X',
           Status.PENDENTE,
+          Sector.ADMINISTRATIVO,
           {
             id: 'user-123',
             name: 'User Test',
             email: 'user@test.com',
+            role: Role.EMPLOYEE,
           }
         ),
       ];
@@ -106,10 +114,12 @@ describe('ServiceOrderController', () => {
           'Filtered Order',
           'Client X',
           Status.PENDENTE,
+          Sector.ADMINISTRATIVO,
           {
             id: 'user-123',
             name: 'User Test',
             email: 'user@test.com',
+            role: Role.EMPLOYEE
           }
         ),
       ];

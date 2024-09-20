@@ -30,7 +30,7 @@ export class UserController {
   @Roles(Role.MANAGER)
   @ApiOperation({ summary: 'Criar usuário' })
   async createUser(
-    @Body() { name, email, role }: CreateUserDTO,
+    @Body() { name, email, role, sector }: CreateUserDTO,
     @Body('password', HashPasswordPipe) hashedPassword: string,
   ) {
     const userCreated = await this.userService.createUser({
@@ -38,6 +38,7 @@ export class UserController {
       email: email,
       password: hashedPassword,
       role: role,
+      sector: sector
     });
 
     return {
@@ -46,7 +47,6 @@ export class UserController {
         userCreated.id,
         userCreated.name,
         userCreated.role,
-        userCreated.orders
       ),
     };
   }
@@ -55,8 +55,7 @@ export class UserController {
   @ApiOperation({ summary: 'Listar todos os usuários' })
   async listUsers() {
     const usersSaved = await this.userService.listUsers();
-
-
+    
     return {
       message: 'Usuários obtidos com sucesso.',
       users: usersSaved,

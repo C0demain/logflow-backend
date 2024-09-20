@@ -7,6 +7,7 @@ import { UserEntity } from 'src/modules/user/user.entity';
 import { UserService } from 'src/modules/user/user.service';
 import { Repository } from 'typeorm';
 import { Role } from '../roles/enums/roles.enum';
+import { Sector } from '../service-order/enums/sector.enum';
 
 describe('ServiceOrderService', () => {
   let service: UserService;
@@ -19,8 +20,8 @@ describe('ServiceOrderService', () => {
     password: '123456',
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
-    deletedAt: '2024-01-01',
     role: Role.MANAGER,
+    sector: Sector.ADMINISTRATIVO,
     orders: []
   };
 
@@ -29,13 +30,15 @@ describe('ServiceOrderService', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     role: Role.MANAGER,
+    sector: Sector.ADMINISTRATIVO,
   };
 
   const updateUserMock: UpdateUserDTO = {
     name: 'test-username-updated',
     email: 'testuser@gmail.com',
     password: '123456',
-    role: Role.USER,
+    role: Role.EMPLOYEE,
+    sector: Sector.ADMINISTRATIVO,
   };
 
   beforeEach(async () => {
