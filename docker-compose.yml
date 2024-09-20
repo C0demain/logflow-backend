@@ -13,7 +13,11 @@ services:
       - "5433:5432"
     networks:
       - backend
-    restart: unless-stopped
+    restart: always
+    healthcheck:
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4

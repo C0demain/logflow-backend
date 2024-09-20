@@ -33,7 +33,7 @@ export class RolesGuard implements CanActivate {
     if (requiredRoles.some((role) => userRole.includes(role))) {
       return true;
     } else {
-      throw new UnauthorizedException('User does not have permission');
+      throw new UnauthorizedException('Usuário sem permissão');
     }
   }
 }

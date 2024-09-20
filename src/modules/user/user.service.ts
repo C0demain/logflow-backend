@@ -18,17 +18,17 @@ export class UserService {
 
     userEntity.name = createUserDTO.name;
     userEntity.email = createUserDTO.email;
+    userEntity.role = createUserDTO.role;
+    userEntity.sector = createUserDTO.sector;
     userEntity.password = createUserDTO.password;
 
     return this.userRepository.save(userEntity);
   }
 
   async listUsers() {
-        const usersSaved = await this.userRepository.find({
-            relations: ['orders']
-        });
+        const usersSaved = await this.userRepository.find();
         const usersList = usersSaved.map(
-            (user) => new ListUsersDTO(user.id, user.name, user.role, user.orders),
+            (user) => new ListUsersDTO(user.id, user.name, user.role),
         );
         return usersList;
   }

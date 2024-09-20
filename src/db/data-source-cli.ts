@@ -10,8 +10,9 @@ const dataSourceOptions: DataSourceOptions & SeederOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   entities: [__dirname + "/../**/*.entity.{js,ts}"],
-  migrations: [__dirname + "/migrations/*.{js,ts}"],
+  //migrations: [__dirname + "/migrations/*.{js,ts}"],
   seeds: [__dirname + "/seeds/**/*.ts"],
+  synchronize: true,
 };
 
 const dataSource = new DataSource(dataSourceOptions);

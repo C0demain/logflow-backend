@@ -8,10 +8,13 @@ import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '../roles/enums/roles.enum';
+import { Sector } from '../service-order/enums/sector.enum';
 
 describe('UserController', () => {
   let controller: UserController;
+  let userService: UserService;
   const hashPasswordPipe = new HashPasswordPipe();
+
   const userMock: UserEntity = {
     id: 'uuid-uuid',
     name: 'test-username',
@@ -19,8 +22,8 @@ describe('UserController', () => {
     password: '123456',
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01',
-    deletedAt: '2024-01-01',
     role: Role.MANAGER,
+    sector: Sector.ADMINISTRATIVO,
     orders:[],
   };
 
@@ -29,6 +32,7 @@ describe('UserController', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     role: Role.MANAGER,
+    sector: Sector.ADMINISTRATIVO,
   };
 
   beforeEach(async () => {
@@ -44,26 +48,38 @@ describe('UserController', () => {
       deleteUser: jest.fn().mockResolvedValue(userMock),
     };
 
+    const jwtServiceMock = {
+      sign: jest.fn().mockReturnValue('jwt-token'),
+      verify: jest.fn().mockReturnValue({}),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
-        JwtService,
-        ConfigService,
         {
           provide: getRepositoryToken(UserEntity),
           useValue: {
-            save: jest.fn().mockResolvedValue(UserEntity),
-            find: jest.fn().mockResolvedValue([new UserEntity()]),
+            save: jest.fn().mockResolvedValue(userMock),
+            find: jest.fn().mockResolvedValue([userMock]),
+            findOne: jest.fn().mockResolvedValue(userMock),
+            update: jest.fn().mockResolvedValue(userMock),
+            delete: jest.fn().mockResolvedValue(userMock),
           },
         },
         {
           provide: UserService,
           useValue: userServiceMock,
         },
+        {
+          provide: JwtService,
+          useValue: jwtServiceMock,
+        },
+        ConfigService,
       ],
     }).compile();
 
     controller = module.get<UserController>(UserController);
+    userService = module.get<UserService>(UserService);
   });
 
   it('should be defined', () => {
@@ -72,19 +88,19 @@ describe('UserController', () => {
 
   it('should create user', async () => {
     const result = await controller.createUser(
-      userMock,
+      createUserMock,
       await hashPasswordPipe.transform(userMock.password),
     );
     expect(result.user).toBeDefined();
     expect(result.user.id).toBeDefined();
-    expect(result.user.name).toBe('test-username');
+    expect(result.user.name).toBe(userMock.name);
   });
 
   it('should get all users', async () => {
     const result = await controller.listUsers();
-
     expect(result.users).toBeDefined();
     expect(result.users).toHaveLength(1);
+    expect(result.users[0].id).toBe(userMock.id);
   });
 
   it('should update user', async () => {

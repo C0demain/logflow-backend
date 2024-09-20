@@ -11,8 +11,18 @@
 			"name": "ordem-de-serviço",
 			"item": [
 				{
-					"name": "get all",
+					"name": "listar todas as ordens",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OGUyOWEyYS0yNWUxLTRjYWYtODYwNS05NjVlMzJiNzFjNDUiLCJ1c2VybmFtZSI6ImpqbSBhZG1pbmlzdHJhZG9yIiwicm9sZXMiOiJNQU5BR0VSIiwiaWF0IjoxNzI2ODY4ODg3LCJleHAiOjE3MjY5NTUyODd9.HpQoa59DHoykcNwzANIeP0jOoo4-ie3FFFvQRmPvT_U",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"url": {
@@ -44,13 +54,67 @@
 					"response": []
 				},
 				{
-					"name": "cadastro",
+					"name": "listar as ordens por setor",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OGUyOWEyYS0yNWUxLTRjYWYtODYwNS05NjVlMzJiNzFjNDUiLCJ1c2VybmFtZSI6ImpqbSBhZG1pbmlzdHJhZG9yIiwicm9sZXMiOiJNQU5BR0VSIiwiaWF0IjoxNzI2ODY4ODg3LCJleHAiOjE3MjY5NTUyODd9.HpQoa59DHoykcNwzANIeP0jOoo4-ie3FFFvQRmPvT_U",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/service-order/ADMINISTRATIVO",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"service-order",
+								"ADMINISTRATIVO"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "teste de criação",
+									"disabled": true
+								},
+								{
+									"key": "clientRelated",
+									"value": "jose1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cadastrar ordem",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OGUyOWEyYS0yNWUxLTRjYWYtODYwNS05NjVlMzJiNzFjNDUiLCJ1c2VybmFtZSI6ImpqbSBhZG1pbmlzdHJhZG9yIiwicm9sZXMiOiJNQU5BR0VSIiwiaWF0IjoxNzI2ODY4ODg3LCJleHAiOjE3MjY5NTUyODd9.HpQoa59DHoykcNwzANIeP0jOoo4-ie3FFFvQRmPvT_U",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"teste de criação\",\r\n    \"clientRelated\": \"jose\",\r\n    \"status\": \"PENDENTE\",\r\n    \"expirationDate\": \"10/10/2024\",\r\n    \"userId\" : \"39a5b0fb-36d9-46c8-80b8-6bafb81bcc32\"\r\n}",
+							"raw": "{\r\n    \"title\": \"ordem de serviço\",\r\n    \"clientRelated\": \"jjm\",\r\n    \"status\": \"PENDENTE\",\r\n    \"sector\": \"COMERCIAL\",\r\n    \"userId\": \"48e29a2a-25e1-4caf-8605-965e32b71c45\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -74,7 +138,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "editar ordem",
 					"request": {
 						"method": "PUT",
 						"header": [],
@@ -105,12 +169,12 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "deletar ordem",
 					"request": {
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/v1/service-order/20a5225a-5f12-4628-bf9e-f71334092a64",
+							"raw": "http://localhost:8000/api/v1/service-order/id",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -120,7 +184,7 @@
 								"api",
 								"v1",
 								"service-order",
-								"20a5225a-5f12-4628-bf9e-f71334092a64"
+								"id"
 							]
 						}
 					},
@@ -140,7 +204,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0NzA1NGNkNy1jZTY0LTRjMWYtOTY4ZC05NjkyNDg4YTlmMTYiLCJ1c2VybmFtZSI6ImpqbSBhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzI2NjE4MjA5LCJleHAiOjE3MjY3MDQ2MDl9.wLXyOqXFuJwkB_ljfVE9vvuOamkIU4p9GuYkmnEJXro",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNjM5MDJmOC02ZjdkLTQ2NGQtYTk4ZC0wMjRmZGViMzFkNjciLCJ1c2VybmFtZSI6InJvbmllbHNvbiIsInJvbGVzIjoiRU1QTE9ZRUUiLCJpYXQiOjE3MjY4Njk2NjEsImV4cCI6MTcyNjk1NjA2MX0.yc3MA_hia2Wr04sGhtJK_cJoiCmr1yuHMGCl0wjgvHI",
 									"type": "string"
 								}
 							]
@@ -149,7 +213,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"ronielson\",\r\n    \"email\":\"ronielson2@gmail.com\",\r\n    \"password\": \"rony123\"\r\n}",
+							"raw": "{\r\n    \"name\": \"ronielson\",\r\n    \"email\":\"ronielson@gmail.com\",\r\n    \"password\": \"rony123\",\r\n    \"role\": \"EMPLOYEE\",\r\n    \"sector\": \"COMERCIAL\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -180,7 +244,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNWVlMTNkYi03MmVhLTQ0NjUtOTE0ZC1mMmZmNmM1MzMxYjIiLCJ1c2VybmFtZSI6ImpqbSBhZG1pbmlzdHJhZG9yIiwiaWF0IjoxNzI2NjE1MDE1LCJleHAiOjE3MjY3MDE0MTV9.8LMkefXuA_TUR1RFM_abRSJswogRNYMm18PQQ0dRYuA",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OGUyOWEyYS0yNWUxLTRjYWYtODYwNS05NjVlMzJiNzFjNDUiLCJ1c2VybmFtZSI6ImpqbSBhZG1pbmlzdHJhZG9yIiwicm9sZXMiOiJNQU5BR0VSIiwiaWF0IjoxNzI2ODczOTE1LCJleHAiOjE3MjY5NjAzMTV9.EdL9Dj5H6GZvTTclEmskS70QRpEkd0SaElyDcuF66Qc",
 									"type": "string"
 								}
 							]
@@ -210,7 +274,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"jjm@gmail.com\",\r\n    \"password\": \"jjm\"\r\n}",
+							"raw": "{\r\n    \"email\":\"jjm@gmail.com\",\r\n    \"password\": \"jjm\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -251,7 +315,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"\",\r\n    \"email\": \"\",\r\n    \"password\": \"\"\r\n}",
+							"raw": "{\r\n    \"name\": \"ronielson\",\r\n    \"email\":\"ronielson@gmail.com\",\r\n    \"password\": \"rony123\",\r\n    \"role\": \"EMPLOYEE\",\r\n    \"sector\": \"COMERCIAL\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -283,7 +347,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YzI2YWY3Zi01M2RmLTQ4MjktODJmNi0xNWVlMDE1ZTJmODciLCJ1c2VybmFtZSI6InJvbmllbHNvbiIsImlhdCI6MTcyNjA5NDUzNCwiZXhwIjoxNzI2MTgwOTM0fQ.oWzXInWB1fZGXoCQ7bxPbf6lzHxTcyahkKTeYn3OVMk",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0OGUyOWEyYS0yNWUxLTRjYWYtODYwNS05NjVlMzJiNzFjNDUiLCJ1c2VybmFtZSI6ImpqbSBhZG1pbmlzdHJhZG9yIiwicm9sZXMiOiJNQU5BR0VSIiwiaWF0IjoxNzI2ODczOTE1LCJleHAiOjE3MjY5NjAzMTV9.EdL9Dj5H6GZvTTclEmskS70QRpEkd0SaElyDcuF66Qc",
 									"type": "string"
 								}
 							]
@@ -291,7 +355,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/v1/users/",
+							"raw": "http://localhost:8000/api/v1/users/id",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -301,7 +365,7 @@
 								"api",
 								"v1",
 								"users",
-								""
+								"id"
 							]
 						}
 					},

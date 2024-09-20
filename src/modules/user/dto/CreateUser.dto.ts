@@ -1,6 +1,7 @@
 import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
 import { UniqueEmail } from '../validation/UniqueEmail.validation';
 import { Role } from 'src/modules/roles/enums/roles.enum';
+import { Sector } from 'src/modules/service-order/enums/sector.enum';
 
 export class CreateUserDTO {
   @IsNotEmpty({ message: 'O campo `name` não pode ser vazio' })
@@ -21,4 +22,9 @@ export class CreateUserDTO {
     message: 'O campo `role` precisa estar dentro dos padrôes estabelecidos',
   })
   role: Role;
+
+  @IsEnum(Sector, {
+    message: 'O campo `sector` precisa estar dentro dos padrôes estabelecidos',
+  })
+  sector: Sector;
 }

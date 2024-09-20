@@ -4,8 +4,11 @@ import { ServiceOrderService } from './service-order.service';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
-import { InternalServerErrorException } from '@nestjs/common';
 import { Status } from './enums/status.enum';
+import { Sector } from './enums/sector.enum';
+import { Role } from '../roles/enums/roles.enum';
+import { JwtService } from '@nestjs/jwt';
+import { NotFoundException } from '@nestjs/common';
 
 describe('ServiceOrderController', () => {
   let controller: ServiceOrderController;
@@ -18,6 +21,11 @@ describe('ServiceOrderController', () => {
     remove: jest.fn(),
   };
 
+  const jwtServiceMock = {
+    sign: jest.fn().mockReturnValue('jwt-token'),
+    verify: jest.fn().mockReturnValue({}),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ServiceOrderController],
@@ -25,6 +33,10 @@ describe('ServiceOrderController', () => {
         {
           provide: ServiceOrderService,
           useValue: mockServiceOrderService,
+        },
+        {
+          provide: JwtService,
+          useValue: jwtServiceMock,
         },
       ],
     }).compile();
@@ -43,6 +55,7 @@ describe('ServiceOrderController', () => {
         title: 'Test Order',
         clientRelated: 'Client X',
         status: Status.PENDENTE,
+        sector: Sector.ADMINISTRATIVO,
         userId: 'user-123',
       };
 
@@ -51,10 +64,12 @@ describe('ServiceOrderController', () => {
         title: 'Test Order',
         clientRelated: 'Client X',
         status: Status.PENDENTE,
+        sector: Sector.ADMINISTRATIVO,
         user: {
           id: 'user-123',
           name: 'User Test',
           email: 'user@test.com',
+          role : Role.EMPLOYEE
         },
       };
 
@@ -69,6 +84,7 @@ describe('ServiceOrderController', () => {
           result.title,
           result.clientRelated,
           result.status,
+          result.sector,
           result.user
         )
       );
@@ -83,17 +99,19 @@ describe('ServiceOrderController', () => {
           'Test Order',
           'Client X',
           Status.PENDENTE,
+          Sector.ADMINISTRATIVO,
           {
             id: 'user-123',
             name: 'User Test',
             email: 'user@test.com',
+            role: Role.EMPLOYEE,
           }
         ),
       ];
 
       mockServiceOrderService.findAll.mockResolvedValue(result);
 
-      const response = await controller.findAll();
+      const response = await controller.findAllOrders();
 
       expect(response.message).toEqual('Ordens de serviço encontradas');
       expect(response.orders).toEqual(result);
@@ -106,21 +124,61 @@ describe('ServiceOrderController', () => {
           'Filtered Order',
           'Client X',
           Status.PENDENTE,
+          Sector.ADMINISTRATIVO,
           {
             id: 'user-123',
             name: 'User Test',
             email: 'user@test.com',
+            role: Role.EMPLOYEE
           }
         ),
       ];
 
       mockServiceOrderService.findAll.mockResolvedValue(result);
 
-      const response = await controller.findAll('order-123', 'Filtered Order', 'Client X', 'PENDENTE');
+      const response = await controller.findAllOrders('order-123', 'Filtered Order', 'Client X', 'PENDENTE');
 
       expect(response.orders).toEqual(result);
     });
   });
+
+  describe('findOrdersBySector', () => {
+    it('should return orders by sector', async () => {
+      const sector = 'ADMINISTRATIVO';
+      const result = [
+        new ListServiceOrderDto(
+          'order-123',
+          'Test Order',
+          'Client X',
+          Status.PENDENTE,
+          Sector.ADMINISTRATIVO,
+          {
+            id: 'user-123',
+            name: 'User Test',
+            email: 'user@test.com',
+            role: Role.EMPLOYEE,
+          }
+        ),
+      ];
+  
+      mockServiceOrderService.findAll.mockResolvedValue(result);
+  
+      const response = await controller.findOrdersBySector(sector);
+  
+      expect(response.message).toEqual(`Ordens de serviço do setor ${sector} encontradas`);
+      expect(response.orders).toEqual(result);
+    });
+  
+    it('should throw NotFoundException if no orders found', async () => {
+      const sector = 'INEXISTENTE';
+  
+      mockServiceOrderService.findAll.mockResolvedValue([]);
+  
+      await expect(controller.findOrdersBySector(sector)).rejects.toThrow(NotFoundException);
+      await expect(controller.findOrdersBySector(sector)).rejects.toThrow('Nenhuma solicitação encontrada para o setor.');
+    });
+  });
+  
 
   describe('update', () => {
   it('should update the service order and return it', async () => {
