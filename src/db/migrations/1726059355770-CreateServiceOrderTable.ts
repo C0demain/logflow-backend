@@ -20,7 +20,7 @@ export class CreateServiceOrderTable1726059355770 implements MigrationInterface 
                 "title" character varying(50) NOT NULL, 
                 "clientRelated" character varying(50) NOT NULL, 
                 "creationDate" date NOT NULL DEFAULT now(), 
-                "status" "public"."service-order_status_enum" NOT NULL DEFAULT 'PENDENTE', 
+                "status" "public"."service-order_status_enum" NOT NULL DEFAULT 'PENDENTE',        
                 "userId" uuid, 
                 CONSTRAINT "PK_042fac11eaef5eec1b6a455123c" 
                 PRIMARY KEY ("id")

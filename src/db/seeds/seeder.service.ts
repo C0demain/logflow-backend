@@ -5,6 +5,7 @@ import { UserEntity } from 'src/modules/user/user.entity';
 import { Repository } from 'typeorm';
 import "dotenv/config";
 import { Role } from 'src/modules/roles/enums/roles.enum';
+import { Sector } from 'src/modules/service-order/enums/sector.enum';
 
 @Injectable()
 export class SeederService {
@@ -38,6 +39,7 @@ export class SeederService {
             user.name = userName;
             user.email = userEmail;
             user.role = Role.MANAGER;
+            user.sector = Sector.ADMINISTRATIVO;
 
             user.password = await this.hashPasswordPipe.transform(userPassword);
 

@@ -4,24 +4,26 @@ import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { UserService } from '../user/user.service';
 
 @ApiTags("service-order")
 @Controller('/api/v1/service-order')
 export class ServiceOrderController {
   constructor(
     private readonly serviceOrderService: ServiceOrderService,
+    private readonly userService: UserService
   ) {}
 
   @Post()
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    const {title, clientRelated, status, userId} = createServiceOrderDto;
+    const {title, clientRelated, status, sector, userId} = createServiceOrderDto;
 
     const orderCreated = await this.serviceOrderService.create({
       title: title,
       clientRelated: clientRelated,
       status:status,
+      sector: sector,
       userId: userId
-
     });
 
     return{
@@ -31,6 +33,7 @@ export class ServiceOrderController {
         orderCreated.title, 
         orderCreated.clientRelated,
         orderCreated.status,
+        orderCreated.sector,
         {
           id: orderCreated.user.id,
           name: orderCreated.user.name,
@@ -55,6 +58,26 @@ export class ServiceOrderController {
     };
   }
 
+  @Get(':id')
+  async findSolicitacoesBySector(@Param('id') id: string) {
+  
+    const user = await this.userService.findById(id);
+    
+    const userSector = user?.sector; 
+  
+    const orders = await this.serviceOrderService.findAll({
+      status: userSector, 
+    });
+  
+    if (!orders) {
+      throw new InternalServerErrorException('Nenhuma solicitação encontrada');
+    }
+  
+    return {
+      message: 'Solicitações encontradas',
+      orders: orders,
+    };
+  }
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() newData: UpdateServiceOrderDto) {

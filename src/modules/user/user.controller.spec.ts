@@ -8,6 +8,7 @@ import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '../roles/enums/roles.enum';
+import { Sector } from '../service-order/enums/sector.enum';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -21,6 +22,7 @@ describe('UserController', () => {
     updatedAt: '2024-01-01',
     deletedAt: '2024-01-01',
     role: Role.MANAGER,
+    sector: Sector.ADMINISTRATIVO,
     orders:[],
   };
 

@@ -7,6 +7,7 @@ import { ServiceOrder } from './entities/service-order.entity';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
 import { UserService } from '../user/user.service';
 import { Status } from './enums/status.enum';
+import { Sector } from './enums/sector.enum';
 
 @Injectable()
 export class ServiceOrderService {
@@ -30,7 +31,7 @@ export class ServiceOrderService {
     
   }
 
-  async findAll(filters: { id?: string ,title?: string; clientRelated?: string; status?: string }) {
+  async findAll(filters: { id?: string ,title?: string; clientRelated?: string; status?: string, sector?: string }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<ServiceOrder> = {};
   
@@ -49,6 +50,10 @@ export class ServiceOrderService {
     if (filters.status) {
       where.status = filters.status as Status; 
     }
+
+    if (filters.sector) {
+      where.sector = filters.sector as Sector; 
+    }
   
     const orders = await this.serviceOrderRepository.find({ where });
   
@@ -63,6 +68,7 @@ export class ServiceOrderService {
           serviceOrder.title,
           serviceOrder.clientRelated,
           serviceOrder.status,
+          serviceOrder.sector,
           {
             id: serviceOrder.user.id,
             name: serviceOrder.user.name,

@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { Status } from "../enums/status.enum";
 import { UserEntity } from "src/modules/user/user.entity";
+import { Sector } from "../enums/sector.enum";
 
 @Entity({name: 'service-order'})
 export class ServiceOrder {
@@ -28,4 +29,7 @@ export class ServiceOrder {
 
     @Column({name: 'status', type: 'enum', enum: Status, default: Status.PENDENTE})
     status: Status;
+
+    @Column({name: 'sector', type: 'enum', enum: Sector})
+    sector: Sector;
 }

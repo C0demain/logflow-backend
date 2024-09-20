@@ -1,3 +1,4 @@
+import { Sector } from "../enums/sector.enum";
 import { Status } from "../enums/status.enum";
 
 export class ListServiceOrderDto{
@@ -6,6 +7,7 @@ export class ListServiceOrderDto{
         readonly title: string,
         readonly clientRelated: string,
         readonly status: Status,
+        readonly sector: Sector,
         readonly user: {
             id: string,
             name: string,
