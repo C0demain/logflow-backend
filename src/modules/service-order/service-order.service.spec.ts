@@ -62,6 +62,7 @@ describe('ServiceOrderService', () => {
         id: 'user-123',
         name: 'User Test',
         email: 'user@test.com',
+        role : Role.EMPLOYEE
       };
 
       const result = {
@@ -94,10 +95,12 @@ describe('ServiceOrderService', () => {
           title: 'Test Order',
           clientRelated: 'Client X',
           status: Status.PENDENTE,
+          sector: Sector.ADMINISTRATIVO,
           user: {
             id: 'user-123',
             name: 'User Test',
             email: 'user@test.com',
+            role: Role.MANAGER
           },
         },
       ];
@@ -130,11 +133,12 @@ describe('ServiceOrderService', () => {
           title: 'Filtered Order',
           clientRelated: 'Client X',
           status: Status.PENDENTE,
+          sector: Sector.ADMINISTRATIVO,
           user: {
             id: 'user-123',
             name: 'User Test',
             email: 'user@test.com',
-            sector: Sector.ADMINISTRATIVO,
+            role: Role.EMPLOYEE
           },
         },
       ];
@@ -169,10 +173,12 @@ describe('ServiceOrderService', () => {
         title: 'Order 1',
         clientRelated: 'Client A',
         status: Status.PENDENTE,
+        sector: Sector.ADMINISTRATIVO,
         user: {
           id: 'user-123',
           name: 'User Test',
           email: 'user@test.com',
+          role: Role.MANAGER
         },
       };
   
@@ -214,24 +220,26 @@ describe('ServiceOrderService', () => {
         id: 'uuid',
         title: 'Order 1',
         clientRelated: 'Client A',
-        status: 'PENDENTE',
+        status: Status.PENDENTE,
+        sector: Sector.ADMINISTRATIVO,
       };
-  
+    
       mockRepository.findOne.mockResolvedValue(order);
-      mockRepository.delete.mockResolvedValue({});
-  
+      mockRepository.delete.mockResolvedValue({ affected: 1 }); // Retorno de sucesso de deleção
+    
       const result = await service.remove('uuid');
-  
+    
       expect(result).toEqual(order);
-      // Aqui a correção, passando apenas o ID
       expect(mockRepository.delete).toHaveBeenCalledWith(order.id);
     });
-  
+    
     it('should throw NotFoundException when no service order is found to delete', async () => {
       mockRepository.findOne.mockResolvedValue(null);
-  
+      mockRepository.delete.mockResolvedValue({ affected: 0 }); // Simula falha de deleção
+    
       await expect(service.remove('uuid')).rejects.toThrow(NotFoundException);
     });
+    
   });
   
 });

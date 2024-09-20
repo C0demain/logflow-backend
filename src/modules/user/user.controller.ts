@@ -23,12 +23,12 @@ import { Role } from '../roles/enums/roles.enum';
 @ApiBearerAuth()
 @Controller('/api/v1/users')
 @UseGuards(AuthenticationGuard, RolesGuard)
+@Roles(Role.MANAGER)
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   @Post()
-  @Roles(Role.MANAGER)
-  @ApiOperation({ summary: 'Criar usuário' })
+  @ApiOperation({ summary: 'Criar usuário', description: 'Rota acessível apenas para administradores' })
   async createUser(
     @Body() { name, email, role, sector }: CreateUserDTO,
     @Body('password', HashPasswordPipe) hashedPassword: string,
@@ -52,10 +52,10 @@ export class UserController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar todos os usuários' })
+  @ApiOperation({ summary: 'Listar todos os usuários', description: 'Rota acessível apenas para administradores' })
   async listUsers() {
     const usersSaved = await this.userService.listUsers();
-    
+
     return {
       message: 'Usuários obtidos com sucesso.',
       users: usersSaved,
@@ -63,7 +63,7 @@ export class UserController {
   }
 
   @Put('/:id')
-  @ApiOperation({ summary: 'Atualizar usuário' })
+  @ApiOperation({ summary: 'Atualizar usuário', description: 'Rota acessível apenas para administradores' })
   async updateUser(@Param('id') id: string, @Body() newData: UpdateUserDTO) {
     const userUpdated = await this.userService.updateUser(id, newData);
 
@@ -74,7 +74,7 @@ export class UserController {
   }
 
   @Delete('/:id')
-  @ApiOperation({ summary: 'Deletar usuário' })
+  @ApiOperation({ summary: 'Deletar usuário', description: 'Rota acessível apenas para administradores' })
   async removeUser(@Param('id') id: string) {
     const userRemoved = await this.userService.deleteUser(id);
 
