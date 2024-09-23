@@ -4,11 +4,16 @@ import {
     CreateDateColumn,
     PrimaryGeneratedColumn,
     ManyToOne,
+    OneToOne,
+    JoinColumn,
 } from "typeorm";
 import { Status } from "../enums/status.enum";
 import { UserEntity } from "src/modules/user/user.entity";
 import { Sector } from "../enums/sector.enum";
+import { ApiTags } from "@nestjs/swagger";
+import { Client } from "src/modules/client/entities/client.entity";
 
+@ApiTags('service-order')
 @Entity({name: 'service-order'})
 export class ServiceOrder {
 
@@ -23,6 +28,10 @@ export class ServiceOrder {
 
     @ManyToOne(() => UserEntity, (user) => user.orders, {eager:true})
     user: UserEntity;
+
+    @OneToOne(() => Client, { eager: true })
+    @JoinColumn() 
+    client: Client;
     
     @CreateDateColumn({ name: 'creationDate', type:'date'})
     creationDate: Date;

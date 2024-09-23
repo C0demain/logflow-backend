@@ -13,6 +13,7 @@ import { FilterGlobalException } from './resources/filters/filter-global-excepti
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { SeederModule } from './db/seeds/seeder.module';
 import { LoggerGlobalInterceptor } from './resources/interceptors/logger-global-interceptors';
+import { ClientModule } from './modules/client/client.module';
 @Module({
   imports: [
     UserModule,
@@ -26,6 +27,7 @@ import { LoggerGlobalInterceptor } from './resources/interceptors/logger-global-
     AuthenticationModule,
     ServiceOrderModule,
     SeederModule,
+    ClientModule,
   ],
   controllers: [RedirectController],
   providers: [
