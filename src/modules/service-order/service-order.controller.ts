@@ -6,16 +6,14 @@ import {
   Param,
   Delete,
   Put,
-  InternalServerErrorException,
   Query,
-  NotFoundException,
   UseGuards
 } from '@nestjs/common';
 import { ServiceOrderService } from './service-order.service';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../auth/authentication.guard';
 import { Roles } from '../roles/roles.decorator';
 import { Role } from '../roles/enums/roles.enum';
@@ -23,6 +21,7 @@ import { Role } from '../roles/enums/roles.enum';
 @ApiTags("service-order")
 @UseGuards(AuthenticationGuard)
 @Controller('/api/v1/service-order')
+@ApiBearerAuth()
 export class ServiceOrderController {
   constructor(
     private readonly serviceOrderService: ServiceOrderService
@@ -62,6 +61,10 @@ export class ServiceOrderController {
   @Get()
   @Roles(Role.MANAGER)
   @ApiOperation({ summary:'Listar todos as ordens de serviço', description: 'Rota acessível apenas para administradores' })
+  @ApiQuery({name: "id", required: false, type: String})
+  @ApiQuery({name: "title", required: false, type: String})
+  @ApiQuery({name: "clientRelated", required: false, type: String})
+  @ApiQuery({name: "status", required: false, type: String})
   async findAllOrders(@Query('id') id?: string, @Query('title') title?: string, @Query('clientRelated') clientRelated?: string, @Query('status') status?: string) {
     
     const orders = await this.serviceOrderService.findAll({ id, title, clientRelated, status });
