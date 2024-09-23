@@ -26,6 +26,10 @@ export class CreateClientDto {
     email: string;
 
     @IsString()
+    @IsNotEmpty({message: 'o campo `cep` não pode estar vazio'})
+    cep: string;
+
+    @IsString()
     @IsNotEmpty({ message: "O campo `estado` não pode estar vazio" })
     estado: string;
 

@@ -6,6 +6,7 @@ export class ListClientDto {
         readonly cnpj: string,
         readonly email: string,
         readonly address: {
+            cep: string,
             estado: string,
             cidade: string,
             bairro: string,
