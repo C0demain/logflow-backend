@@ -67,7 +67,10 @@ export class ServiceOrderController {
     const orders = await this.serviceOrderService.findAll({ id, title, clientRelated, status });
 
     if (!orders || orders.length === 0) {
-      throw new InternalServerErrorException('Nenhuma ordem de serviço encontrada');
+      return {
+        message: "Nenhuma ordem de serviço encontrada",
+        orders: orders,
+      }
     }
 
     return {
