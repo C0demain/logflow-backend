@@ -88,7 +88,10 @@ export class ServiceOrderController {
     })
 
     if (!ordersBySector || ordersBySector.length === 0) {
-      throw new NotFoundException('Nenhuma solicitação encontrada para o setor.');
+      return {
+        message: `Nenhuma ordem de serviço encontrada para o setor: ${sector}`,
+        orders: ordersBySector,
+      }
     }
 
     return {
