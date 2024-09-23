@@ -35,6 +35,7 @@ export class AuthenticationService {
     console.log(payload);
 
     return {
+      id: user.id,
       token: await this.jwtService.signAsync(payload),
     };
   }
