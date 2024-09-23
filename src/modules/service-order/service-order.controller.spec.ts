@@ -108,15 +108,15 @@ describe('ServiceOrderController', () => {
           }
         ),
       ];
-
+  
       mockServiceOrderService.findAll.mockResolvedValue(result);
-
+  
       const response = await controller.findAllOrders();
-
+  
       expect(response.message).toEqual('Ordens de serviço encontradas');
       expect(response.orders).toEqual(result);
     });
-
+  
     it('should apply filters and return filtered service orders', async () => {
       const result = [
         new ListServiceOrderDto(
@@ -133,15 +133,25 @@ describe('ServiceOrderController', () => {
           }
         ),
       ];
-
+  
       mockServiceOrderService.findAll.mockResolvedValue(result);
-
+  
       const response = await controller.findAllOrders('order-123', 'Filtered Order', 'Client X', 'PENDENTE');
-
+  
       expect(response.orders).toEqual(result);
     });
+  
+    // Novo teste: quando não há ordens de serviço encontradas
+    it('should return a message when no service orders are found', async () => {
+      mockServiceOrderService.findAll.mockResolvedValue([]);
+  
+      const response = await controller.findAllOrders();
+  
+      expect(response.message).toEqual('Nenhuma ordem de serviço encontrada');
+      expect(response.orders).toEqual([]);
+    });
   });
-
+  
   describe('findOrdersBySector', () => {
     it('should return orders by sector', async () => {
       const sector = 'ADMINISTRATIVO';
@@ -169,13 +179,16 @@ describe('ServiceOrderController', () => {
       expect(response.orders).toEqual(result);
     });
   
-    it('should throw NotFoundException if no orders found', async () => {
+    // Novo teste: quando não há ordens de serviço para o setor
+    it('should return a message when no orders are found for the sector', async () => {
       const sector = 'INEXISTENTE';
   
       mockServiceOrderService.findAll.mockResolvedValue([]);
   
-      await expect(controller.findOrdersBySector(sector)).rejects.toThrow(NotFoundException);
-      await expect(controller.findOrdersBySector(sector)).rejects.toThrow('Nenhuma solicitação encontrada para o setor.');
+      const response = await controller.findOrdersBySector(sector);
+  
+      expect(response.message).toEqual(`Nenhuma ordem de serviço encontrada para o setor: ${sector}`);
+      expect(response.orders).toEqual([]);
     });
   });
   
