@@ -22,9 +22,6 @@ export class ServiceOrder {
 
     @Column({name: 'title', length: 50, nullable:false})
     title: string;
-  
-    @Column({name: 'clientRelated', length: 50, nullable:false})
-    clientRelated: string
 
     @ManyToOne(() => UserEntity, (user) => user.orders, {eager:true})
     user: UserEntity;

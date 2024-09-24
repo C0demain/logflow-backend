@@ -8,22 +8,25 @@ import { ListServiceOrderDto } from './dto/list-service-order.dto';
 import { UserService } from '../user/user.service';
 import { Status } from './enums/status.enum';
 import { Sector } from './enums/sector.enum';
+import { ClientService } from '../client/client.service';
 
 @Injectable()
 export class ServiceOrderService {
 
   constructor(
     @InjectRepository(ServiceOrder) private readonly serviceOrderRepository: Repository<ServiceOrder>,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly clientService: ClientService
   ){}
 
   async create(createServiceOrderDto: CreateServiceOrderDto) {
     const serviceDb = new ServiceOrder();
 
     const user = await this.userService.findById(createServiceOrderDto.userId);
+    const client = await this.clientService.findById(createServiceOrderDto.clientId)
 
     serviceDb.title = createServiceOrderDto.title;
-    serviceDb.clientRelated = createServiceOrderDto.clientRelated;
+    serviceDb.client = client;
     serviceDb.status = createServiceOrderDto.status;
     serviceDb.sector = createServiceOrderDto.sector;
     serviceDb.user = user;
@@ -32,7 +35,7 @@ export class ServiceOrderService {
     
   }
 
-  async findAll(filters: { id?: string ,title?: string, clientRelated?: string, status?: string, sector?: string }) {
+  async findAll(filters: { id?: string ,title?: string, status?: string, sector?: string }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<ServiceOrder> = {};
   
@@ -42,10 +45,6 @@ export class ServiceOrderService {
 
     if (filters.title) {
       where.title = filters.title;
-    }
-  
-    if (filters.clientRelated) {
-      where.clientRelated = filters.clientRelated;
     }
   
     if (filters.status) {
@@ -64,17 +63,22 @@ export class ServiceOrderService {
   
     const ordersList = orders.map((serviceOrder) => {
       const user = serviceOrder.user;
+      const client = serviceOrder.client;
       return new ListServiceOrderDto(
         serviceOrder.id,
         serviceOrder.title,
-        serviceOrder.clientRelated,
+        {
+          clientName: client.name,
+          clientEmail: client.email,
+          clientCnpj: client.cnpj
+        },
         serviceOrder.status,
         serviceOrder.sector,
         {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
+          userId: user.id,
+          userName: user.name,
+          userEmail: user.email,
+          userRole: user.role,
         } 
       );
     });

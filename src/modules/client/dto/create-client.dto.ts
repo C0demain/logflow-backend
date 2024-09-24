@@ -2,9 +2,6 @@ import { IsString, IsNotEmpty, IsEmail, IsUUID, Length } from "class-validator";
 
 export class CreateClientDto {
 
-    @IsUUID()
-    id: string;
-
     @IsString()
     @IsNotEmpty({ message: "O campo `name` não pode estar vazio" })
     @Length(1, 100, { message: "O campo `name` deve ter entre 1 e 100 caracteres" })
