@@ -16,7 +16,7 @@ export class Task {
     @Column({name: 'title', length: 50, nullable: false})
     title: string
 
-    @ManyToOne(() => ServiceOrder, serviceOrder => serviceOrder.tasks)
+    @ManyToOne(() => ServiceOrder, serviceOrder => serviceOrder.tasks, {eager:true})
     serviceOrder: ServiceOrder
 
     @ManyToOne(() => UserEntity, user => user.tasks, {eager:true})

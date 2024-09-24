@@ -3,8 +3,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from 'src/modules/task/entities/task.entity';
-import { Repository } from 'typeorm'
-import { NotFoundError } from 'rxjs';
+import { Repository, FindOptionsWhere } from 'typeorm'
 import { ServiceOrderService } from 'src/modules/service-order/service-order.service';
 import { UserService } from 'src/modules/user/user.service';
 import { GetTaskDto } from 'src/modules/task/dto/list-task.dto';
@@ -42,19 +41,39 @@ export class TaskService {
     return await this.taskRepository.save(taskDb)
   }
 
-  async findAll() {
-    const tasks = await this.taskRepository.find()
+  async findAll(filters: {title?: string, assignedUserId?: string, serviceOrderId?: string}) {
+    // Construir a consulta dinamicamente
+    const where: FindOptionsWhere<Task> = {}
 
+    if(filters.title){
+      where.title = filters.title
+    }
+
+    if(filters.assignedUserId){
+      where.assignedUser = {id: filters.assignedUserId}
+    }
+
+    if(filters.serviceOrderId){
+      where.serviceOrder = {id: filters.serviceOrderId}
+    }
+
+    
+    const tasks = await this.taskRepository.find({ where })
+    
     const taskList = tasks.map( task => {
-      const assignedUser = task.assignedUser
-      return new GetTaskDto(task.id, task.title, {
-        id: assignedUser.id,
-        name: assignedUser.name,
-        email: assignedUser.email
-      })
-    })
+      const serviceOrder = {
+        id: task.serviceOrder.id,
+        title: task.serviceOrder.title
+      }
 
-    console.log(tasks)
+      const assignedUser = {
+        id: task.assignedUser.id,
+        name: task.assignedUser.name,
+        email: task.assignedUser.email
+      }
+
+      return new GetTaskDto(task.id, task.title, serviceOrder, assignedUser)
+    })
 
     return taskList
     
@@ -67,7 +86,7 @@ export class TaskService {
       throw new NotFoundException(`Tarefa com id ${id} não encontrada`)
     }
 
-    return new GetTaskDto(id, task.title, task.assignedUser)
+    return new GetTaskDto(id, task.title, task.serviceOrder, task.assignedUser)
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {

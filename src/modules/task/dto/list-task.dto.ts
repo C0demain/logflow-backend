@@ -1,8 +1,10 @@
-import { UserEntity } from "src/modules/user/user.entity";
-
 export class GetTaskDto{
     readonly id: string
     readonly title: string
+    readonly serviceOrder: {
+        id: string,
+        title: string
+    }
     readonly assignedUser: {
         id: string,
         name: string,
@@ -12,6 +14,10 @@ export class GetTaskDto{
     constructor(
         id: string,
         title: string,
+        serviceOrder: {
+            id: string,
+            title: string
+        },
         assignedUser: {
             id: string,
             name: string,
@@ -21,6 +27,7 @@ export class GetTaskDto{
         this.id = id,
         this.title = title,
         this.assignedUser = assignedUser
+        this.serviceOrder = serviceOrder
     };
 
 }
