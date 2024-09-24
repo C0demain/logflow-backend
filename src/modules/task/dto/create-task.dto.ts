@@ -9,4 +9,8 @@ export class CreateTaskDto {
     @IsUUID()
     @IsNotEmpty()
     orderId: string
+
+    @IsUUID()
+    @IsNotEmpty()
+    userId: string
 }

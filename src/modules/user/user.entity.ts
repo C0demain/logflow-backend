@@ -13,6 +13,7 @@ import { ServiceOrder } from '../service-order/entities/service-order.entity';
 
 import { Role } from '../roles/enums/roles.enum';
 import { Sector } from '../service-order/enums/sector.enum';
+import { Task } from 'src/modules/task/entities/task.entity';
 @ApiTags('users')
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -31,12 +32,15 @@ export class UserEntity {
 
   @Column({ name: 'role', type: 'enum', enum: Role, default: Role.EMPLOYEE })
   role: Role;
+  
+  @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
+  sector: Sector;
 
   @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {eager: false})
   orders: ServiceOrder[];
 
-  @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
-  sector: Sector;
+  @OneToMany(() => Task, task => task.assignedUser)
+  tasks: Task[]
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
