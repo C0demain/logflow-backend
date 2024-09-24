@@ -2,9 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query, UseGuard
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { AuthenticationGuard } from 'src/modules/auth/authentication.guard';
 
 @Controller('/api/v1/task')
+@ApiBearerAuth()
+@UseGuards(AuthenticationGuard)
 @ApiTags('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
