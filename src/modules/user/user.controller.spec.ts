@@ -25,6 +25,7 @@ describe('UserController', () => {
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
     orders:[],
+    tasks: []
   };
 
   const createUserMock: CreateUserDTO = {

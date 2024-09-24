@@ -22,7 +22,8 @@ describe('ServiceOrderService', () => {
     updatedAt: '2024-01-01',
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
-    orders: []
+    orders: [],
+    tasks: []
   };
 
   const createUserMock: CreateUserDTO = {
