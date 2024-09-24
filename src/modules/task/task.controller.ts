@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query, UseGuards, NotFoundException } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -14,8 +14,12 @@ export class TaskController {
 
   @Post()
   @ApiOperation({summary: 'Criar tarefa'})
-  create(@Body() createTaskDto: CreateTaskDto) {
-    return this.taskService.create(createTaskDto);
+  async create(@Body() createTaskDto: CreateTaskDto) {
+    const task = await this.taskService.create(createTaskDto)
+    return {
+      message: 'Tarefa criada com sucesso',
+      task
+    }
   }
 
   @Get()
@@ -23,25 +27,42 @@ export class TaskController {
   @ApiQuery({name: 'title', required: false})
   @ApiQuery({name: 'assignedUserId', required: false})
   @ApiQuery({name: 'serviceOrderId', required: false})
-  findAll(@Query('title') title?: string, @Query('assignedUserId') assignedUserId?: string, @Query('serviceOrderId') serviceOrderId?: string) {
-    return this.taskService.findAll({ title, assignedUserId, serviceOrderId });
+  async findAll(@Query('title') title?: string, @Query('assignedUserId') assignedUserId?: string, @Query('serviceOrderId') serviceOrderId?: string) {
+    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId });
+    return {
+      message: 'Tarefas obtidas com sucesso',
+      tasks
+    }
   }
 
   @Get(':id')
   @ApiOperation({summary: 'Retornar uma tarefa de acordo com id'})
-  findById(@Param('id') id: string) {
-    return this.taskService.findById(id);
+  async findById(@Param('id') id: string) {
+    const task = await this.taskService.findById(id)
+    return {
+      message: 'Tarefa obtida com sucesso',
+      task
+    }
+      
   }
 
   @Put(':id')
   @ApiOperation({summary: 'Atualizar uma tarefa'})
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.taskService.update(id, updateTaskDto);
+  async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
+    const task = await this.taskService.update(id, updateTaskDto)
+    return {
+      message: 'Tarefa atualizada com sucesso',
+      task
+    }
   }
 
   @Delete(':id')
   @ApiOperation({summary: 'Deletar uma tarefa'})
-  remove(@Param('id') id: string) {
-    return this.taskService.remove(id);
+  async remove(@Param('id') id: string) {
+    const task = await this.taskService.remove(id)
+    return {
+      message: 'Tarefa excluída com sucesso',
+      task
+    }
   }
 }
