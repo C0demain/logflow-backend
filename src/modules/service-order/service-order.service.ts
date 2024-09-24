@@ -82,6 +82,17 @@ export class ServiceOrderService {
     return ordersList;
   }
 
+  async findById(id: string){
+    const orderFound = await this.serviceOrderRepository.findOne({
+      where:{id}
+    });
+
+    if(!orderFound){
+      throw new NotFoundException(`Ordem de serviço com id: ${id}, não encontrada`);
+    }
+
+    return orderFound
+  }
 
   async update(id: string, newOrderData: UpdateServiceOrderDto) {
     const orderFound = await this.serviceOrderRepository.findOne({

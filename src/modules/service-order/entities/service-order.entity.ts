@@ -4,10 +4,12 @@ import {
     CreateDateColumn,
     PrimaryGeneratedColumn,
     ManyToOne,
+    OneToMany
 } from "typeorm";
 import { Status } from "../enums/status.enum";
 import { UserEntity } from "src/modules/user/user.entity";
 import { Sector } from "../enums/sector.enum";
+import { Task } from "src/modules/task/entities/task.entity";
 
 @Entity({name: 'service-order'})
 export class ServiceOrder {
@@ -32,4 +34,7 @@ export class ServiceOrder {
 
     @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
     sector: Sector;
+
+    @OneToMany( () => Task, task => task.serviceOrder)
+    tasks: Task[]
 }
