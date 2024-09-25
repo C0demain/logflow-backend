@@ -8,7 +8,7 @@ import {
     JoinColumn,
 } from "typeorm";
 import { Status } from "../enums/status.enum";
-import { UserEntity } from "src/modules/user/user.entity";
+import { UserEntity } from "src/modules/user/entities/user.entity";
 import { Sector } from "../enums/sector.enum";
 import { ApiTags } from "@nestjs/swagger";
 import { Client } from "src/modules/client/entities/client.entity";

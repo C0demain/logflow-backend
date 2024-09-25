@@ -7,18 +7,13 @@ import {
   Delete,
   Put,
   Query,
-  NotFoundException,
-  InternalServerErrorException,
   UseGuards
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import { ListClientDto } from './dto/list-client.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../auth/authentication.guard';
-import { Roles } from '../roles/roles.decorator';
-import { Role } from '../roles/enums/roles.enum';
 
 @ApiTags('client')
 @UseGuards(AuthenticationGuard)

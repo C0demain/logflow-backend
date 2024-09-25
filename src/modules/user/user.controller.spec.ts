@@ -2,17 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { UserEntity } from './user.entity';
+import { UserEntity } from './entities/user.entity';
 import { CreateUserDTO } from './dto/CreateUser.dto';
 import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { Role } from '../roles/enums/roles.enum';
 import { Sector } from '../service-order/enums/sector.enum';
+import { AuthenticationGuard } from '../auth/authentication.guard';
 
 describe('UserController', () => {
   let controller: UserController;
-  let userService: UserService;
   const hashPasswordPipe = new HashPasswordPipe();
 
   const userMock: UserEntity = {
@@ -20,8 +19,6 @@ describe('UserController', () => {
     name: 'test-username',
     email: 'testuser@gmail.com',
     password: '123456',
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01',
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
     orders:[],
@@ -48,11 +45,6 @@ describe('UserController', () => {
       deleteUser: jest.fn().mockResolvedValue(userMock),
     };
 
-    const jwtServiceMock = {
-      sign: jest.fn().mockReturnValue('jwt-token'),
-      verify: jest.fn().mockReturnValue({}),
-    };
-
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [
@@ -70,16 +62,14 @@ describe('UserController', () => {
           provide: UserService,
           useValue: userServiceMock,
         },
-        {
-          provide: JwtService,
-          useValue: jwtServiceMock,
-        },
         ConfigService,
       ],
-    }).compile();
+    })
+    .overrideGuard(AuthenticationGuard)
+    .useValue({ canActivate: jest.fn(() => true) })
+    .compile();
 
     controller = module.get<UserController>(UserController);
-    userService = module.get<UserService>(UserService);
   });
 
   it('should be defined', () => {
