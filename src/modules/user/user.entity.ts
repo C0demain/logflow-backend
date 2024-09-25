@@ -32,15 +32,20 @@ export class UserEntity {
 
   @Column({ name: 'role', type: 'enum', enum: Role, default: Role.EMPLOYEE })
   role: Role;
-  
-  @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
+
+  @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false })
   sector: Sector;
 
-  @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {eager: false})
+  @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {
+    eager: false,
+  })
   orders: ServiceOrder[];
 
-  @OneToMany(() => Task, task => task.assignedUser)
-  tasks: Task[]
+  @OneToMany(() => Task, (task) => task.assignedUser)
+  tasks: Task[];
+
+  @Column({ name: 'isActive', default: true, nullable: false })
+  isActive: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
