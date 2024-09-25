@@ -26,8 +26,9 @@ describe('Normal user request', () => {
     updatedAt: '2024-01-01',
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
-    orders:[],
-    tasks: []
+    orders: [],
+    tasks: [],
+    isActive: true,
   };
 
   const mockUsersService = {
