@@ -5,7 +5,7 @@ on:
       - sprint-*
 jobs:
     tests:
-      uses: ./.github/workflows/unit-test.yml
+      uses: https://github.com/C0demain/logflow-backend/blob/dev/.github/workflows/unit-tests.yml
     build:
       name: push docker image to docker hub
       needs: [tests]
