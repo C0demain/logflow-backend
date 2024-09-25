@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateUserDTO } from 'src/modules/user/dto/CreateUser.dto';
 import { UpdateUserDTO } from 'src/modules/user/dto/UpdateUser.dto';
-import { UserEntity } from 'src/modules/user/user.entity';
+import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
 import { Repository } from 'typeorm';
 import { Role } from '../roles/enums/roles.enum';

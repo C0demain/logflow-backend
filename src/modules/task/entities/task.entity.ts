@@ -1,5 +1,5 @@
 import { ServiceOrder } from "src/modules/service-order/entities/service-order.entity";
-import { UserEntity } from "src/modules/user/user.entity";
+import { UserEntity } from "src/modules/user/entities/user.entity";
 import {
     Entity,
     Column,
