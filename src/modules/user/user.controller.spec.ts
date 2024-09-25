@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { UserEntity } from './entities/user.entity'
+import { UserEntity } from './entities/user.entity';
 import { CreateUserDTO } from './dto/CreateUser.dto';
 import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { ConfigService } from '@nestjs/config';

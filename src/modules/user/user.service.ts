@@ -21,12 +21,18 @@ export class UserService {
     userEntity.role = createUserDTO.role;
     userEntity.sector = createUserDTO.sector;
     userEntity.password = createUserDTO.password;
+    userEntity.isActive = createUserDTO.isActive;
 
     return this.userRepository.save(userEntity);
   }
 
-  async listUsers() {
-    const usersSaved = await this.userRepository.find();
+  async listUsers(isActive?: boolean) {
+    console.log(isActive);
+
+    const usersSaved =
+      isActive === undefined
+        ? await this.userRepository.find()
+        : await this.userRepository.find({ where: { isActive: isActive } });
     const usersList = usersSaved.map(
       (user) => new ListUsersDTO(user.id, user.name, user.role, user.isActive),
     );
@@ -73,8 +79,8 @@ export class UserService {
       throw new NotFoundException('O usuário não foi encontrado');
     }
 
-    await this.userRepository.update({ id }, { isActive: false });
+    user.isActive = false;
 
-    return user;
+    return await this.userRepository.save(user);
   }
 }

@@ -117,17 +117,14 @@ describe('ServiceOrderService', () => {
   });
 
   it('should delete user', async () => {
-    repository.update = jest.fn().mockResolvedValue(userMock);
+    repository.save = jest.fn().mockResolvedValue(userMock);
     repository.findOneBy = jest.fn().mockResolvedValue(userMock);
 
     const oldUser = await service.deleteUser(userMock.id);
 
     expect(oldUser).toEqual(userMock);
     expect(repository.findOneBy).toHaveBeenCalledWith({ id: userMock.id });
-    expect(repository.update).toHaveBeenCalledWith(
-      { id: userMock.id },
-      { isActive: false },
-    );
+    expect(repository.save).toHaveBeenCalledWith(userMock);
   });
 
   it('should throw NotFoundException when user is not found in findByEmail', async () => {

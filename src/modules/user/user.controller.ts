@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ListUsersDTO } from './dto/ListUser.dto';
@@ -61,8 +62,8 @@ export class UserController {
     summary: 'Listar todos os usuários',
     description: 'Rota acessível apenas para administradores',
   })
-  async listUsers() {
-    const usersSaved = await this.userService.listUsers();
+  async listUsers(@Query('active') activeUsers?: boolean) {
+    const usersSaved = await this.userService.listUsers(activeUsers);
 
     return {
       message: 'Usuários obtidos com sucesso.',
