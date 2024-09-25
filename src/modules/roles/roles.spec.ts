@@ -6,7 +6,7 @@ import { UserPayload } from '../auth/authentication.service';
 import { Role } from './enums/roles.enum';
 import { UserController } from '../user/user.controller';
 import { UserService } from '../user/user.service';
-import { UserEntity } from '../user/user.entity';
+import { UserEntity } from '../user/entities/user.entity';
 import { Sector } from '../service-order/enums/sector.enum';
 
 describe('Normal user request', () => {

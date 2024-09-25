@@ -7,7 +7,7 @@ import {
     OneToMany
 } from "typeorm";
 import { Status } from "../enums/status.enum";
-import { UserEntity } from "src/modules/user/user.entity";
+import { UserEntity } from "src/modules/user/entities/user.entity";
 import { Sector } from "../enums/sector.enum";
 import { Task } from "src/modules/task/entities/task.entity";
 
