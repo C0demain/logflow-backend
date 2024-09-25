@@ -26,13 +26,15 @@ export class AuthenticationService {
       throw new UnauthorizedException('The email or password is incorrect.');
     }
 
+    if (user.isActive === false) {
+      throw new UnauthorizedException('The user must be active.');
+    }
+
     const payload: UserPayload = {
       sub: user.id,
       username: user.name,
-      roles: user.role, //TODO: Relacionar com o banco
+      roles: user.role,
     };
-
-    console.log(payload);
 
     return {
       id: user.id,
