@@ -3,11 +3,13 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../roles/enums/roles.enum';
 import { UserService } from '../user/user.service';
+import { Sector } from '../service-order/enums/sector.enum';
 
 export interface UserPayload {
   sub: string;
   username: string;
   roles: Role;
+  sector: Sector;
 }
 
 @Injectable()
@@ -34,11 +36,13 @@ export class AuthenticationService {
       sub: user.id,
       username: user.name,
       roles: user.role,
+      sector: user.sector
     };
 
     return {
       id: user.id,
       token: await this.jwtService.signAsync(payload),
+      sector: user.sector
     };
   }
 }
