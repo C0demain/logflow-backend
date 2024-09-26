@@ -3,23 +3,23 @@ import { Column } from "typeorm";
 export class Address {
 
     @Column({length: 8})
-    cep: string;
+    zipCode: string;
     
     @Column({ length: 100 })
-    estado: string;
+    state: string;
 
     @Column({ length: 100 })
-    cidade: string;
+    city: string;
 
     @Column({ length: 100 })
-    bairro: string;
+    neighborhood: string;
 
     @Column({ length: 150 })
-    rua: string;
+    street: string;
 
     @Column()
-    numero: string;
+    number: string;
 
     @Column({ nullable: true, default: "sem complemento"})
-    complemento?: string; 
+    complement?: string; 
 }

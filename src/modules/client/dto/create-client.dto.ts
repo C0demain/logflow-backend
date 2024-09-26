@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsEmail, IsUUID, Length } from "class-validator";
+import { UniqueEmail } from "src/modules/user/validation/UniqueEmail.validation";
 
 export class CreateClientDto {
 
@@ -8,9 +9,9 @@ export class CreateClientDto {
     name: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo `telefone` não pode estar vazio" })
-    @Length(10, 12, { message: "O campo `telefone` deve ter entre 10 e 12 caracteres" })
-    telefone: string;
+    @IsNotEmpty({ message: "O campo `phone` não pode estar vazio" })
+    @Length(10, 12, { message: "O campo `phone` deve ter entre 10 e 12 caracteres" })
+    phone: string;
 
     @IsString()
     @IsNotEmpty({ message: "O campo `cnpj` não pode estar vazio" })
@@ -20,32 +21,33 @@ export class CreateClientDto {
     @IsEmail({}, { message: "O campo `email` deve ser um e-mail válido" })
     @IsNotEmpty({ message: "O campo `email` não pode estar vazio" })
     @Length(1, 40, { message: "O campo `email` deve ter até 40 caracteres" })
+    @UniqueEmail({ message: 'Já existe um usuário ou um cliente com este email.' })
     email: string;
 
     @IsString()
-    @IsNotEmpty({message: 'o campo `cep` não pode estar vazio'})
-    cep: string;
+    @IsNotEmpty({message: 'o campo `zipCode` não pode estar vazio'})
+    zipCode: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo `estado` não pode estar vazio" })
-    estado: string;
+    @IsNotEmpty({ message: "O campo `state` não pode estar vazio" })
+    state: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo `cidade` não pode estar vazio" })
-    cidade: string;
+    @IsNotEmpty({ message: "O campo `city` não pode estar vazio" })
+    city: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo `bairro` não pode estar vazio" })
-    bairro: string;
+    @IsNotEmpty({ message: "O campo `neighborhood` não pode estar vazio" })
+    neighborhood: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo `rua` não pode estar vazio" })
-    rua: string;
+    @IsNotEmpty({ message: "O campo `street` não pode estar vazio" })
+    street: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo `numero` não pode estar vazio" })
-    numero: string;
+    @IsNotEmpty({ message: "O campo `number` não pode estar vazio" })
+    number: string;
 
     @IsString()
-    complemento?: string;
+    complement?: string;
 }
