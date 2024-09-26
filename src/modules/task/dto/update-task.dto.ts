@@ -5,6 +5,7 @@ export class UpdateTaskDto {
     @IsNotEmpty()
     title: string
 
+    @IsOptional()
     @IsNotEmpty()
     @IsUUID()
     userId: string
