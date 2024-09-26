@@ -1,3 +1,5 @@
+import { Task } from "src/modules/task/entities/task.entity"
+
 export class GetTaskDto{
     readonly id: string
     readonly title: string
@@ -32,5 +34,21 @@ export class GetTaskDto{
         this.assignedUser = assignedUser
         this.serviceOrder = serviceOrder
     };
+
+}
+
+export function parseToGetTaskDTO(task: Task): GetTaskDto{
+    const serviceOrder = {
+        id: task.serviceOrder.id,
+        title: task.serviceOrder.title
+      }
+
+    const assignedUser = {
+        id: task.assignedUser.id,
+        name: task.assignedUser.name,
+        email: task.assignedUser.email
+    }
+
+    return new GetTaskDto(task.id, task.title, task.completed, serviceOrder, assignedUser)
 
 }

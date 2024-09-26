@@ -6,7 +6,7 @@ import { Task } from 'src/modules/task/entities/task.entity';
 import { Repository, FindOptionsWhere } from 'typeorm'
 import { ServiceOrderService } from 'src/modules/service-order/service-order.service';
 import { UserService } from 'src/modules/user/user.service';
-import { GetTaskDto } from 'src/modules/task/dto/list-task.dto';
+import { GetTaskDto, parseToGetTaskDTO } from 'src/modules/task/dto/list-task.dto';
 
 @Injectable()
 export class TaskService {
@@ -61,18 +61,8 @@ export class TaskService {
     const tasks = await this.taskRepository.find({ where })
     
     const taskList = tasks.map( task => {
-      const serviceOrder = {
-        id: task.serviceOrder.id,
-        title: task.serviceOrder.title
-      }
-
-      const assignedUser = {
-        id: task.assignedUser.id,
-        name: task.assignedUser.name,
-        email: task.assignedUser.email
-      }
-
-      return new GetTaskDto(task.id, task.title, task.completed,serviceOrder, assignedUser)
+      const parsedTask = parseToGetTaskDTO(task)
+      return parsedTask
     })
 
     return taskList
@@ -86,7 +76,8 @@ export class TaskService {
       throw new NotFoundException(`Tarefa com id ${id} não encontrada`)
     }
 
-    return new GetTaskDto(id, task.title, task.completed, task.serviceOrder, task.assignedUser)
+    const parsedTask = parseToGetTaskDTO(task)
+    return parsedTask
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {
@@ -103,7 +94,10 @@ export class TaskService {
     task.title = updateTaskDto.title
     task.assignedUser = user
 
-    return await this.taskRepository.save(task)
+    const updatedTask = await this.taskRepository.save(task)
+    const parsedTask = parseToGetTaskDTO(updatedTask)
+
+    return parsedTask
   }
 
   async remove(id: string) {
@@ -114,7 +108,7 @@ export class TaskService {
     }
 
     await this.taskRepository.delete(id)
-
-    return task
+    const parsedTask = parseToGetTaskDTO(task)
+    return parsedTask
   }
 }
