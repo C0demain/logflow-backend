@@ -2,17 +2,17 @@ export class ListClientDto {
     constructor(
         readonly id: string,
         readonly name: string,
-        readonly telefone: string,
+        readonly phone: string,
         readonly cnpj: string,
         readonly email: string,
         readonly address: {
-            cep: string,
-            estado: string,
-            cidade: string,
-            bairro: string,
-            rua: string,
-            numero: string,
-            complemento?: string,  // Opcional
+            zipCode: string,
+            state: string,
+            city: string,
+            neighborhood: string,
+            street: string,
+            number: string,
+            complement?: string,  // Opcional
         }
     ) {};
 }

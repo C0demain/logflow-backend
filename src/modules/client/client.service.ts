@@ -16,19 +16,19 @@ export class ClientService {
     const clientCreated = new Client();
 
     clientCreated.address  = {
-      cep: createClientDto.cep,
-      estado: createClientDto.estado,
-      cidade: createClientDto.cidade,
-      bairro: createClientDto.bairro,
-      rua: createClientDto.rua,
-      numero: createClientDto.numero,
-      complemento: createClientDto.complemento
+      zipCode: createClientDto.zipCode,
+      state: createClientDto.state,
+      city: createClientDto.city,
+      neighborhood: createClientDto.neighborhood,
+      street: createClientDto.street,
+      number: createClientDto.number,
+      complement: createClientDto.complement
     };
 
     clientCreated.cnpj = createClientDto.cnpj;
     clientCreated.email = createClientDto.email;
     clientCreated.name = createClientDto.name;
-    clientCreated.telefone = createClientDto.telefone;
+    clientCreated.phone = createClientDto.phone;
 
     return await this.clientRepository.save(clientCreated);
   }
@@ -65,17 +65,17 @@ export class ClientService {
         return new ListClientDto(
           client.id,
           client.name,
-          client.telefone,
-          client.telefone,
+          client.phone,
+          client.cnpj,
           client.email,
           {
-            cep: client.address.cep,
-            estado: client.address.estado,
-            cidade: client.address.cidade,
-            bairro: client.address.bairro,
-            rua: client.address.rua,
-            numero: client.address.numero,
-            complemento: client.address.complemento
+            zipCode: client.address.zipCode,
+            state: client.address.state,
+            city: client.address.city,
+            neighborhood: client.address.neighborhood,
+            street: client.address.street,
+            number: client.address.number,
+            complement: client.address.complement
           }
 
         )
@@ -110,7 +110,7 @@ export class ClientService {
       client: {
         id: updatedClient.id,
         name: updatedClient.name,
-        telefone: updatedClient.telefone,
+        phone: updatedClient.phone,
         cnpj: updatedClient.cnpj,
         email: updatedClient.email,
         address: updatedClient.address,

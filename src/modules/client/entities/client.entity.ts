@@ -20,7 +20,7 @@ export class Client {
     name: string;
 
     @Column({ name: 'telefone', length: 12, nullable: false })
-    telefone: string;
+    phone: string;
 
     @Column({ name: 'cnpj', length: 15, nullable: false })
     cnpj: string;
