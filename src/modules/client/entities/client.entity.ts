@@ -3,7 +3,7 @@ import {
     Entity,
     Column,
     PrimaryGeneratedColumn,
-    OneToOne,
+    OneToMany,
 } from "typeorm";
 
 import { Address } from "./address.entity";
@@ -28,7 +28,7 @@ export class Client {
     @Column({ name: 'email', length: 40, nullable: false })
     email: string;
 
-    @OneToOne(() => ServiceOrder, (serviceOrder) => serviceOrder.client)
+    @OneToMany(() => ServiceOrder, (serviceOrder: { client: any; }) => serviceOrder.client)
     serviceOrder: ServiceOrder;
     
     @Column(() => Address)

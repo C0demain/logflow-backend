@@ -29,7 +29,7 @@ export class ServiceOrder {
     @ManyToOne(() => UserEntity, (user) => user.orders, {eager:true})
     user: UserEntity;
 
-    @OneToOne(() => Client, { eager: true })
+    @ManyToOne(() => Client, { eager: true })
     @JoinColumn() 
     client: Client;
     
