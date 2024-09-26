@@ -12,10 +12,11 @@ import {
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../auth/authentication.guard';
 
 @ApiTags('client')
+@ApiBearerAuth()
 @UseGuards(AuthenticationGuard)
 @Controller('/api/v1/client')
 export class ClientController {
