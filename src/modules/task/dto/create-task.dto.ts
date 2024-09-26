@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class CreateTaskDto {
 
@@ -10,7 +10,7 @@ export class CreateTaskDto {
     @IsNotEmpty()
     orderId: string
 
+    @IsOptional()
     @IsUUID()
-    @IsNotEmpty()
     userId: string
 }

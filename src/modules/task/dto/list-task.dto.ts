@@ -1,6 +1,7 @@
 export class GetTaskDto{
     readonly id: string
     readonly title: string
+    readonly completed: boolean
     readonly serviceOrder: {
         id: string,
         title: string
@@ -14,6 +15,7 @@ export class GetTaskDto{
     constructor(
         id: string,
         title: string,
+        completed: boolean,
         serviceOrder: {
             id: string,
             title: string
@@ -26,6 +28,7 @@ export class GetTaskDto{
     ){
         this.id = id,
         this.title = title,
+        this.completed = completed
         this.assignedUser = assignedUser
         this.serviceOrder = serviceOrder
     };

@@ -16,6 +16,9 @@ export class Task {
     @Column({name: 'title', length: 50, nullable: false})
     title: string
 
+    @Column({default: false})
+    completed: boolean
+
     @ManyToOne(() => ServiceOrder, serviceOrder => serviceOrder.tasks, {eager:true})
     serviceOrder: ServiceOrder
 

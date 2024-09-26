@@ -105,6 +105,7 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -123,6 +124,7 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -141,6 +143,7 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -159,6 +162,7 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -178,6 +182,7 @@ describe('TaskService', () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -202,6 +207,7 @@ describe('TaskService', () => {
       const expectedResult = {
           id: 'task1',
           title: 'Task2',
+          completed: false,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -209,7 +215,7 @@ describe('TaskService', () => {
       mockRepository.findOneBy.mockResolvedValue({...expectedResult, ...{title: 'Task1'} })
       mockRepository.save.mockResolvedValue(expectedResult)
 
-      const task = await service.update('task1', {title: 'Task2', userId: 'user1'})
+      const task = await service.update('task1', {title: 'Task2', completed: false, userId: 'user1'})
 
       expect(task).toEqual(expectedResult)
     })
@@ -218,7 +224,7 @@ describe('TaskService', () => {
       
       mockRepository.findOneBy.mockResolvedValue(null)
 
-      expect(service.update('task1', {title: 'Task2', userId: 'user1'})).rejects.toBeInstanceOf(NotFoundException)
+      expect(service.update('task1', {title: 'Task2', completed: false, userId: 'user1'})).rejects.toBeInstanceOf(NotFoundException)
     })
   })
 
@@ -227,6 +233,7 @@ describe('TaskService', () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }

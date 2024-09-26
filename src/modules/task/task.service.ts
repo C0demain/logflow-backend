@@ -72,7 +72,7 @@ export class TaskService {
         email: task.assignedUser.email
       }
 
-      return new GetTaskDto(task.id, task.title, serviceOrder, assignedUser)
+      return new GetTaskDto(task.id, task.title, task.completed,serviceOrder, assignedUser)
     })
 
     return taskList
@@ -86,7 +86,7 @@ export class TaskService {
       throw new NotFoundException(`Tarefa com id ${id} não encontrada`)
     }
 
-    return new GetTaskDto(id, task.title, task.serviceOrder, task.assignedUser)
+    return new GetTaskDto(id, task.title, task.completed, task.serviceOrder, task.assignedUser)
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {

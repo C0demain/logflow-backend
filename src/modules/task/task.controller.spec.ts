@@ -67,6 +67,7 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
         id: 'task1',
         title: 'Task1',
+        completed: false,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser
       }
@@ -86,6 +87,7 @@ describe('TaskController', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -104,6 +106,7 @@ describe('TaskController', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -122,6 +125,7 @@ describe('TaskController', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -140,6 +144,7 @@ describe('TaskController', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -159,6 +164,7 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -178,17 +184,18 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
       }
 
       mockTaskService.update.mockResolvedValue(expectedResult)
 
-      const response = await controller.update('task1', {title: 'Task1', userId: mockedUser.id})
+      const response = await controller.update('task1', {title: 'Task1', completed: false, userId: mockedUser.id})
 
       expect(response.message).toEqual('Tarefa atualizada com sucesso')
       expect(response.task).toEqual(expectedResult)
-      expect(mockTaskService.update).toHaveBeenCalledWith('task1', {title: 'Task1', userId: mockedUser.id})
+      expect(mockTaskService.update).toHaveBeenCalledWith('task1', {title: 'Task1', completed: false,userId: mockedUser.id})
     })
   })
 
@@ -197,6 +204,7 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
+          completed: false,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
