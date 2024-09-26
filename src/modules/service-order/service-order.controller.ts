@@ -30,11 +30,11 @@ export class ServiceOrderController {
   @Post()
   @ApiOperation({ summary:'Criar ordem de serviço' })
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    const { title, clientRelated, status, sector, userId } = createServiceOrderDto;
+    const { title, clientId, status, sector, userId } = createServiceOrderDto;
 
     const orderCreated = await this.serviceOrderService.create({
       title: title,
-      clientRelated: clientRelated,
+      clientId: clientId,
       status: status,
       sector: sector,
       userId: userId
@@ -45,14 +45,18 @@ export class ServiceOrderController {
       serviceOrder: new ListServiceOrderDto(
         orderCreated.id,
         orderCreated.title,
-        orderCreated.clientRelated,
+        {
+          clientName: orderCreated.client.name,
+          clientEmail: orderCreated.client.email,
+          clientCnpj: orderCreated.client.cnpj
+        },
         orderCreated.status,
         orderCreated.sector,
         {
-          id: orderCreated.user.id,
-          name: orderCreated.user.name,
-          email: orderCreated.user.email,
-          role: orderCreated.user.role,
+          userId: orderCreated.user.id,
+          userName: orderCreated.user.name,
+          userEmail: orderCreated.user.email,
+          userRole: orderCreated.user.role,
         }
       )
     };
@@ -61,13 +65,15 @@ export class ServiceOrderController {
   @Get()
   @Roles(Role.MANAGER)
   @ApiOperation({ summary:'Listar todos as ordens de serviço', description: 'Rota acessível apenas para administradores' })
+  async findAllOrders(@Query('id') id?: string, @Query('title') title?: string, @Query('status') status?: string) {
   @ApiQuery({name: "id", required: false, type: String})
   @ApiQuery({name: "title", required: false, type: String})
   @ApiQuery({name: "clientRelated", required: false, type: String})
   @ApiQuery({name: "status", required: false, type: String})
   async findAllOrders(@Query('id') id?: string, @Query('title') title?: string, @Query('clientRelated') clientRelated?: string, @Query('status') status?: string) {
     
-    const orders = await this.serviceOrderService.findAll({ id, title, clientRelated, status });
+    try{
+      const orders = await this.serviceOrderService.findAll({ id, title, status });
 
     if (!orders || orders.length === 0) {
       return {
@@ -80,27 +86,40 @@ export class ServiceOrderController {
       message: "Ordens de serviço encontradas",
       orders: orders,
     };
+    }catch(error){
+      return {
+        message: "Nenhuma ordem de serviço encontrada",
+        orders: []
+      }
+    }
   }
 
   @Get('/:sector')
   @ApiOperation({ summary:'Listar ordens de serviço por setor' })
   async findOrdersBySector(@Param('sector') sector: string) {
 
-    const ordersBySector = await this.serviceOrderService.findAll({
+    try{
+      const ordersBySector = await this.serviceOrderService.findAll({
       sector: sector
-    })
+      })
 
-    if (!ordersBySector || ordersBySector.length === 0) {
-      return {
-        message: `Nenhuma ordem de serviço encontrada para o setor: ${sector}`,
-        orders: ordersBySector,
+      if (!ordersBySector || ordersBySector.length === 0) {
+        return {
+          message: `Nenhuma ordem de serviço encontrada para o setor: ${sector}`,
+          orders: ordersBySector,
+        }
       }
-    }
 
+      return {
+        message: `Ordens de serviço do setor ${sector} encontradas`,
+        orders: ordersBySector,
+      };
+    }catch(error){
     return {
-      message: `Ordens de serviço do setor ${sector} encontradas`,
-      orders: ordersBySector,
-    };
+      message: "Nenhuma ordem de serviço encontrada",
+      orders: []
+    }
+    }
   }
 
   @Put(':id')

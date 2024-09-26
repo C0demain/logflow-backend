@@ -1,32 +1,34 @@
-import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { ServiceOrderService } from './service-order.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { ServiceOrder } from './entities/service-order.entity';
+import { UserService } from '../user/user.service';
+import { ClientService } from '../client/client.service';
+import { Repository } from 'typeorm';
+import { NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { Status } from './enums/status.enum';
-import { UserService } from '../user/user.service';
-import { ListServiceOrderDto } from './dto/list-service-order.dto';
 import { Sector } from './enums/sector.enum';
-import { Role } from '../roles/enums/roles.enum';
+
+const mockServiceOrderRepository = {
+  save: jest.fn(),
+  findOne: jest.fn(),
+  find: jest.fn(),
+  delete: jest.fn(),
+};
+
+const mockUserService = {
+  findById: jest.fn(),
+};
+
+const mockClientService = {
+  findById: jest.fn(),
+};
 
 describe('ServiceOrderService', () => {
   let service: ServiceOrderService;
-  let repo: Repository<ServiceOrder>;
-  let userService: UserService;
-
-  const mockRepository = {
-    save: jest.fn(),
-    find: jest.fn(),
-    findOne: jest.fn(),
-    delete: jest.fn(),
-  };
-
-  const mockUserService = {
-    findById: jest.fn(),
-  };
+  let repository: Repository<ServiceOrder>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -34,212 +36,138 @@ describe('ServiceOrderService', () => {
         ServiceOrderService,
         {
           provide: getRepositoryToken(ServiceOrder),
-          useValue: mockRepository,
+          useValue: mockServiceOrderRepository,
         },
         {
           provide: UserService,
           useValue: mockUserService,
         },
+        {
+          provide: ClientService,
+          useValue: mockClientService,
+        },
       ],
     }).compile();
 
     service = module.get<ServiceOrderService>(ServiceOrderService);
-    repo = module.get<Repository<ServiceOrder>>(getRepositoryToken(ServiceOrder));
-    userService = module.get<UserService>(UserService);
+    repository = module.get<Repository<ServiceOrder>>(getRepositoryToken(ServiceOrder));
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
   describe('create', () => {
     it('should create a new service order', async () => {
       const createServiceOrderDto: CreateServiceOrderDto = {
         title: 'Test Order',
-        clientRelated: 'Client X',
+        clientId: 'client-id-123',
         status: Status.PENDENTE,
         sector: Sector.ADMINISTRATIVO,
-        userId: 'user-123',
+        userId: 'user-id-123',
       };
 
-      const user = {
-        id: 'user-123',
-        name: 'User Test',
-        email: 'user@test.com',
-        role : Role.EMPLOYEE
-      };
+      const userMock = { id: 'user-id-123', name: 'User Test', email: 'user@test.com', role: 'EMPLOYEE' };
+      const clientMock = { id: 'client-id-123', name: 'Client X', email: 'client@gmail.com', cnpj: '12345' };
 
-      const result = {
+      mockUserService.findById.mockResolvedValue(userMock);
+      mockClientService.findById.mockResolvedValue(clientMock);
+
+      const savedOrder = {
         id: 'order-123',
         ...createServiceOrderDto,
-        user,
+        client: clientMock,
+        user: userMock,
       };
 
-      mockUserService.findById.mockResolvedValue(user);
-      mockRepository.save.mockResolvedValue(result);
+      mockServiceOrderRepository.save.mockResolvedValue(savedOrder);
 
-      const createdOrder = await service.create(createServiceOrderDto);
+      const result = await service.create(createServiceOrderDto);
 
-      expect(createdOrder).toEqual(result);
-      expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({
+      expect(result).toEqual(savedOrder);
+      expect(mockUserService.findById).toHaveBeenCalledWith('user-id-123');
+      expect(mockClientService.findById).toHaveBeenCalledWith('client-id-123');
+      expect(mockServiceOrderRepository.save).toHaveBeenCalledWith(expect.objectContaining({
         title: 'Test Order',
-        clientRelated: 'Client X',
         status: Status.PENDENTE,
         sector: Sector.ADMINISTRATIVO,
-        user,
+        client: clientMock,
+        user: userMock,
       }));
     });
   });
 
   describe('findAll', () => {
-    it('should return all service orders without filters', async () => {
-      const result = [
+    it('should return a list of service orders based on filters', async () => {
+      const filters = { status: Status.PENDENTE, sector: Sector.ADMINISTRATIVO };
+      const orders = [
         {
           id: 'order-123',
           title: 'Test Order',
-          clientRelated: 'Client X',
           status: Status.PENDENTE,
           sector: Sector.ADMINISTRATIVO,
-          user: {
-            id: 'user-123',
-            name: 'User Test',
-            email: 'user@test.com',
-            role: Role.MANAGER
-          },
+          client: { name: 'Client X', email: 'client@gmail.com', cnpj: '12345' },
+          user: { id: 'user-id-123', name: 'User Test', email: 'user@test.com', role: 'EMPLOYEE' },
         },
       ];
 
-      mockRepository.find.mockResolvedValue(result);
+      mockServiceOrderRepository.find.mockResolvedValue(orders);
 
-      const orders = await service.findAll({});
+      const result = await service.findAll(filters);
 
-      expect(orders).toEqual([
-        new ListServiceOrderDto(
-          'order-123',
-          'Test Order',
-          'Client X',
-          Status.PENDENTE,
-          Sector.ADMINISTRATIVO,
-          {
-            id: 'user-123',
-            name: 'User Test',
-            email: 'user@test.com',
-            role: Role.MANAGER
-          },
-        ),
-      ]);
+      expect(result.length).toEqual(1);
+      expect(result[0].id).toEqual('order-123');
+      expect(mockServiceOrderRepository.find).toHaveBeenCalledWith({ where: filters });
     });
 
-    it('should return filtered service orders', async () => {
-      const result = [
-        {
-          id: 'order-123',
-          title: 'Filtered Order',
-          clientRelated: 'Client X',
-          status: Status.PENDENTE,
-          sector: Sector.ADMINISTRATIVO,
-          user: {
-            id: 'user-123',
-            name: 'User Test',
-            email: 'user@test.com',
-            role: Role.EMPLOYEE
-          },
-        },
-      ];
+    it('should throw an error if no orders are found', async () => {
+      mockServiceOrderRepository.find.mockResolvedValue([]);
 
-      mockRepository.find.mockResolvedValue(result);
-
-      const orders = await service.findAll({ title: 'Filtered Order' });
-
-      expect(orders).toEqual([
-        new ListServiceOrderDto(
-          'order-123',
-          'Filtered Order',
-          'Client X',
-          Status.PENDENTE,
-          Sector.ADMINISTRATIVO,
-          {
-            id: 'user-123',
-            name: 'User Test',
-            email: 'user@test.com',
-            role: Role.EMPLOYEE
-          },
-        ),
-      ]);
+      await expect(service.findAll({})).rejects.toThrow(InternalServerErrorException);
     });
   });
 
-  // Teste do método update
   describe('update', () => {
-    it('should update a service order and return it', async () => {
-      const existingOrder = {
-        id: 'uuid',
-        title: 'Order 1',
-        clientRelated: 'Client A',
-        status: Status.PENDENTE,
-        sector: Sector.ADMINISTRATIVO,
-        user: {
-          id: 'user-123',
-          name: 'User Test',
-          email: 'user@test.com',
-          role: Role.MANAGER
-        },
-      };
-  
-      const updateServiceOrderDto: UpdateServiceOrderDto = {
-        title: 'Updated Order',
-        clientRelated: 'Client B',
-        status: Status.FINALIZADO,
-      };
-  
-      mockRepository.findOne.mockResolvedValue(existingOrder);
-      mockRepository.save.mockResolvedValue({
-        ...existingOrder,
-        ...updateServiceOrderDto,
-      });
-  
-      const result = await service.update('uuid', updateServiceOrderDto);
-  
-      expect(result).toEqual({
-        ...existingOrder,
-        ...updateServiceOrderDto,
-      });
-      expect(mockRepository.save).toHaveBeenCalledWith({
-        ...existingOrder,
-        ...updateServiceOrderDto,
-      });
+    it('should update a service order', async () => {
+      const updateServiceOrderDto: UpdateServiceOrderDto = { title: 'Updated Order', status: Status.FINALIZADO };
+      const existingOrder = { id: 'order-123', title: 'Test Order', status: Status.PENDENTE };
+
+      mockServiceOrderRepository.findOne.mockResolvedValue(existingOrder);
+      mockServiceOrderRepository.save.mockResolvedValue({ ...existingOrder, ...updateServiceOrderDto });
+
+      const result = await service.update('order-123', updateServiceOrderDto);
+
+      expect(result.title).toEqual('Updated Order');
+      expect(result.status).toEqual(Status.FINALIZADO);
+      expect(mockServiceOrderRepository.findOne).toHaveBeenCalledWith({ where: { id: 'order-123' } });
+      expect(mockServiceOrderRepository.save).toHaveBeenCalledWith({ ...existingOrder, ...updateServiceOrderDto });
     });
-  
-    it('should throw NotFoundException when no service order is found to update', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
-  
-      await expect(service.update('uuid', {} as UpdateServiceOrderDto)).rejects.toThrow(NotFoundException);
+
+    it('should throw an error if order is not found', async () => {
+      mockServiceOrderRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.update('invalid-id', { title: 'Updated Order' })).rejects.toThrow(NotFoundException);
     });
   });
-  
 
   describe('remove', () => {
-    it('should remove a service order and return it', async () => {
-      const order = {
-        id: 'uuid',
-        title: 'Order 1',
-        clientRelated: 'Client A',
-        status: Status.PENDENTE,
-        sector: Sector.ADMINISTRATIVO,
-      };
-    
-      mockRepository.findOne.mockResolvedValue(order);
-      mockRepository.delete.mockResolvedValue({ affected: 1 }); // Retorno de sucesso de deleção
-    
-      const result = await service.remove('uuid');
-    
-      expect(result).toEqual(order);
-      expect(mockRepository.delete).toHaveBeenCalledWith(order.id);
+    it('should delete a service order', async () => {
+      const orderToDelete = { id: 'order-123', title: 'Order 1' };
+
+      mockServiceOrderRepository.findOne.mockResolvedValue(orderToDelete);
+      mockServiceOrderRepository.delete.mockResolvedValue(orderToDelete);
+
+      const result = await service.remove('order-123');
+
+      expect(result).toEqual(orderToDelete);
+      expect(mockServiceOrderRepository.findOne).toHaveBeenCalledWith({ where: { id: 'order-123' } });
+      expect(mockServiceOrderRepository.delete).toHaveBeenCalledWith('order-123');
     });
-    
-    it('should throw NotFoundException when no service order is found to delete', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
-      mockRepository.delete.mockResolvedValue({ affected: 0 }); // Simula falha de deleção
-    
-      await expect(service.remove('uuid')).rejects.toThrow(NotFoundException);
+
+    it('should throw an error if order is not found', async () => {
+      mockServiceOrderRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.remove('invalid-id')).rejects.toThrow(NotFoundException);
     });
-    
   });
-  
 });

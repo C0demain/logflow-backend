@@ -5,14 +5,18 @@ export class ListServiceOrderDto{
     constructor(
         readonly id: string,
         readonly title: string,
-        readonly clientRelated: string,
+        readonly client:{
+            clientName: string,
+            clientEmail: string,
+            clientCnpj: string
+        },
         readonly status: Status,
         readonly sector: Sector,
         readonly user: {
-            id: string,
-            name: string,
-            email: string,
-            role: string,
+            userId: string,
+            userName: string,
+            userEmail: string,
+            userRole: string,
         }
     ){};
 }

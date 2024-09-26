@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   PrimaryGeneratedColumn,
   OneToMany,
 } from 'typeorm';
@@ -32,7 +33,10 @@ export class UserEntity {
   @Column({ name: 'role', type: 'enum', enum: Role, default: Role.EMPLOYEE })
   role: Role;
 
-  @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false })
+  @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {eager: false})
+  orders: ServiceOrder[];
+
+  @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
   sector: Sector;
 
   @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {

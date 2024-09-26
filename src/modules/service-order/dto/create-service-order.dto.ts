@@ -8,8 +8,9 @@ export class CreateServiceOrderDto {
     @IsNotEmpty({message: "o campo `title` não pode estar vazio"})
     title: string;
 
-    @IsString()
-    clientRelated: string;
+    @IsUUID()
+    @IsNotEmpty({message: "o campo `clientId`é obrigatorio"})
+    clientId: string;
 
     @IsEnum(Status, {message: 'o campo `status` precisa estar dentro dos padrões pré-definidos'})
     status: Status;
