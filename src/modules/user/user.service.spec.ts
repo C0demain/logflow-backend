@@ -18,6 +18,7 @@ describe('ServiceOrderService', () => {
     name: 'test-username',
     email: 'testuser@gmail.com',
     password: '123456',
+    createdAt: '2024-01-01',
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
     isActive: true,

@@ -65,12 +65,11 @@ export class ServiceOrderController {
   @Get()
   @Roles(Role.MANAGER)
   @ApiOperation({ summary:'Listar todos as ordens de serviço', description: 'Rota acessível apenas para administradores' })
-  async findAllOrders(@Query('id') id?: string, @Query('title') title?: string, @Query('status') status?: string) {
   @ApiQuery({name: "id", required: false, type: String})
   @ApiQuery({name: "title", required: false, type: String})
   @ApiQuery({name: "clientRelated", required: false, type: String})
   @ApiQuery({name: "status", required: false, type: String})
-  async findAllOrders(@Query('id') id?: string, @Query('title') title?: string, @Query('clientRelated') clientRelated?: string, @Query('status') status?: string) {
+  async findAllOrders(@Query('id') id?: string, @Query('title') title?: string, @Query('status') status?: string) {
     
     try{
       const orders = await this.serviceOrderService.findAll({ id, title, status });

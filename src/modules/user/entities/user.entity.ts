@@ -2,8 +2,6 @@ import {
   Entity,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  DeleteDateColumn,
   PrimaryGeneratedColumn,
   OneToMany,
 } from 'typeorm';
@@ -39,11 +37,6 @@ export class UserEntity {
   @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
   sector: Sector;
 
-  @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {
-    eager: false,
-  })
-  orders: ServiceOrder[];
-
   @OneToMany(() => Task, (task) => task.assignedUser)
   tasks: Task[];
 
@@ -53,6 +46,4 @@ export class UserEntity {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: string;
 }
