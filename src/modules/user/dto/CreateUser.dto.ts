@@ -1,4 +1,11 @@
-import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  MinLength,
+  IsOptional,
+  IsBoolean,
+} from 'class-validator';
 import { UniqueEmail } from '../validation/UniqueEmail.validation';
 import { Role } from 'src/modules/roles/enums/roles.enum';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
@@ -18,6 +25,7 @@ export class CreateUserDTO {
   })
   password: string;
 
+  @IsOptional()
   @IsEnum(Role, {
     message: 'O campo `role` precisa estar dentro dos padrôes estabelecidos',
   })
@@ -27,4 +35,8 @@ export class CreateUserDTO {
     message: 'O campo `sector` precisa estar dentro dos padrôes estabelecidos',
   })
   sector: Sector;
+
+  @IsOptional()
+  @IsBoolean({ message: "O campo `isActive` precisa ser 'true' ou 'false'" })
+  isActive: boolean;
 }

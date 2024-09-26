@@ -6,12 +6,15 @@ import {
     ManyToOne,
     OneToOne,
     JoinColumn,
+    OneToMany
 } from "typeorm";
 import { Status } from "../enums/status.enum";
 import { UserEntity } from "src/modules/user/entities/user.entity";
 import { Sector } from "../enums/sector.enum";
 import { ApiTags } from "@nestjs/swagger";
 import { Client } from "src/modules/client/entities/client.entity";
+import { Task } from "src/modules/task/entities/task.entity";
+
 
 @ApiTags('service-order')
 @Entity({name: 'service-order'})
@@ -38,4 +41,7 @@ export class ServiceOrder {
 
     @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
     sector: Sector;
+
+    @OneToMany( () => Task, task => task.serviceOrder)
+    tasks: Task[]
 }

@@ -21,7 +21,9 @@ describe('UserController', () => {
     password: '123456',
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
-    orders:[],
+    isActive: true,
+    orders: [],
+    tasks: [],
   };
 
   const createUserMock: CreateUserDTO = {
@@ -30,18 +32,17 @@ describe('UserController', () => {
     password: '123456',
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
+    isActive: true,
   };
 
   beforeEach(async () => {
     const userServiceMock: Partial<UserService> = {
       createUser: jest.fn().mockResolvedValue(userMock),
       listUsers: jest.fn().mockResolvedValue([userMock]),
-      updateUser: jest
-        .fn()
-        .mockResolvedValue({
-          ...userMock,
-          ...{ name: 'test-username-updated' },
-        }),
+      updateUser: jest.fn().mockResolvedValue({
+        ...userMock,
+        ...{ name: 'test-username-updated' },
+      }),
       deleteUser: jest.fn().mockResolvedValue(userMock),
     };
 

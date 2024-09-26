@@ -24,7 +24,9 @@ describe('Normal user request', () => {
     password: '123456',
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
-    orders:[],
+    orders: [],
+    tasks: [],
+    isActive: true,
   };
 
   const mockUsersService = {

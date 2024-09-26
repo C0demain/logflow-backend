@@ -20,7 +20,9 @@ describe('ServiceOrderService', () => {
     password: '123456',
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
-    orders: []
+    isActive: true,
+    orders: [],
+    tasks: [],
   };
 
   const createUserMock: CreateUserDTO = {
@@ -29,6 +31,7 @@ describe('ServiceOrderService', () => {
     password: '123456',
     role: Role.MANAGER,
     sector: Sector.ADMINISTRATIVO,
+    isActive: true,
   };
 
   const updateUserMock: UpdateUserDTO = {
@@ -76,11 +79,14 @@ describe('ServiceOrderService', () => {
 
     const userList = await service.listUsers();
 
-    expect(userList).toEqual([{ 
-      id: 'uuid-uuid', 
-      name: 'test-username', 
-      role: Role.MANAGER,
-    }]);
+    expect(userList).toEqual([
+      {
+        id: 'uuid-uuid',
+        name: 'test-username',
+        role: Role.MANAGER,
+        isActive: true,
+      },
+    ]);
 
     expect(repository.find).toHaveBeenCalled();
   });
@@ -109,14 +115,14 @@ describe('ServiceOrderService', () => {
   });
 
   it('should delete user', async () => {
-    repository.delete = jest.fn().mockResolvedValue(userMock);
+    repository.save = jest.fn().mockResolvedValue(userMock);
     repository.findOneBy = jest.fn().mockResolvedValue(userMock);
 
     const oldUser = await service.deleteUser(userMock.id);
 
     expect(oldUser).toEqual(userMock);
     expect(repository.findOneBy).toHaveBeenCalledWith({ id: userMock.id });
-    expect(repository.delete).toHaveBeenCalledWith(userMock.id);
+    expect(repository.save).toHaveBeenCalledWith(userMock);
   });
 
   it('should throw NotFoundException when user is not found in findByEmail', async () => {
