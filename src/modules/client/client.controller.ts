@@ -12,7 +12,7 @@ import {
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../auth/authentication.guard';
 
 @ApiTags('client')
@@ -34,6 +34,10 @@ export class ClientController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os clientes' })
+  @ApiQuery({name: 'id', required: false})
+  @ApiQuery({name: 'name', required: false})
+  @ApiQuery({name: 'email', required: false})
+  @ApiQuery({name: 'cnpj', required: false})
   async findAll(
     @Query('id') id?: string,
     @Query('name') name?: string,
