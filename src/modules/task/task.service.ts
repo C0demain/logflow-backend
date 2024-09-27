@@ -7,6 +7,7 @@ import { Repository, FindOptionsWhere } from 'typeorm'
 import { ServiceOrderService } from 'src/modules/service-order/service-order.service';
 import { UserService } from 'src/modules/user/user.service';
 import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
+import { Sector } from 'src/modules/service-order/enums/sector.enum';
 
 @Injectable()
 export class TaskService {
@@ -37,17 +38,24 @@ export class TaskService {
     taskDb.serviceOrder = serviceOrder
     taskDb.assignedUser = user
 
-    console.log(taskDb)
-
-    return await this.taskRepository.save(taskDb)
+    const createdTask =  await this.taskRepository.save(taskDb)
+    return parseToGetTaskDTO(createdTask)
   }
 
-  async findAll(filters: {title?: string, assignedUserId?: string, serviceOrderId?: string}) {
+  async findAll(filters: {title?: string, assignedUserId?: string, serviceOrderId?: string, completed?: boolean, sector?: Sector}) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<Task> = {}
 
     if(filters.title){
       where.title = filters.title
+    }
+    
+    if(filters.completed){
+      where.completed = filters.completed 
+    }
+
+    if(filters.sector){
+      where.sector = filters.sector
     }
 
     if(filters.assignedUserId){

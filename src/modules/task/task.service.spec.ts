@@ -82,11 +82,13 @@ describe('TaskService', () => {
       sector: Sector.ADMINISTRATIVO
     }
 
-    const expectedResult = {
+    const expectedResult: GetTaskDto = {
       id: 'task1',
-      ...createTaskDto,
+      title: 'task-title',
+      completed: false,
+      sector: Sector.ADMINISTRATIVO,
       serviceOrder: mockedServiceOrder,
-      user: mockedUser
+      assignedUser: mockedUser
     }
 
     mockRepository.save.mockResolvedValue(expectedResult)
