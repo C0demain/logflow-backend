@@ -15,7 +15,7 @@ import { UserService } from './user.service';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { AuthenticationGuard } from '../auth/authentication.guard';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from '../roles/roles.guard';
 import { Roles } from '../roles/roles.decorator';
 import { Role } from '../roles/enums/roles.enum';
@@ -62,6 +62,7 @@ export class UserController {
     summary: 'Listar todos os usuários',
     description: 'Rota acessível apenas para administradores',
   })
+  @ApiQuery({name: 'active', required: false})
   async listUsers(@Query('active') activeUsers?: boolean) {
     const usersSaved = await this.userService.listUsers(activeUsers);
 
