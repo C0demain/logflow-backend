@@ -6,7 +6,7 @@ import { Task } from 'src/modules/task/entities/task.entity';
 import { Repository, FindOptionsWhere } from 'typeorm'
 import { ServiceOrderService } from 'src/modules/service-order/service-order.service';
 import { UserService } from 'src/modules/user/user.service';
-import { GetTaskDto, parseToGetTaskDTO } from 'src/modules/task/dto/list-task.dto';
+import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
 
 @Injectable()
 export class TaskService {

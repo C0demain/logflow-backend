@@ -6,9 +6,10 @@ import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ServiceOrderService } from 'src/modules/service-order/service-order.service';
 import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
-import { GetTaskDto } from 'src/modules/task/dto/list-task.dto';
+import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { NotFoundException } from '@nestjs/common';
 import { title } from 'process';
+import { Sector } from 'src/modules/service-order/enums/sector.enum';
 
 describe('TaskService', () => {
   let service: TaskService;
@@ -77,7 +78,8 @@ describe('TaskService', () => {
     const createTaskDto: CreateTaskDto = {
       title: 'task-title',
       orderId: 'order1',
-      userId: 'user1'
+      userId: 'user1',
+      sector: Sector.ADMINISTRATIVO
     }
 
     const expectedResult = {
@@ -106,6 +108,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -125,6 +128,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -144,6 +148,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -163,6 +168,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -183,6 +189,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -208,6 +215,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task2',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -234,6 +242,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }

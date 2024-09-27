@@ -1,4 +1,5 @@
 import { ServiceOrder } from "src/modules/service-order/entities/service-order.entity";
+import { Sector } from "src/modules/service-order/enums/sector.enum";
 import { UserEntity } from "src/modules/user/entities/user.entity";
 import {
     Entity,
@@ -18,6 +19,9 @@ export class Task {
 
     @Column({default: false})
     completed: boolean
+
+    @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
+    sector: Sector
 
     @ManyToOne(() => ServiceOrder, serviceOrder => serviceOrder.tasks, {eager:true})
     serviceOrder: ServiceOrder

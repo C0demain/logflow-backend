@@ -3,7 +3,8 @@ import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
-import { GetTaskDto } from 'src/modules/task/dto/list-task.dto';
+import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
+import { Sector } from 'src/modules/service-order/enums/sector.enum';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -12,7 +13,8 @@ describe('TaskController', () => {
   const createTaskDto: CreateTaskDto = {
     title: 'Task1',
     userId: 'user1',
-    orderId: 'order1'
+    orderId: 'order1',
+    sector: Sector.ADMINISTRATIVO
   }
 
   const mockedUser = {
@@ -68,6 +70,7 @@ describe('TaskController', () => {
         id: 'task1',
         title: 'Task1',
         completed: false,
+        sector: Sector.ADMINISTRATIVO,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser
       }
@@ -88,6 +91,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -107,6 +111,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -126,6 +131,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -145,6 +151,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -165,6 +172,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -185,6 +193,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
       }
@@ -205,6 +214,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
+          sector: Sector.ADMINISTRATIVO,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
