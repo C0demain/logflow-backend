@@ -33,6 +33,7 @@ export class TaskService {
     }
 
     taskDb.title = createTaskDto.title
+    taskDb.sector = createTaskDto.sector
     taskDb.serviceOrder = serviceOrder
     taskDb.assignedUser = user
 
@@ -92,6 +93,7 @@ export class TaskService {
     }
 
     task.title = updateTaskDto.title
+    task.completed = updateTaskDto.completed
     task.assignedUser = user
 
     const updatedTask = await this.taskRepository.save(task)
