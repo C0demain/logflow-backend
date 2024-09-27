@@ -32,7 +32,7 @@ export class UserService {
     where.isActive = isActive === undefined ? true : isActive
     const usersSaved = await this.userRepository.find({where})
     const usersList = usersSaved.map(
-      (user) => new ListUsersDTO(user.id, user.name, user.role, user.isActive),
+      (user) => new ListUsersDTO(user.id, user.name, user.role, user.isActive, user.email, user.sector),
     );
     return usersList;
   }

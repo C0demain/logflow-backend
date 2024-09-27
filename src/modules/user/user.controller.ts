@@ -53,6 +53,8 @@ export class UserController {
         userCreated.name,
         userCreated.role,
         userCreated.isActive,
+        userCreated.email,
+        userCreated.sector
       ),
     };
   }
