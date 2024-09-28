@@ -3,7 +3,10 @@ import { ClientService } from './client.service';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Client } from './entities/client.entity';
-import { InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { ListClientDto } from './dto/list-client.dto';
@@ -64,13 +67,15 @@ describe('ClientService', () => {
       const result = await service.create(createClientDto);
 
       expect(result).toEqual(createdClient);
-      expect(mockClientRepository.save).toHaveBeenCalledWith(expect.any(Client));
+      expect(mockClientRepository.save).toHaveBeenCalledWith(
+        expect.any(Client),
+      );
     });
   });
 
   describe('findAll', () => {
     it('should return a list of clients based on filters', async () => {
-      const filters = { name: 'Client X' };
+      const filters = { name: 'Client X', isActive: true };
 
       const clients = [
         {
@@ -105,7 +110,9 @@ describe('ClientService', () => {
     it('should throw an exception if no clients are found', async () => {
       mockClientRepository.find.mockResolvedValue([]);
 
-      await expect(service.findAll({})).rejects.toThrow(InternalServerErrorException);
+      await expect(service.findAll({})).rejects.toThrow(
+        InternalServerErrorException,
+      );
     });
   });
 
@@ -133,13 +140,17 @@ describe('ClientService', () => {
       const result = await service.findById('client-123');
 
       expect(result).toEqual(client);
-      expect(mockClientRepository.findOne).toHaveBeenCalledWith({ where: { id: 'client-123' } });
+      expect(mockClientRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 'client-123' },
+      });
     });
 
     it('should throw NotFoundException if client not found', async () => {
       mockClientRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findById('client-123')).rejects.toThrow(NotFoundException);
+      await expect(service.findById('client-123')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -181,7 +192,9 @@ describe('ClientService', () => {
     it('should throw NotFoundException if client not found', async () => {
       mockClientRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.update('client-123', {} as UpdateClientDto)).rejects.toThrow(NotFoundException);
+      await expect(
+        service.update('client-123', {} as UpdateClientDto),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -202,21 +215,27 @@ describe('ClientService', () => {
           number: '123',
           complement: 'Apt 101',
         },
+        isActive: true,
       };
 
       mockClientRepository.findOne.mockResolvedValue(client);
-      mockClientRepository.delete.mockResolvedValue(client);
+      mockClientRepository.delete.mockResolvedValue({
+        ...client,
+        isActive: false,
+      });
 
       const result = await service.remove('client-123');
 
-      expect(result).toEqual(client);
-      expect(mockClientRepository.delete).toHaveBeenCalledWith('client-123');
+      expect(result.isActive).toBeFalsy();
+      expect(mockClientRepository.save).toHaveBeenCalledWith(client);
     });
 
     it('should throw NotFoundException if client not found', async () => {
       mockClientRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove('client-123')).rejects.toThrow(NotFoundException);
+      await expect(service.remove('client-123')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
