@@ -45,6 +45,7 @@ export class ServiceOrderService {
     title?: string;
     status?: string;
     sector?: string;
+    active?: boolean;
   }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<ServiceOrder> = {};
@@ -65,7 +66,7 @@ export class ServiceOrderService {
       where.sector = filters.sector as Sector;
     }
 
-    where.isActive = true;
+    where.isActive = filters.active === undefined ? true : filters.active;
 
     const orders = await this.serviceOrderRepository.find({ where });
 

@@ -43,6 +43,7 @@ export class ClientService {
     name?: string;
     email?: string;
     cnpj?: string;
+    active?: boolean;
   }) {
     const where: FindOptionsWhere<Client> = {};
 
@@ -62,7 +63,7 @@ export class ClientService {
       where.cnpj = filters.cnpj;
     }
 
-    where.isActive = true;
+    where.isActive = filters.active === undefined ? true : filters.active;
 
     const clientsFound = await this.clientRepository.find({ where });
 

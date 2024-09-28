@@ -7,12 +7,17 @@ import {
   Delete,
   Put,
   Query,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthenticationGuard } from '../auth/authentication.guard';
 
 @ApiTags('client')
@@ -34,35 +39,45 @@ export class ClientController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os clientes' })
-  @ApiQuery({name: 'id', required: false})
-  @ApiQuery({name: 'name', required: false})
-  @ApiQuery({name: 'email', required: false})
-  @ApiQuery({name: 'cnpj', required: false})
+  @ApiQuery({ name: 'id', required: false })
+  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ name: 'email', required: false })
+  @ApiQuery({ name: 'cnpj', required: false })
+  @ApiQuery({ name: 'active', required: false })
   async findAll(
     @Query('id') id?: string,
     @Query('name') name?: string,
     @Query('email') email?: string,
-    @Query('cnpj') cnpj?: string
+    @Query('cnpj') cnpj?: string,
+    @Query('active') active?: boolean,
   ) {
+    try {
+      const clients = await this.clientService.findAll({
+        id,
+        name,
+        email,
+        cnpj,
+        active,
+      });
 
-    try{
-    const clients = await this.clientService.findAll({ id, name, email, cnpj });
-
-    return {
-      message: 'Clientes encontrados',
-      clients: clients,
-    };
-    } catch(error){
-      return{
-        message: "nenhum cliente encontrado",
-        clients: []
-      }
+      return {
+        message: 'Clientes encontrados',
+        clients: clients,
+      };
+    } catch (error) {
+      return {
+        message: 'nenhum cliente encontrado',
+        clients: [],
+      };
     }
   }
-  
+
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar cliente' })
-  async update(@Param('id') id: string, @Body() updateClientDto: UpdateClientDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateClientDto: UpdateClientDto,
+  ) {
     const clientUpdated = await this.clientService.update(id, updateClientDto);
 
     return {
