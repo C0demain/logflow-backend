@@ -41,6 +41,7 @@ describe('ServiceOrderService', () => {
     password: '123456',
     role: Role.EMPLOYEE,
     sector: Sector.ADMINISTRATIVO,
+    isActive: true
   };
 
   beforeEach(async () => {
