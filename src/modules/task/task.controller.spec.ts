@@ -14,7 +14,7 @@ describe('TaskController', () => {
     title: 'Task1',
     userId: 'user1',
     orderId: 'order1',
-    sector: Sector.ADMINISTRATIVO
+    sector: Sector.OPERACIONAL
   }
 
   const mockedUser = {
@@ -70,7 +70,7 @@ describe('TaskController', () => {
         id: 'task1',
         title: 'Task1',
         completed: false,
-        sector: Sector.ADMINISTRATIVO,
+        sector: Sector.OPERACIONAL,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser
       }
@@ -91,7 +91,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -111,7 +111,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -131,7 +131,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -151,7 +151,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -172,7 +172,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -193,7 +193,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
       }
@@ -214,7 +214,7 @@ describe('TaskController', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }

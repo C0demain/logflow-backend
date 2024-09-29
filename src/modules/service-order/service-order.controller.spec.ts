@@ -46,7 +46,7 @@ describe('ServiceOrderController', () => {
         title: 'Test Order',
         clientId: 'Client X',
         status: Status.PENDENTE,
-        sector: Sector.ADMINISTRATIVO,
+        sector: Sector.OPERACIONAL,
         userId: 'user-123',
       };
 
@@ -59,7 +59,7 @@ describe('ServiceOrderController', () => {
           cnpj: '12345',
         },
         status: Status.PENDENTE,
-        sector: Sector.ADMINISTRATIVO,
+        sector: Sector.OPERACIONAL,
         user: {
           id: 'user-123',
           name: 'User Test',
@@ -107,7 +107,7 @@ describe('ServiceOrderController', () => {
             clientCnpj: '12345',
           },
           Status.PENDENTE,
-          Sector.ADMINISTRATIVO,
+          Sector.OPERACIONAL,
           {
             userId: 'user-123', 
             userName: 'User Test',
@@ -136,7 +136,7 @@ describe('ServiceOrderController', () => {
             clientCnpj: '12345',
           },
           Status.PENDENTE,
-          Sector.ADMINISTRATIVO,
+          Sector.OPERACIONAL,
           {
             userId: 'user-123', 
             userName: 'User Test',
@@ -165,7 +165,7 @@ describe('ServiceOrderController', () => {
 
   describe('findOrdersBySector', () => {
     it('should return orders by sector', async () => {
-      const sector = Sector.ADMINISTRATIVO;
+      const sector = Sector.OPERACIONAL;
       const result = [
         new ListServiceOrderDto(
           'order-123',
@@ -176,7 +176,7 @@ describe('ServiceOrderController', () => {
             clientCnpj: '12345',
           },
           Status.PENDENTE,
-          Sector.ADMINISTRATIVO,
+          Sector.OPERACIONAL,
           {
             userId: 'user-123', 
             userName: 'User Test',

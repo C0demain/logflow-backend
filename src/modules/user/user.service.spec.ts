@@ -20,7 +20,7 @@ describe('ServiceOrderService', () => {
     password: '123456',
     createdAt: '2024-01-01',
     role: Role.MANAGER,
-    sector: Sector.ADMINISTRATIVO,
+    sector: Sector.OPERACIONAL,
     isActive: true,
     orders: [],
     tasks: [],
@@ -31,7 +31,7 @@ describe('ServiceOrderService', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     role: Role.MANAGER,
-    sector: Sector.ADMINISTRATIVO,
+    sector: Sector.OPERACIONAL,
     isActive: true,
   };
 
@@ -40,7 +40,7 @@ describe('ServiceOrderService', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     role: Role.EMPLOYEE,
-    sector: Sector.ADMINISTRATIVO,
+    sector: Sector.OPERACIONAL,
     isActive: true
   };
 
@@ -88,7 +88,7 @@ describe('ServiceOrderService', () => {
         role: Role.MANAGER,
         isActive: true,
         email: "testuser@gmail.com",
-        sector: Sector.ADMINISTRATIVO
+        sector: Sector.OPERACIONAL
       },
     ]);
 

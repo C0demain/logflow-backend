@@ -79,14 +79,14 @@ describe('TaskService', () => {
       title: 'task-title',
       orderId: 'order1',
       userId: 'user1',
-      sector: Sector.ADMINISTRATIVO
+      sector: Sector.OPERACIONAL
     }
 
     const expectedResult: GetTaskDto = {
       id: 'task1',
       title: 'task-title',
       completed: false,
-      sector: Sector.ADMINISTRATIVO,
+      sector: Sector.OPERACIONAL,
       serviceOrder: mockedServiceOrder,
       assignedUser: mockedUser
     }
@@ -110,7 +110,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -130,7 +130,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -150,7 +150,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -170,7 +170,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -191,7 +191,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -217,7 +217,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task2',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -244,7 +244,7 @@ describe('TaskService', () => {
           id: 'task1',
           title: 'Task1',
           completed: false,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }

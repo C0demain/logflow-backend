@@ -21,7 +21,7 @@ describe('UserController', () => {
     password: '123456',
     createdAt: '2024-01-01',
     role: Role.MANAGER,
-    sector: Sector.ADMINISTRATIVO,
+    sector: Sector.OPERACIONAL,
     isActive: true,
     orders: [],
     tasks: [],
@@ -32,7 +32,7 @@ describe('UserController', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     role: Role.MANAGER,
-    sector: Sector.ADMINISTRATIVO,
+    sector: Sector.OPERACIONAL,
     isActive: true,
   };
 

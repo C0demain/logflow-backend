@@ -15,7 +15,7 @@ describe('Normal user request', () => {
     sub: 'testId',
     username: 'test',
     roles: Role.EMPLOYEE,
-    sector: Sector.ADMINISTRATIVO
+    sector: Sector.OPERACIONAL
   };
 
   const userMock: UserEntity = {
@@ -25,7 +25,7 @@ describe('Normal user request', () => {
     password: '123456',
     createdAt: '2024-01-01',
     role: Role.MANAGER,
-    sector: Sector.ADMINISTRATIVO,
+    sector: Sector.OPERACIONAL,
     orders: [],
     tasks: [],
     isActive: true,

@@ -39,7 +39,7 @@ export class SeederService {
             user.name = userName;
             user.email = userEmail;
             user.role = Role.MANAGER;
-            user.sector = Sector.ADMINISTRATIVO;
+            user.sector = Sector.OPERACIONAL;
 
             user.password = await this.hashPasswordPipe.transform(userPassword);
 

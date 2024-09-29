@@ -68,7 +68,7 @@ describe('ServiceOrderService', () => {
         title: 'Test Order',
         clientId: 'client-id-123',
         status: Status.PENDENTE,
-        sector: Sector.ADMINISTRATIVO,
+        sector: Sector.OPERACIONAL,
         userId: 'user-id-123',
       };
 
@@ -106,7 +106,7 @@ describe('ServiceOrderService', () => {
         expect.objectContaining({
           title: 'Test Order',
           status: Status.PENDENTE,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           client: clientMock,
           user: userMock,
         }),
@@ -119,14 +119,14 @@ describe('ServiceOrderService', () => {
       const filters = {
         isActive: true,
         status: Status.PENDENTE,
-        sector: Sector.ADMINISTRATIVO,
+        sector: Sector.OPERACIONAL,
       };
       const orders = [
         {
           id: 'order-123',
           title: 'Test Order',
           status: Status.PENDENTE,
-          sector: Sector.ADMINISTRATIVO,
+          sector: Sector.OPERACIONAL,
           client: {
             name: 'Client X',
             email: 'client@gmail.com',

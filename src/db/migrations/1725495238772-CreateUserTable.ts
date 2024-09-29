@@ -9,7 +9,7 @@ export class CreateUserTable1725495238772 implements MigrationInterface {
         );
 
         await queryRunner.query(
-            `CREATE TYPE "public"."users_sector_enum" AS ENUM('FINANCEIRO', 'ADMINISTRATIVO', 'COMERCIAL')`,
+            `CREATE TYPE "public"."users_sector_enum" AS ENUM('FINANCEIRO', 'OPERACIONAL', 'COMERCIAL')`,
         );
         
         await queryRunner.query(
