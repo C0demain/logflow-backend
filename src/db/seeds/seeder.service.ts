@@ -1,7 +1,7 @@
 import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/modules/user/user.entity';
+import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import "dotenv/config";
 import { Role } from 'src/modules/roles/enums/roles.enum';
@@ -39,7 +39,7 @@ export class SeederService {
             user.name = userName;
             user.email = userEmail;
             user.role = Role.MANAGER;
-            user.sector = Sector.ADMINISTRATIVO;
+            user.sector = Sector.OPERACIONAL;
 
             user.password = await this.hashPasswordPipe.transform(userPassword);
 

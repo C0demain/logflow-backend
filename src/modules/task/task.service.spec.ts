@@ -6,9 +6,10 @@ import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ServiceOrderService } from 'src/modules/service-order/service-order.service';
 import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
-import { GetTaskDto } from 'src/modules/task/dto/list-task.dto';
+import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { NotFoundException } from '@nestjs/common';
 import { title } from 'process';
+import { Sector } from 'src/modules/service-order/enums/sector.enum';
 
 describe('TaskService', () => {
   let service: TaskService;
@@ -77,14 +78,17 @@ describe('TaskService', () => {
     const createTaskDto: CreateTaskDto = {
       title: 'task-title',
       orderId: 'order1',
-      userId: 'user1'
+      userId: 'user1',
+      sector: Sector.OPERACIONAL
     }
 
-    const expectedResult = {
+    const expectedResult: GetTaskDto = {
       id: 'task1',
-      ...createTaskDto,
+      title: 'task-title',
+      completed: false,
+      sector: Sector.OPERACIONAL,
       serviceOrder: mockedServiceOrder,
-      user: mockedUser
+      assignedUser: mockedUser
     }
 
     mockRepository.save.mockResolvedValue(expectedResult)
@@ -105,6 +109,8 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -123,6 +129,8 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -141,6 +149,8 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -159,6 +169,8 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -178,6 +190,8 @@ describe('TaskService', () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -202,6 +216,8 @@ describe('TaskService', () => {
       const expectedResult = {
           id: 'task1',
           title: 'Task2',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -209,7 +225,7 @@ describe('TaskService', () => {
       mockRepository.findOneBy.mockResolvedValue({...expectedResult, ...{title: 'Task1'} })
       mockRepository.save.mockResolvedValue(expectedResult)
 
-      const task = await service.update('task1', {title: 'Task2', userId: 'user1'})
+      const task = await service.update('task1', {title: 'Task2', completed: false, userId: 'user1'})
 
       expect(task).toEqual(expectedResult)
     })
@@ -218,7 +234,7 @@ describe('TaskService', () => {
       
       mockRepository.findOneBy.mockResolvedValue(null)
 
-      expect(service.update('task1', {title: 'Task2', userId: 'user1'})).rejects.toBeInstanceOf(NotFoundException)
+      expect(service.update('task1', {title: 'Task2', completed: false, userId: 'user1'})).rejects.toBeInstanceOf(NotFoundException)
     })
   })
 
@@ -227,6 +243,8 @@ describe('TaskService', () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }

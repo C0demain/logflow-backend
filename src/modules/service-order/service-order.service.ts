@@ -1,106 +1,129 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
-import { FindOptionsWhere, Repository } from "typeorm";
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceOrder } from './entities/service-order.entity';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
 import { UserService } from '../user/user.service';
 import { Status } from './enums/status.enum';
 import { Sector } from './enums/sector.enum';
+import { ClientService } from '../client/client.service';
 
 @Injectable()
 export class ServiceOrderService {
-
   constructor(
-    @InjectRepository(ServiceOrder) private readonly serviceOrderRepository: Repository<ServiceOrder>,
-    private readonly userService: UserService
-  ){}
+    @InjectRepository(ServiceOrder)
+    private readonly serviceOrderRepository: Repository<ServiceOrder>,
+    private readonly userService: UserService,
+    private readonly clientService: ClientService,
+  ) {}
 
   async create(createServiceOrderDto: CreateServiceOrderDto) {
     const serviceDb = new ServiceOrder();
 
     const user = await this.userService.findById(createServiceOrderDto.userId);
+    const client = await this.clientService.findById(
+      createServiceOrderDto.clientId,
+    );
 
     serviceDb.title = createServiceOrderDto.title;
-    serviceDb.clientRelated = createServiceOrderDto.clientRelated;
+    serviceDb.client = client;
     serviceDb.status = createServiceOrderDto.status;
     serviceDb.sector = createServiceOrderDto.sector;
     serviceDb.user = user;
 
     return await this.serviceOrderRepository.save(serviceDb);
-    
   }
 
-  async findAll(filters: { id?: string ,title?: string, clientRelated?: string, status?: string, sector?: string }) {
+  async findAll(filters: {
+    id?: string;
+    title?: string;
+    status?: string;
+    sector?: string;
+    active?: boolean;
+  }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<ServiceOrder> = {};
-  
-    if(filters.id){
+
+    if (filters.id) {
       where.id = filters.id;
     }
 
     if (filters.title) {
       where.title = filters.title;
     }
-  
-    if (filters.clientRelated) {
-      where.clientRelated = filters.clientRelated;
-    }
-  
+
     if (filters.status) {
-      where.status = filters.status as Status; 
+      where.status = filters.status as Status;
     }
 
     if (filters.sector) {
-      where.sector = filters.sector as Sector; 
+      where.sector = filters.sector as Sector;
     }
-  
+
+    where.isActive = filters.active === undefined ? true : filters.active;
+
     const orders = await this.serviceOrderRepository.find({ where });
-  
+
     if (!orders || orders.length === 0) {
-      throw new InternalServerErrorException('Nenhuma ordem de serviço encontrada');
-    }    
-  
+      throw new InternalServerErrorException(
+        'Nenhuma ordem de serviço encontrada',
+      );
+    }
+
     const ordersList = orders.map((serviceOrder) => {
       const user = serviceOrder.user;
+      const client = serviceOrder.client;
       return new ListServiceOrderDto(
         serviceOrder.id,
         serviceOrder.title,
-        serviceOrder.clientRelated,
+        {
+          clientName: client.name,
+          clientEmail: client.email,
+          clientCnpj: client.cnpj,
+        },
         serviceOrder.status,
         serviceOrder.sector,
         {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        } 
+          userId: user.id,
+          userName: user.name,
+          userEmail: user.email,
+          userRole: user.role,
+        },
       );
     });
-  
+
     return ordersList;
   }
 
-  async findById(id: string){
+  async findById(id: string) {
     const orderFound = await this.serviceOrderRepository.findOne({
-      where:{id}
+      where: { id },
     });
 
-    if(!orderFound){
-      throw new NotFoundException(`Ordem de serviço com id: ${id}, não encontrada`);
+    if (!orderFound) {
+      throw new NotFoundException(
+        `Ordem de serviço com id: ${id}, não encontrada`,
+      );
     }
 
-    return orderFound
+    return orderFound;
   }
 
   async update(id: string, newOrderData: UpdateServiceOrderDto) {
     const orderFound = await this.serviceOrderRepository.findOne({
-      where:{id}
+      where: { id },
     });
 
-    if(!orderFound){
-      throw new NotFoundException(`Ordem de serviço com id: ${id}, não encontrada`);
+    if (!orderFound) {
+      throw new NotFoundException(
+        `Ordem de serviço com id: ${id}, não encontrada`,
+      );
     }
 
     Object.assign(orderFound, newOrderData as ServiceOrder);
@@ -110,14 +133,17 @@ export class ServiceOrderService {
 
   async remove(id: string) {
     const orderFound = await this.serviceOrderRepository.findOne({
-      where:{id}
+      where: { id },
     });
 
-    if(!orderFound){
-      throw new NotFoundException(`Ordem de serviço com id: ${id}, não encontrada`);
+    if (!orderFound) {
+      throw new NotFoundException(
+        `Ordem de serviço com id: ${id}, não encontrada`,
+      );
     }
 
-    await this.serviceOrderRepository.delete(orderFound.id);
+    orderFound.isActive = false;
+    await this.serviceOrderRepository.save(orderFound);
 
     return orderFound;
   }

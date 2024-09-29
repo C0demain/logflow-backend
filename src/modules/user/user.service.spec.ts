@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateUserDTO } from 'src/modules/user/dto/CreateUser.dto';
 import { UpdateUserDTO } from 'src/modules/user/dto/UpdateUser.dto';
-import { UserEntity } from 'src/modules/user/user.entity';
+import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
 import { Repository } from 'typeorm';
 import { Role } from '../roles/enums/roles.enum';
@@ -19,11 +19,11 @@ describe('ServiceOrderService', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     createdAt: '2024-01-01',
-    updatedAt: '2024-01-01',
     role: Role.MANAGER,
-    sector: Sector.ADMINISTRATIVO,
+    sector: Sector.OPERACIONAL,
+    isActive: true,
     orders: [],
-    tasks: []
+    tasks: [],
   };
 
   const createUserMock: CreateUserDTO = {
@@ -31,7 +31,8 @@ describe('ServiceOrderService', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     role: Role.MANAGER,
-    sector: Sector.ADMINISTRATIVO,
+    sector: Sector.OPERACIONAL,
+    isActive: true,
   };
 
   const updateUserMock: UpdateUserDTO = {
@@ -39,7 +40,8 @@ describe('ServiceOrderService', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     role: Role.EMPLOYEE,
-    sector: Sector.ADMINISTRATIVO,
+    sector: Sector.OPERACIONAL,
+    isActive: true
   };
 
   beforeEach(async () => {
@@ -79,11 +81,16 @@ describe('ServiceOrderService', () => {
 
     const userList = await service.listUsers();
 
-    expect(userList).toEqual([{ 
-      id: 'uuid-uuid', 
-      name: 'test-username', 
-      role: Role.MANAGER,
-    }]);
+    expect(userList).toEqual([
+      {
+        id: 'uuid-uuid',
+        name: 'test-username',
+        role: Role.MANAGER,
+        isActive: true,
+        email: "testuser@gmail.com",
+        sector: Sector.OPERACIONAL
+      },
+    ]);
 
     expect(repository.find).toHaveBeenCalled();
   });
@@ -112,14 +119,14 @@ describe('ServiceOrderService', () => {
   });
 
   it('should delete user', async () => {
-    repository.delete = jest.fn().mockResolvedValue(userMock);
+    repository.save = jest.fn().mockResolvedValue(userMock);
     repository.findOneBy = jest.fn().mockResolvedValue(userMock);
 
     const oldUser = await service.deleteUser(userMock.id);
 
     expect(oldUser).toEqual(userMock);
     expect(repository.findOneBy).toHaveBeenCalledWith({ id: userMock.id });
-    expect(repository.delete).toHaveBeenCalledWith(userMock.id);
+    expect(repository.save).toHaveBeenCalledWith(userMock);
   });
 
   it('should throw NotFoundException when user is not found in findByEmail', async () => {

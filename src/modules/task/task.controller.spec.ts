@@ -3,7 +3,8 @@ import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
-import { GetTaskDto } from 'src/modules/task/dto/list-task.dto';
+import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
+import { Sector } from 'src/modules/service-order/enums/sector.enum';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -12,7 +13,8 @@ describe('TaskController', () => {
   const createTaskDto: CreateTaskDto = {
     title: 'Task1',
     userId: 'user1',
-    orderId: 'order1'
+    orderId: 'order1',
+    sector: Sector.OPERACIONAL
   }
 
   const mockedUser = {
@@ -67,6 +69,8 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
         id: 'task1',
         title: 'Task1',
+        completed: false,
+        sector: Sector.OPERACIONAL,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser
       }
@@ -86,6 +90,8 @@ describe('TaskController', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -104,6 +110,8 @@ describe('TaskController', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -122,6 +130,8 @@ describe('TaskController', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -140,6 +150,8 @@ describe('TaskController', () => {
         {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -159,6 +171,8 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }
@@ -178,17 +192,19 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
       }
 
       mockTaskService.update.mockResolvedValue(expectedResult)
 
-      const response = await controller.update('task1', {title: 'Task1', userId: mockedUser.id})
+      const response = await controller.update('task1', {title: 'Task1', completed: false, userId: mockedUser.id})
 
       expect(response.message).toEqual('Tarefa atualizada com sucesso')
       expect(response.task).toEqual(expectedResult)
-      expect(mockTaskService.update).toHaveBeenCalledWith('task1', {title: 'Task1', userId: mockedUser.id})
+      expect(mockTaskService.update).toHaveBeenCalledWith('task1', {title: 'Task1', completed: false,userId: mockedUser.id})
     })
   })
 
@@ -197,6 +213,8 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser
         }

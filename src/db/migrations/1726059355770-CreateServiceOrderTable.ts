@@ -13,7 +13,7 @@ export class CreateServiceOrderTable1726059355770 implements MigrationInterface 
         );
 
         await queryRunner.query(
-            `CREATE TYPE "public"."service-order_sector_enum" AS ENUM('FINANCEIRO', 'ADMINISTRATIVO', 'COMERCIAL')`,
+            `CREATE TYPE "public"."service-order_sector_enum" AS ENUM('FINANCEIRO', 'OPERACIONAL', 'COMERCIAL')`,
         );
 
         await queryRunner.query(

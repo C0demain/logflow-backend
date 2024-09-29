@@ -69,7 +69,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/v1/service-order/ADMINISTRATIVO",
+							"raw": "http://localhost:8000/api/v1/service-order/OPERACIONAL",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -79,7 +79,7 @@
 								"api",
 								"v1",
 								"service-order",
-								"ADMINISTRATIVO"
+								"OPERACIONAL"
 							],
 							"query": [
 								{

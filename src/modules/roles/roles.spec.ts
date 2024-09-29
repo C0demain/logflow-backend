@@ -6,7 +6,7 @@ import { UserPayload } from '../auth/authentication.service';
 import { Role } from './enums/roles.enum';
 import { UserController } from '../user/user.controller';
 import { UserService } from '../user/user.service';
-import { UserEntity } from '../user/user.entity';
+import { UserEntity } from '../user/entities/user.entity';
 import { Sector } from '../service-order/enums/sector.enum';
 
 describe('Normal user request', () => {
@@ -15,6 +15,7 @@ describe('Normal user request', () => {
     sub: 'testId',
     username: 'test',
     roles: Role.EMPLOYEE,
+    sector: Sector.OPERACIONAL
   };
 
   const userMock: UserEntity = {
@@ -23,11 +24,11 @@ describe('Normal user request', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     createdAt: '2024-01-01',
-    updatedAt: '2024-01-01',
     role: Role.MANAGER,
-    sector: Sector.ADMINISTRATIVO,
-    orders:[],
-    tasks: []
+    sector: Sector.OPERACIONAL,
+    orders: [],
+    tasks: [],
+    isActive: true,
   };
 
   const mockUsersService = {

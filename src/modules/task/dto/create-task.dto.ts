@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { Sector } from "src/modules/service-order/enums/sector.enum";
 
 export class CreateTaskDto {
 
@@ -10,7 +11,10 @@ export class CreateTaskDto {
     @IsNotEmpty()
     orderId: string
 
+    @IsOptional()
     @IsUUID()
-    @IsNotEmpty()
     userId: string
+
+    @IsEnum(Sector)
+    sector: Sector
 }

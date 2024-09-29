@@ -4,6 +4,8 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from 'src/modules/auth/authentication.guard';
+import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
 
 @Controller('/api/v1/task')
 @ApiBearerAuth()
@@ -25,10 +27,12 @@ export class TaskController {
   @Get()
   @ApiOperation({summary: 'Listar todas as tarefas'})
   @ApiQuery({name: 'title', required: false})
+  @ApiQuery({name: 'completed', required: false})
+  @ApiQuery({name: 'sector', required: false})
   @ApiQuery({name: 'assignedUserId', required: false})
   @ApiQuery({name: 'serviceOrderId', required: false})
-  async findAll(@Query('title') title?: string, @Query('assignedUserId') assignedUserId?: string, @Query('serviceOrderId') serviceOrderId?: string) {
-    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId });
+  async findAll(@Query('title') title?: string, @Query('assignedUserId') assignedUserId?: string, @Query('serviceOrderId') serviceOrderId?: string, @Query('completed') completed?: boolean, @Query('sector') sector?: Sector) {
+    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId, completed, sector });
     return {
       message: 'Tarefas obtidas com sucesso',
       tasks
