@@ -76,6 +76,7 @@ describe('ClientController', () => {
           email: 'client@example.com',
           cnpj: '12345678901234',
           phone: '123456789',
+          isActive: true,
           address: {
             zipCode: '12345-678',
             state: 'SP',
@@ -96,11 +97,63 @@ describe('ClientController', () => {
         message: 'Clientes encontrados',
         clients: clients,
       });
-      expect(mockClientService.findAll).toHaveBeenCalledWith({ id: undefined, name: undefined, email: undefined, cnpj: undefined });
+      expect(mockClientService.findAll).toHaveBeenCalledWith({
+        id: undefined,
+        name: undefined,
+        email: undefined,
+        cnpj: undefined,
+        active: undefined,
+      });
+    });
+
+    it('should return a list of inactive clients', async () => {
+      const clients = [
+        {
+          id: '1',
+          name: 'Test Client',
+          email: 'client@example.com',
+          cnpj: '12345678901234',
+          phone: '123456789',
+          isActive: false,
+          address: {
+            zipCode: '12345-678',
+            state: 'SP',
+            city: 'São Paulo',
+            neighborhood: 'Centro',
+            street: 'Rua X',
+            number: '123',
+            complement: 'Apt 101',
+          },
+        },
+      ];
+
+      mockClientService.findAll.mockResolvedValue(clients);
+
+      const result = await controller.findAll(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        false,
+      );
+
+      expect(result).toEqual({
+        message: 'Clientes encontrados',
+        clients: clients,
+      });
+      expect(mockClientService.findAll).toHaveBeenCalledWith({
+        id: undefined,
+        name: undefined,
+        email: undefined,
+        cnpj: undefined,
+        active: false,
+      });
     });
 
     it('should return an empty list if no clients are found', async () => {
-      mockClientService.findAll.mockRejectedValue(new Error('nenhum cliente encontrado'));
+      mockClientService.findAll.mockRejectedValue(
+        new Error('nenhum cliente encontrado'),
+      );
 
       const result = await controller.findAll();
 
@@ -127,7 +180,10 @@ describe('ClientController', () => {
         message: 'Cliente atualizado com sucesso',
         client: { client: updatedClient },
       });
-      expect(mockClientService.update).toHaveBeenCalledWith('1', updateClientDto);
+      expect(mockClientService.update).toHaveBeenCalledWith(
+        '1',
+        updateClientDto,
+      );
     });
   });
 
