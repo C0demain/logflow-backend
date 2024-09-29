@@ -1,8 +1,9 @@
 name: Push image to DockerHub by sprint
 on:
   push:
-    branches:
+    tags:
       - sprint-*
+
 jobs:
     tests:
       uses: C0demain/logflow-backend/.github/workflows/unit-tests.yml@dev
