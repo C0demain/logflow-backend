@@ -111,6 +111,7 @@ export class ClientService {
     }
 
     Object.assign(clientFound, updateClientDto as Client);
+    Object.assign(clientFound.address, updateClientDto as Client);
 
     const updatedClient = await this.clientRepository.save(clientFound);
 
