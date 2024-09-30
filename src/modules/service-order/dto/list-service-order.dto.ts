@@ -6,6 +6,7 @@ export class ListServiceOrderDto{
         readonly id: string,
         readonly title: string,
         readonly client:{
+            clientId: string,
             clientName: string,
             clientEmail: string,
             clientCnpj: string

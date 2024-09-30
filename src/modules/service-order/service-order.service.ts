@@ -83,6 +83,7 @@ export class ServiceOrderService {
         serviceOrder.id,
         serviceOrder.title,
         {
+          clientId: client.id,
           clientName: client.name,
           clientEmail: client.email,
           clientCnpj: client.cnpj,
@@ -126,7 +127,7 @@ export class ServiceOrderService {
       );
     }
 
-    Object.assign(orderFound, newOrderData as ServiceOrder);
+    Object.assign(orderFound, newOrderData);
 
     return await this.serviceOrderRepository.save(orderFound);
   }

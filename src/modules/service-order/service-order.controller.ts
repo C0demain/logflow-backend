@@ -49,6 +49,7 @@ export class ServiceOrderController {
         orderCreated.id,
         orderCreated.title,
         {
+          clientId: orderCreated.client.id,
           clientName: orderCreated.client.name,
           clientEmail: orderCreated.client.email,
           clientCnpj: orderCreated.client.cnpj,
