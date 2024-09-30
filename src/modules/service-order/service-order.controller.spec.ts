@@ -54,6 +54,7 @@ describe('ServiceOrderController', () => {
         id: 'order-123',
         title: 'Test Order',
         client: {
+          id: "client-123",
           name: 'Client X',
           email: 'client@gmail.com',
           cnpj: '12345',
@@ -78,6 +79,7 @@ describe('ServiceOrderController', () => {
           result.id,
           result.title,
           {
+            clientId: result.client.id,
             clientName: result.client.name,
             clientEmail: result.client.email,
             clientCnpj: result.client.cnpj,
@@ -102,6 +104,7 @@ describe('ServiceOrderController', () => {
           'order-123',
           'Filtered Order',
           {
+            clientId: "client-123",
             clientName: 'Client X',
             clientEmail: 'client@gmail.com',
             clientCnpj: '12345',
@@ -131,6 +134,7 @@ describe('ServiceOrderController', () => {
           'order-123',
           'Filtered Order',
           {
+            clientId: "client-123",
             clientName: 'Client X',
             clientEmail: 'client@gmail.com',
             clientCnpj: '12345',
@@ -171,6 +175,7 @@ describe('ServiceOrderController', () => {
           'order-123',
           'Filtered Order',
           {
+            clientId: "client-123",
             clientName: 'Client X',
             clientEmail: 'client@gmail.com',
             clientCnpj: '12345',
