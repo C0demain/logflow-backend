@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsEmail, Length } from "class-validator";
+import { IsString, IsNotEmpty, IsEmail, Length, IsIn } from "class-validator";
 import { UniqueEmail } from "src/modules/user/validation/UniqueEmail.validation";
 import { IsBrazilianPhoneNumber } from "src/resources/validations/brazilianPhoneNumberValidator";
 import { IsZipCode } from "src/resources/validations/brazilianZipCodeValidation";
@@ -34,6 +34,10 @@ export class CreateClientDto {
 
     @IsString()
     @IsNotEmpty({ message: "O campo `state` não pode estar vazio" })
+    @IsIn(['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 
+        'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 
+        'RR', 'SC', 'SP', 'SE', 'TO'], 
+        { message: "O campo `state` deve ser uma sigla de estado válida" })
     state: string;
 
     @IsString()
