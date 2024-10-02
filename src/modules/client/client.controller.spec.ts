@@ -41,17 +41,17 @@ describe('ClientController', () => {
   describe('create', () => {
     it('should create a client and return success message', async () => {
       const createClientDto: CreateClientDto = {
-        name: 'Test Client',
-        email: 'client@example.com',
-        cnpj: '12345678901234',
-        phone: '123456789',
-        zipCode: '12345-678',
-        state: 'SP',
-        city: 'São Paulo',
-        neighborhood: 'Centro',
-        street: 'Rua X',
-        number: '123',
-        complement: 'Apt 101',
+          name: 'Test Client',
+          email: 'client@example.com',
+          cnpj: '12.345.678/9012-34',
+          phone: '(12) 3456-3789',
+          zipCode: '12345-678',
+          state: 'SP',
+          city: 'São Paulo',
+          neighborhood: 'Centro',
+          street: 'Rua X',
+          number: '123',
+          complement: 'Apt 101',
       };
 
       const createdClient = { id: '1', ...createClientDto };
@@ -74,8 +74,8 @@ describe('ClientController', () => {
           id: '1',
           name: 'Test Client',
           email: 'client@example.com',
-          cnpj: '12345678901234',
-          phone: '123456789',
+          cnpj: '12.345.678/9012-34',
+          phone: '(12) 3456-3789',
           isActive: true,
           address: {
             zipCode: '12345-678',
@@ -112,8 +112,8 @@ describe('ClientController', () => {
           id: '1',
           name: 'Test Client',
           email: 'client@example.com',
-          cnpj: '12345678901234',
-          phone: '123456789',
+          cnpj: '12.345.678/9012-34',
+          phone: '(12) 3456-1789',
           isActive: false,
           address: {
             zipCode: '12345-678',
