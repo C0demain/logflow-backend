@@ -2,7 +2,7 @@ import { Column } from "typeorm";
 
 export class Address {
 
-    @Column({length: 8})
+    @Column({length: 9})
     zipCode: string;
     
     @Column({ length: 100 })

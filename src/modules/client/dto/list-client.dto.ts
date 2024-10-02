@@ -12,7 +12,7 @@ export class ListClientDto {
             neighborhood: string,
             street: string,
             number: string,
-            complement?: string,  // Opcional
+            complement?: string,
         }
     ) {};
 }
