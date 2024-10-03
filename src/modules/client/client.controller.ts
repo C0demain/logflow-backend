@@ -92,8 +92,8 @@ export class ClientController {
     const {clientRemoved, message} = await this.clientService.remove(id);
 
     return {
-      message: message,
-      client: clientRemoved,
+      message,
+      client: clientRemoved
     };
   }
 }

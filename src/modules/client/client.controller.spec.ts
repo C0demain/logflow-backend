@@ -190,14 +190,20 @@ describe('ClientController', () => {
   describe('remove', () => {
     it('should remove a client and return success message', async () => {
       const removedClient = { id: '1', name: 'Test Client' };
-      mockClientService.remove.mockResolvedValue(removedClient);
-
+      const expectedMessage = 'Cliente removido com sucesso';
+  
+      mockClientService.remove.mockResolvedValue({
+        clientRemoved: removedClient,
+        message: expectedMessage,
+      });
+  
       const result = await controller.remove('1');
-
+  
       expect(result).toEqual({
-        message: 'Cliente removido com sucesso',
+        message: expectedMessage,
         client: removedClient,
       });
+
       expect(mockClientService.remove).toHaveBeenCalledWith('1');
     });
   });

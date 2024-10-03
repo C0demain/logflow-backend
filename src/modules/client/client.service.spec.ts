@@ -199,43 +199,57 @@ describe('ClientService', () => {
   });
 
   describe('remove', () => {
-    it('should delete a client', async () => {
+    it('should delete a client if there are no service orders', async () => {
       const client = {
         id: 'client-123',
         name: 'Client X',
         email: 'client@gmail.com',
         cnpj: '12.345.678/9234-12',
         phone: '(12) 97343-1234',
-        address: {
-          zipCode: '12345-123',
-          state: 'SP',
-          city: 'São Paulo',
-          neighborhood: 'Centro',
-          street: 'Rua X',
-          number: '123',
-          complement: 'Apt 101',
-        },
         isActive: true,
+        serviceOrder: [], // Sem ordens de serviço
       };
-
+  
       mockClientRepository.findOne.mockResolvedValue(client);
-      mockClientRepository.delete.mockResolvedValue({
-        ...client,
-        isActive: false,
-      });
-
+      mockClientRepository.delete.mockResolvedValue(undefined); // Simula exclusão
+  
       const result = await service.remove('client-123');
-
-      expect(result.isActive).toBeFalsy();
-      expect(mockClientRepository.save).toHaveBeenCalledWith(client);
+  
+      expect(result.clientRemoved).toEqual(client);
+      expect(result.message).toEqual(`cliente com id: client-123 excluído com sucesso`);
+      expect(mockClientRepository.delete).toHaveBeenCalledWith('client-123');
     });
-
+  
+    it('should deactivate a client if there are service orders', async () => {
+      const client = {
+        id: 'client-123',
+        name: 'Client X',
+        email: 'client@gmail.com',
+        cnpj: '12.345.678/9234-12',
+        phone: '(12) 97343-1234',
+        isActive: true,
+        serviceOrder: [{}], // Com ordens de serviço
+      };
+  
+      mockClientRepository.findOne.mockResolvedValue(client);
+      mockClientRepository.save.mockResolvedValue({ ...client, isActive: false }); // Simula salvamento com isActive: false
+  
+      const result = await service.remove('client-123');
+  
+      expect(result.clientRemoved.isActive).toBe(false); // Verifica se o cliente foi desativado
+      expect(result.message).toEqual(`cliente com id: client-123 arquivado com sucesso`);
+      expect(mockClientRepository.save).toHaveBeenCalledWith({ ...client, isActive: false });
+    });
+  
     it('should throw NotFoundException if client not found', async () => {
       mockClientRepository.findOne.mockResolvedValue(null);
-
+  
       await expect(service.remove('client-123')).rejects.toThrow(
         NotFoundException,
       );
     });
   });
+  
+  
+  
 });
