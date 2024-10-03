@@ -25,7 +25,7 @@ export class Client {
     () => ServiceOrder,
     (serviceOrder: { client: any }) => serviceOrder.client,
   )
-  serviceOrder: ServiceOrder;
+  serviceOrder: ServiceOrder[];
 
   @Column(() => Address)
   address: Address;

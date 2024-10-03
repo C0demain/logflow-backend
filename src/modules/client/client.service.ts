@@ -130,15 +130,28 @@ export class ClientService {
   async remove(id: string) {
     const clientFound = await this.clientRepository.findOne({
       where: { id },
+      relations: ['serviceOrder'],
     });
 
+    let message = "";
+  
     if (!clientFound) {
       throw new NotFoundException(`Cliente com id: ${id}, não encontrado`);
     }
-
-    clientFound.isActive = false;
-    await this.clientRepository.save(clientFound);
-
-    return clientFound;
+  
+    if (clientFound.serviceOrder && clientFound.serviceOrder.length === 0) {
+      message = `cliente com id: ${id} excluído com sucesso`;
+      await this.clientRepository.delete(id);
+    }else{
+      clientFound.isActive = false;
+      message = `cliente com id: ${id} arquivado com sucesso`
+      await this.clientRepository.save(clientFound);
+    }
+  
+    return{
+      clientRemoved: clientFound,
+      message: message
+    };
   }
+  
 }
