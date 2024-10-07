@@ -184,6 +184,7 @@ describe('ServiceOrderService', () => {
       expect(result.title).toEqual('Updated Order');
       expect(result.status).toEqual(Status.FINALIZADO);
       expect(mockServiceOrderRepository.findOne).toHaveBeenCalledWith({
+        relations: { serviceOrderLogs: true },
         where: { id: 'order-123' },
       });
       expect(mockServiceOrderRepository.save).toHaveBeenCalledWith({
