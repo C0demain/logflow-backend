@@ -14,6 +14,7 @@ import { Sector } from '../enums/sector.enum';
 import { ApiTags } from '@nestjs/swagger';
 import { Client } from 'src/modules/client/entities/client.entity';
 import { Task } from 'src/modules/task/entities/task.entity';
+import { ServiceOrderLog } from './service-order-log.entity';
 
 @ApiTags('service-order')
 @Entity({ name: 'service-order' })
@@ -44,6 +45,14 @@ export class ServiceOrder {
 
   @OneToMany(() => Task, (task) => task.serviceOrder)
   tasks: Task[];
+
+  @OneToMany(
+    () => ServiceOrderLog,
+    (serviceOrderLog) => serviceOrderLog.serviceOrder,
+    { cascade: true },
+  )
+  @JoinColumn()
+  serviceOrderLogs: ServiceOrderLog[];
 
   @CreateDateColumn({ name: 'creationDate', type: 'date' })
   creationDate: Date;

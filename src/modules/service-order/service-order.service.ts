@@ -13,6 +13,7 @@ import { UserService } from '../user/user.service';
 import { Status } from './enums/status.enum';
 import { Sector } from './enums/sector.enum';
 import { ClientService } from '../client/client.service';
+import { ServiceOrderLog } from './entities/service-order-log.entity';
 
 @Injectable()
 export class ServiceOrderService {
@@ -70,6 +71,8 @@ export class ServiceOrderService {
 
     const orders = await this.serviceOrderRepository.find({ where });
 
+    console.log(orders);
+
     if (!orders || orders.length === 0) {
       throw new InternalServerErrorException(
         'Nenhuma ordem de serviço encontrada',
@@ -79,6 +82,7 @@ export class ServiceOrderService {
     const ordersList = orders.map((serviceOrder) => {
       const user = serviceOrder.user;
       const client = serviceOrder.client;
+
       return new ListServiceOrderDto(
         serviceOrder.id,
         serviceOrder.title,
@@ -119,12 +123,24 @@ export class ServiceOrderService {
   async update(id: string, newOrderData: UpdateServiceOrderDto) {
     const orderFound = await this.serviceOrderRepository.findOne({
       where: { id },
+      relations: {
+        serviceOrderLogs: true,
+      },
     });
 
     if (!orderFound) {
       throw new NotFoundException(
         `Ordem de serviço com id: ${id}, não encontrada`,
       );
+    }
+
+    if (
+      newOrderData.sector != undefined &&
+      orderFound.sector !== newOrderData.sector
+    ) {
+      const orderLog = new ServiceOrderLog();
+      orderLog.changedTo = newOrderData.sector;
+      orderFound.serviceOrderLogs.push(orderLog);
     }
 
     Object.assign(orderFound, newOrderData);
