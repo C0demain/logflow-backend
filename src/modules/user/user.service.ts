@@ -6,20 +6,28 @@ import { CreateUserDTO } from './dto/CreateUser.dto';
 import { ListUsersDTO } from './dto/ListUser.dto';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { FindOptionsWhere } from 'typeorm'
+import { RoleEntity } from '../roles/roles.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(RoleEntity) 
+    private readonly roleRepository: Repository<RoleEntity>
   ) {}
 
   async createUser(createUserDTO: CreateUserDTO) {
     const userEntity = new UserEntity();
 
+    const role = await this.roleRepository.findOne({where: {name: createUserDTO.role}})
+    if(!role){
+      throw new NotFoundException(`role ${createUserDTO.role} não encontrada`)  
+    }
+
     userEntity.name = createUserDTO.name;
     userEntity.email = createUserDTO.email;
-    userEntity.role = createUserDTO.role;
+    userEntity.role = role;
     userEntity.sector = createUserDTO.sector;
     userEntity.password = createUserDTO.password;
     userEntity.isActive = createUserDTO.isActive;
@@ -32,7 +40,7 @@ export class UserService {
     where.isActive = isActive === undefined ? true : isActive
     const usersSaved = await this.userRepository.find({where})
     const usersList = usersSaved.map(
-      (user) => new ListUsersDTO(user.id, user.name, user.role, user.isActive, user.email, user.sector),
+      (user) => new ListUsersDTO(user.id, user.name, user.role.name, user.isActive, user.email, user.sector),
     );
     return usersList;
   }

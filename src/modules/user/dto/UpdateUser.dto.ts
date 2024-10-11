@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsEmail, MinLength, IsOptional, IsEnum, IsBoolean } from "class-validator";
-import { Role } from "src/modules/roles/enums/roles.enum";
 import { Sector } from "src/modules/service-order/enums/sector.enum";
 import { UniqueEmail } from "src/modules/user/validation/UniqueEmail.validation";
 
@@ -9,10 +8,6 @@ export class UpdateUserDTO{
 
     @IsEmail(undefined, {message: 'O campo `email` informado é inválido ou não foi informado.',})
     email: string;
-
-    @IsOptional()
-    @IsEnum(Role, {message: `O campo 'role' precisa estar dentro dos padrôes estabelecidos. (${Role.EMPLOYEE},${Role.MANAGER})`,})
-    role: Role;
 
     @IsOptional()
     @MinLength(6, {message: 'O campo `password` precisa ter pelo menos 6 caracteres.',})

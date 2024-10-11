@@ -4,13 +4,16 @@ import {
   CreateDateColumn,
   PrimaryGeneratedColumn,
   OneToMany,
+  ManyToOne,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiTags } from '@nestjs/swagger';
 import { Task } from 'src/modules/task/entities/task.entity';
-import { Role } from 'src/modules/roles/enums/roles.enum';
 import { ServiceOrder } from 'src/modules/service-order/entities/service-order.entity';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { RoleEntity } from 'src/modules/roles/roles.entity';
 
 @ApiTags('users')
 @Entity({ name: 'users' })
@@ -28,8 +31,9 @@ export class UserEntity {
   @Column({ name: 'password', length: 255, nullable: false })
   password: string;
 
-  @Column({ name: 'role', type: 'enum', enum: Role, default: Role.EMPLOYEE })
-  role: Role;
+  @OneToOne(() => RoleEntity, { eager: true, nullable: false })
+  @JoinColumn({ name: 'role_id' })  // Define que esta coluna será a chave estrangeira
+  role: RoleEntity;
 
   @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {eager: false})
   orders: ServiceOrder[];

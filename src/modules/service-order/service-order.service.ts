@@ -98,7 +98,7 @@ export class ServiceOrderService {
           userId: user.id,
           userName: user.name,
           userEmail: user.email,
-          userRole: user.role,
+          userRole: user.role.name,
         },
       );
     });
