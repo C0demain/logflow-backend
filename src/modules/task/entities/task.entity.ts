@@ -29,4 +29,15 @@ export class Task {
     @ManyToOne(() => UserEntity, user => user.tasks, {eager:true})
     assignedUser: UserEntity
 
+    @Column({ length: 30, nullable: true })
+    produto_coletado: string
+
+    @Column({ length: 30, nullable: true })
+    saida_para_entrega: string
+
+    @Column({ length: 30, nullable: true })
+    chegada_do_produto: string
+
+    @Column({ length: 30, nullable: true })
+    coleta_de_assinatura: string
 }

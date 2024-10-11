@@ -16,6 +16,9 @@ export class TaskController {
 
   @Post()
   @ApiOperation({summary: 'Criar tarefa'})
+  @ApiQuery({ name: 'title', required: true })
+  @ApiQuery({ name: 'orderId', required: true })
+  @ApiQuery({ name: 'sector', required: true})
   async create(@Body() createTaskDto: CreateTaskDto) {
     const task = await this.taskService.create(createTaskDto)
     return {

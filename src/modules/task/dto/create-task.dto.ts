@@ -17,4 +17,12 @@ export class CreateTaskDto {
 
     @IsEnum(Sector)
     sector: Sector
+
+    @IsOptional()
+    driverChecklists: {
+        produto_coletado: string;
+        saida_para_entrega: string;
+        chegada_do_produto: string;
+        coleta_de_assinatura: string;
+    }
 }

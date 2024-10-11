@@ -37,6 +37,10 @@ export class TaskService {
     taskDb.sector = createTaskDto.sector
     taskDb.serviceOrder = serviceOrder
     taskDb.assignedUser = user
+    taskDb.produto_coletado = createTaskDto.driverChecklists.produto_coletado
+    taskDb.saida_para_entrega = createTaskDto.driverChecklists.saida_para_entrega
+    taskDb.chegada_do_produto = createTaskDto.driverChecklists.chegada_do_produto
+    taskDb.coleta_de_assinatura = createTaskDto.driverChecklists.coleta_de_assinatura
 
     const createdTask =  await this.taskRepository.save(taskDb)
     return parseToGetTaskDTO(createdTask)
