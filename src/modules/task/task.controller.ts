@@ -5,7 +5,6 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from 'src/modules/auth/authentication.guard';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
-import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
 
 @Controller('/api/v1/task')
 @ApiBearerAuth()

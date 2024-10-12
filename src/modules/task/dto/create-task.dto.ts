@@ -1,28 +1,40 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 import { Sector } from "src/modules/service-order/enums/sector.enum";
 
 export class CreateTaskDto {
 
     @IsString()
     @IsNotEmpty()
-    title: string
+    title: string;
 
     @IsUUID()
     @IsNotEmpty()
-    orderId: string
+    orderId: string;
 
     @IsOptional()
     @IsUUID()
-    userId: string
+    userId: string;
 
     @IsEnum(Sector)
-    sector: Sector
+    sector: Sector;
 
     @IsOptional()
-    driverChecklists: {
-        produto_coletado: string;
-        saida_para_entrega: string;
-        chegada_do_produto: string;
-        coleta_de_assinatura: string;
-    }
+    @IsUUID()
+    driverId: string;
+
+    @IsOptional()
+    @IsBoolean()
+    collectProduct: boolean;
+
+    @IsOptional()
+    @IsBoolean()
+    departureForDelivery: boolean;
+
+    @IsOptional()
+    @IsBoolean()
+    arrival: boolean;
+
+    @IsOptional()
+    @IsBoolean()
+    collectSignature: boolean;
 }

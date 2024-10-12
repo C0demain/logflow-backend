@@ -1,8 +1,8 @@
 import { IsString, IsNotEmpty, IsEmail, Length, IsIn } from "class-validator";
 import { UniqueEmail } from "src/modules/user/validation/UniqueEmail.validation";
-import { IsBrazilianPhoneNumber } from "src/resources/validations/brazilianPhoneNumberValidator";
-import { IsZipCode } from "src/resources/validations/brazilianZipCodeValidation";
-import { IsCNPJ } from "src/resources/validations/brazilianCNPJValidator";
+import { IsBrazilianPhoneNumber } from "src/modules/client/validations/brazilianPhoneNumberValidator";
+import { IsZipCode } from "src/modules/client/validations/brazilianZipCodeValidator";
+import { IsCNPJ } from "src/modules/client/validations/brazilianCNPJValidator";
 
 export class CreateClientDto {
 

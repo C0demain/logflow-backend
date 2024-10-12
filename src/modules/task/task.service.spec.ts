@@ -8,7 +8,6 @@ import { ServiceOrderService } from 'src/modules/service-order/service-order.ser
 import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
 import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { NotFoundException } from '@nestjs/common';
-import { title } from 'process';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
 
 describe('TaskService', () => {
@@ -79,7 +78,12 @@ describe('TaskService', () => {
       title: 'task-title',
       orderId: 'order1',
       userId: 'user1',
-      sector: Sector.OPERACIONAL
+      sector: Sector.OPERACIONAL,
+      collectProduct: false,
+      departureForDelivery: false,
+      arrival: false,
+      collectSignature: false,
+      driverId: 'driver1'
     }
 
     const expectedResult: GetTaskDto = {

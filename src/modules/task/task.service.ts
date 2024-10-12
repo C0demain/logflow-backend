@@ -22,25 +22,38 @@ export class TaskService {
     const taskDb = new Task()
 
     const serviceOrder = await this.serviceOrderService.findById(createTaskDto.orderId)
-
     if(serviceOrder === null){
       throw new NotFoundException('Ordem de serviço não encontrada')
     }
 
-    const user = await this.userService.findById(createTaskDto.userId)
-
-    if(user === null){
+    const userId = await this.userService.findById(createTaskDto.userId)
+    if (userId === null){
       throw new NotFoundException('Usuário não encontrado')
     }
 
+    let driver = null;
+    if (createTaskDto.driverId) {
+      driver = await this.userService.findById(createTaskDto.driverId);
+      if (!driver) {
+        throw new NotFoundException('Motorista não encontrado');
+      }
+    }
+
+    // Obrigatórios
     taskDb.title = createTaskDto.title
     taskDb.sector = createTaskDto.sector
     taskDb.serviceOrder = serviceOrder
-    taskDb.assignedUser = user
-    taskDb.produto_coletado = createTaskDto.driverChecklists.produto_coletado
-    taskDb.saida_para_entrega = createTaskDto.driverChecklists.saida_para_entrega
-    taskDb.chegada_do_produto = createTaskDto.driverChecklists.chegada_do_produto
-    taskDb.coleta_de_assinatura = createTaskDto.driverChecklists.coleta_de_assinatura
+    taskDb.assignedUser = userId
+
+    // Opcionais
+    taskDb.collectProduct = createTaskDto.collectProduct
+    taskDb.departureForDelivery = createTaskDto.departureForDelivery
+    taskDb.arrival = createTaskDto.arrival
+    taskDb.collectSignature = createTaskDto.collectSignature
+
+    if (driver) {
+      taskDb.driver = driver;
+    }
 
     const createdTask =  await this.taskRepository.save(taskDb)
     return parseToGetTaskDTO(createdTask)
