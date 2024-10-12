@@ -14,7 +14,12 @@ describe('TaskController', () => {
     title: 'Task1',
     userId: 'user1',
     orderId: 'order1',
-    sector: Sector.OPERACIONAL
+    sector: Sector.OPERACIONAL,
+    driverId: 'driver1',
+    collectProduct: false,
+    departureForDelivery: false,
+    arrival: false,
+    collectSignature: false
   }
 
   const mockedUser = {
