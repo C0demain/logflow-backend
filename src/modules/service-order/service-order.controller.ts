@@ -27,7 +27,7 @@ import { Roles } from '../roles/roles.decorator';
 @Controller('/api/v1/service-order')
 @ApiBearerAuth()
 export class ServiceOrderController {
-  constructor(private readonly serviceOrderService: ServiceOrderService) {}
+  constructor(private readonly serviceOrderService: ServiceOrderService) { }
 
   @Post()
   @ApiOperation({ summary: 'Criar ordem de serviço' })
