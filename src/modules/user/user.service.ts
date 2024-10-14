@@ -69,12 +69,24 @@ export class UserService {
 
   async updateUser(id: string, newData: UpdateUserDTO) {
     const user = await this.userRepository.findOneBy({ id });
-
-    if (user === null)
+  
+    if (!user) {
       throw new NotFoundException('O usuário não foi encontrado.');
+    }
+  
+    if (newData.role) {
+      const role = await this.roleRepository.findOne({
+        where: { name: newData.role},
+      });
+  
+      if (!role) {
+        throw new NotFoundException(`Role "${newData.role}" não encontrada.`);
+      }
 
-    Object.assign(user, newData as UserEntity);
-
+      user.role = role;
+    }
+    Object.assign(user, newData);
+  
     return this.userRepository.save(user);
   }
 

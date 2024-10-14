@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsEmail, MinLength, IsOptional, IsEnum, IsBoolean } from "class-validator";
+import { IsNotEmpty, IsEmail, MinLength, IsOptional, IsEnum, IsBoolean, IsSemVer, IsString } from "class-validator";
+import { RoleEntity } from "src/modules/roles/roles.entity";
 import { Sector } from "src/modules/service-order/enums/sector.enum";
 import { UniqueEmail } from "src/modules/user/validation/UniqueEmail.validation";
 
@@ -12,6 +13,10 @@ export class UpdateUserDTO{
     @IsOptional()
     @MinLength(6, {message: 'O campo `password` precisa ter pelo menos 6 caracteres.',})
     password: string;
+
+    @IsOptional()
+    @IsString()
+    role: string;
 
     @IsOptional()
     @IsEnum(Sector, {message: 'O campo `sector` precisa estar dentro dos padrôes estabelecidos.',})

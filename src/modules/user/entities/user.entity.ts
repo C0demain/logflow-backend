@@ -31,8 +31,8 @@ export class UserEntity {
   @Column({ name: 'password', length: 255, nullable: false })
   password: string;
 
-  @OneToOne(() => RoleEntity, { eager: true, nullable: false })
-  @JoinColumn({ name: 'role_id' })  // Define que esta coluna será a chave estrangeira
+  @ManyToOne(() => RoleEntity, { eager: true, nullable: false })
+  @JoinColumn({ name: 'role_id' })  
   role: RoleEntity;
 
   @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {eager: false})

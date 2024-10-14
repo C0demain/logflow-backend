@@ -59,7 +59,7 @@ export class ServiceOrderController {
           userId: orderCreated.user.id,
           userName: orderCreated.user.name,
           userEmail: orderCreated.user.email,
-          userRole: orderCreated.user.role.name,
+          userRole: "",
         },
       ),
     };

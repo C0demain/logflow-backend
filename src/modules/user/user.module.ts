@@ -9,7 +9,7 @@ import { RoleEntity } from '../roles/roles.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity, RoleEntity])],
   controllers: [UserController],
-  providers: [UserService, UniqueEmailValidator],
+  providers: [UserService, UniqueEmailValidator, RoleEntity],
   exports: [UserService],
 })
 export class UserModule {}

@@ -6,7 +6,6 @@ import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
 import { Status } from './enums/status.enum';
 import { Sector } from './enums/sector.enum';
-import { Role } from '../roles/enums/roles.enum';
 import { AuthenticationGuard } from '../auth/authentication.guard';
 
 describe('ServiceOrderController', () => {
@@ -65,7 +64,7 @@ describe('ServiceOrderController', () => {
           id: 'user-123',
           name: 'User Test',
           email: 'user@test.com',
-          role: Role.EMPLOYEE,
+          role: '',
         },
       };
 
@@ -90,7 +89,7 @@ describe('ServiceOrderController', () => {
             userId: result.user.id,
             userName: result.user.name,
             userEmail: result.user.email,
-            userRole: result.user.role,
+            userRole: result.user.role ?? '',
           }
         ),
       );
@@ -115,7 +114,7 @@ describe('ServiceOrderController', () => {
             userId: 'user-123', 
             userName: 'User Test',
             userEmail: 'user@test.com',
-            userRole: Role.EMPLOYEE,
+            userRole: '',
           },
         ),
       ];
@@ -145,7 +144,7 @@ describe('ServiceOrderController', () => {
             userId: 'user-123', 
             userName: 'User Test',
             userEmail: 'user@test.com',
-            userRole: Role.EMPLOYEE,
+            userRole: '',
           },
         ),
       ];
@@ -186,7 +185,7 @@ describe('ServiceOrderController', () => {
             userId: 'user-123', 
             userName: 'User Test',
             userEmail: 'user@test.com',
-            userRole: Role.EMPLOYEE,
+            userRole: '',
           },
         ),
       ];
