@@ -9,8 +9,10 @@ import {
     ManyToOne,
     BeforeInsert,
     BeforeUpdate,
+    JoinColumn,
 } from "typeorm";
-import { defaultIfEmpty } from "rxjs";
+import { Address } from "src/modules/client/entities/address.entity";
+import { Client } from "src/modules/client/entities/client.entity";
 
 @Entity({name: 'task'})
 export class Task {
@@ -34,6 +36,10 @@ export class Task {
 
     @ManyToOne(() => UserEntity, {eager:true})
     driver: UserEntity;
+
+    @ManyToOne(() => Client, { eager: true })
+    @JoinColumn()
+    client: Client;
 
     @Column({ default: false, nullable: true })
     collectProduct: boolean;

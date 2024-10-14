@@ -19,7 +19,8 @@ describe('TaskController', () => {
     collectProduct: false,
     departureForDelivery: false,
     arrival: false,
-    collectSignature: false
+    collectSignature: false,
+    clientId: 'client1'
   }
 
   const mockedUser = {

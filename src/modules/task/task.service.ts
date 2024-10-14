@@ -8,6 +8,7 @@ import { ServiceOrderService } from 'src/modules/service-order/service-order.ser
 import { UserService } from 'src/modules/user/user.service';
 import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { ClientService } from 'src/modules/client/client.service';
 
 @Injectable()
 export class TaskService {
@@ -15,48 +16,60 @@ export class TaskService {
   constructor(
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
     private readonly serviceOrderService: ServiceOrderService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly clientService: ClientService
   ){}
 
   async create(createTaskDto: CreateTaskDto) {
-    const taskDb = new Task()
+    const taskDb = new Task();
 
-    const serviceOrder = await this.serviceOrderService.findById(createTaskDto.orderId)
+    const serviceOrder = await this.serviceOrderService.findById(createTaskDto.orderId);
     if(serviceOrder === null){
-      throw new NotFoundException('Ordem de serviço não encontrada')
+      throw new NotFoundException('Ordem de serviço não encontrada.');
     }
 
-    const userId = await this.userService.findById(createTaskDto.userId)
+    const userId = await this.userService.findById(createTaskDto.userId);
     if (userId === null){
-      throw new NotFoundException('Usuário não encontrado')
+      throw new NotFoundException('Usuário não encontrado.');
     }
 
-    let driver = null;
+    let driverId = null;
     if (createTaskDto.driverId) {
-      driver = await this.userService.findById(createTaskDto.driverId);
-      if (!driver) {
-        throw new NotFoundException('Motorista não encontrado');
+      driverId = await this.userService.findById(createTaskDto.driverId);
+      if (!driverId) {
+        throw new NotFoundException('Motorista não encontrado.');
+      }
+    }
+
+    let clientId = null;
+    if (createTaskDto.clientId) {
+      clientId = await this.clientService.findById(createTaskDto.clientId);
+      if (!clientId) {
+        throw new NotFoundException("Cliente não encontrado.");
       }
     }
 
     // Obrigatórios
-    taskDb.title = createTaskDto.title
-    taskDb.sector = createTaskDto.sector
-    taskDb.serviceOrder = serviceOrder
-    taskDb.assignedUser = userId
+    taskDb.title = createTaskDto.title;
+    taskDb.sector = createTaskDto.sector;
+    taskDb.serviceOrder = serviceOrder;
 
     // Opcionais
-    taskDb.collectProduct = createTaskDto.collectProduct
-    taskDb.departureForDelivery = createTaskDto.departureForDelivery
-    taskDb.arrival = createTaskDto.arrival
-    taskDb.collectSignature = createTaskDto.collectSignature
+    taskDb.assignedUser = userId;
+    taskDb.collectProduct = createTaskDto.collectProduct;
+    taskDb.departureForDelivery = createTaskDto.departureForDelivery;
+    taskDb.arrival = createTaskDto.arrival;
+    taskDb.collectSignature = createTaskDto.collectSignature;
 
-    if (driver) {
-      taskDb.driver = driver;
+    if (driverId) {
+      taskDb.driver = driverId;
+    }
+    if (clientId){
+      taskDb.client = clientId;
     }
 
-    const createdTask =  await this.taskRepository.save(taskDb)
-    return parseToGetTaskDTO(createdTask)
+    const createdTask =  await this.taskRepository.save(taskDb);
+    return parseToGetTaskDTO(createdTask);
   }
 
   async findAll(filters: {title?: string, assignedUserId?: string, serviceOrderId?: string, completed?: boolean, sector?: Sector}) {

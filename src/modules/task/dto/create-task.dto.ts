@@ -20,6 +20,10 @@ export class CreateTaskDto {
 
     @IsOptional()
     @IsUUID()
+    clientId: string
+
+    @IsOptional()
+    @IsUUID()
     driverId: string;
 
     @IsOptional()

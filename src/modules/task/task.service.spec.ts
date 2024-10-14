@@ -83,7 +83,8 @@ describe('TaskService', () => {
       departureForDelivery: false,
       arrival: false,
       collectSignature: false,
-      driverId: 'driver1'
+      driverId: 'driver1',
+      clientId: 'client1'
     }
 
     const expectedResult: GetTaskDto = {
