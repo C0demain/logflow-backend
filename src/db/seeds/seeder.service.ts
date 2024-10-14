@@ -64,12 +64,12 @@ export class SeederService {
   // Método para injetar as roles no banco de dados
   private async seedRoles(): Promise<void> {
     const roles = [
-      { name: 'Vendedor', description: 'Responsável pelas vendas', sector: Sector.COMERCIAL },
-      { name: 'SAC', description: 'Atendimento ao cliente', sector: Sector.COMERCIAL },
+      { name: 'Vendedor', description: 'Responsável pelas vendas', sector: Sector.VENDAS },
+      { name: 'SAC', description: 'Atendimento ao cliente', sector: Sector.OPERACIONAL },
       { name: 'Motorista', description: 'Responsável pelas entregas', sector: Sector.OPERACIONAL },
       { name: 'Analista de Logística', description: 'Gerenciamento de logística', sector: Sector.OPERACIONAL },
-      { name: 'Consultoria', description: 'Consultoria especializada', sector: Sector.COMERCIAL },
-      { name: 'Diretor Comercial', description: 'Diretor do setor comercial', sector: Sector.COMERCIAL },
+      { name: 'Consultoria', description: 'Consultoria especializada', sector: Sector.DIRETORIA},
+      { name: 'Diretor Comercial', description: 'Diretor do setor comercial', sector: Sector.DIRETORIA},
       { name: 'Diretor Administrativo', description: 'Diretor do setor administrativo', sector: Sector.FINANCEIRO },
       { name: 'Analista de RH', description: 'Responsável pelo RH', sector: Sector.FINANCEIRO },
       { name: 'Analista Administrativo "Financeiro"', description: 'Administração financeira', sector: Sector.FINANCEIRO },
