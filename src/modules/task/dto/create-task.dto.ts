@@ -15,6 +15,9 @@ export class CreateTaskDto {
     @IsUUID()
     userId: string;
 
+    @IsBoolean()
+    completed: boolean
+
     @IsEnum(Sector)
     sector: Sector;
 

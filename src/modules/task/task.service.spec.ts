@@ -9,12 +9,14 @@ import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
 import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { NotFoundException } from '@nestjs/common';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { ClientService } from '../client/client.service';
 
 describe('TaskService', () => {
   let service: TaskService;
   let repo: Repository<Task>;
   let userService: UserService;
   let serviceOrderService: ServiceOrderService;
+  let clientService: ClientService;
 
   const mockRepository = {
     save: jest.fn(),
@@ -29,8 +31,18 @@ describe('TaskService', () => {
     email: 'user1@gmail.com'
   }
 
+  const mockedClient = {
+    id: 'client1',
+    name: 'Client1',
+    email: 'client1@gmail.com'
+  }
+
   const mockUserService = {
     findById: jest.fn().mockResolvedValue(mockedUser),
+  };
+
+  const mockClientService = {
+    findById: jest.fn().mockResolvedValue(mockedClient),
   };
 
   const mockedServiceOrder = {
@@ -57,6 +69,10 @@ describe('TaskService', () => {
         {
           provide: ServiceOrderService,
           useValue: mockServiceOrderService
+        },
+        {
+          provide: ClientService,
+          useValue: mockClientService
         }
       ],
     }).compile();
@@ -65,6 +81,7 @@ describe('TaskService', () => {
     repo = module.get<Repository<Task>>(getRepositoryToken(Task));
     userService = module.get<UserService>(UserService);
     serviceOrderService = module.get<ServiceOrderService>(ServiceOrderService);
+    clientService = module.get<ClientService>(ClientService);
   });
 
   it('should be defined', () => {
@@ -84,7 +101,8 @@ describe('TaskService', () => {
       arrival: false,
       collectSignature: false,
       driverId: 'driver1',
-      clientId: 'client1'
+      clientId: 'client1',
+      completed: false
     }
 
     const expectedResult: GetTaskDto = {
@@ -230,7 +248,17 @@ describe('TaskService', () => {
       mockRepository.findOneBy.mockResolvedValue({...expectedResult, ...{title: 'Task1'} })
       mockRepository.save.mockResolvedValue(expectedResult)
 
-      const task = await service.update('task1', {title: 'Task2', completed: false, userId: 'user1'})
+      const task = await service.update('task1', {
+        title: 'Task2', completed: false, userId: 'user1',
+        orderId: 'order1',
+        sector: Sector.OPERACIONAL,
+        clientId: 'client1',
+        driverId: 'driver1',
+        collectProduct: false,
+        departureForDelivery: false,
+        arrival: false,
+        collectSignature: false
+      })
 
       expect(task).toEqual(expectedResult)
     })
@@ -239,7 +267,17 @@ describe('TaskService', () => {
       
       mockRepository.findOneBy.mockResolvedValue(null)
 
-      expect(service.update('task1', {title: 'Task2', completed: false, userId: 'user1'})).rejects.toBeInstanceOf(NotFoundException)
+      expect(service.update('task1', {
+        title: 'Task2', completed: false, userId: 'user1',
+        orderId: 'order2',
+        sector: Sector.OPERACIONAL,
+        clientId: 'client2',
+        driverId: 'driver2',
+        collectProduct: false,
+        departureForDelivery: false,
+        arrival: false,
+        collectSignature: false
+      })).rejects.toBeInstanceOf(NotFoundException)
     })
   })
 

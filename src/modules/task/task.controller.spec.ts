@@ -12,15 +12,16 @@ describe('TaskController', () => {
 
   const createTaskDto: CreateTaskDto = {
     title: 'Task1',
-    userId: 'user1',
     orderId: 'order1',
+    userId: 'user1',
+    completed: false,
     sector: Sector.OPERACIONAL,
+    clientId: 'client1',
     driverId: 'driver1',
     collectProduct: false,
     departureForDelivery: false,
     arrival: false,
-    collectSignature: false,
-    clientId: 'client1'
+    collectSignature: false
   }
 
   const mockedUser = {
@@ -71,21 +72,50 @@ describe('TaskController', () => {
   });
 
   describe('create', ()=>{
-    it('should create a task', async ()=>{
-      const expectedResult: GetTaskDto = {
-        id: 'task1',
-        title: 'Task1',
-        completed: false,
-        sector: Sector.OPERACIONAL,
-        serviceOrder: mockedServiceOrder,
-        assignedUser: mockedUser
-      }
+    it('should create a task', async () => {
+      const expectedResult: GetTaskDto = new GetTaskDto(
+        'task1',
+        'Task1',
+        Sector.OPERACIONAL,
+        false,
+        {
+          id: 'order1',
+          title: 'Order1',
+        },
+        {
+          id: 'user1',
+          name: 'User1',
+          email: 'user1@gmail.com',
+        },
+        {
+          id: 'driver1',
+          name: 'Driver1',
+          email: 'driver1@gmail.com',
+        },
+        {
+          id: 'client1',
+          name: 'Client1',
+          email: 'client1@gmail.com',
+          address: {
+            zipCode: '12345-678',
+            state: 'SP',
+            city: 'São Paulo',
+            neighborhood: 'Centro',
+            street: 'Rua A',
+            number: '123',
+            complement: 'Apto 456',
+          },
+        }
+      );
       mockTaskService.create.mockResolvedValue(expectedResult)
 
       const response = await controller.create(createTaskDto)
 
-      expect(response.task).toEqual(expectedResult)
-      expect(response.message).toEqual('Tarefa criada com sucesso')
+      expect(response).toEqual({
+        message: 'Tarefa criada com sucesso',
+        task: expectedResult,
+      });
+  
       expect(mockTaskService.create).toHaveBeenCalledWith(createTaskDto)
     })
   })
@@ -193,26 +223,69 @@ describe('TaskController', () => {
     })
   })
 
-  describe('update', ()=>{
-    it('should update task by id', async ()=>{
-      const expectedResult: GetTaskDto = {
-          id: 'task1',
-          title: 'Task1',
-          completed: false,
-          sector: Sector.OPERACIONAL,
-          serviceOrder: mockedServiceOrder,
-          assignedUser: mockedUser
-      }
-
-      mockTaskService.update.mockResolvedValue(expectedResult)
-
-      const response = await controller.update('task1', {title: 'Task1', completed: false, userId: mockedUser.id})
-
-      expect(response.message).toEqual('Tarefa atualizada com sucesso')
-      expect(response.task).toEqual(expectedResult)
-      expect(mockTaskService.update).toHaveBeenCalledWith('task1', {title: 'Task1', completed: false,userId: mockedUser.id})
-    })
-  })
+  describe('update', () => {
+    it('should update task by id', async () => {
+      // Construindo o resultado esperado com base no DTO GetTaskDto
+      const expectedResult: GetTaskDto = new GetTaskDto(
+        'task1',
+        'Task1',
+        Sector.OPERACIONAL,
+        false,
+        {
+          id: 'order1',
+          title: 'Order1',
+        },
+        {
+          id: 'user1',
+          name: 'User1',
+          email: 'user1@gmail.com',
+        },
+        {
+          id: 'driver1',
+          name: 'Driver1',
+          email: 'driver1@gmail.com',
+        },
+        {
+          id: 'client1',
+          name: 'Client1',
+          email: 'client1@gmail.com',
+          address: {
+            zipCode: '12345-678',
+            state: 'SP',
+            city: 'São Paulo',
+            neighborhood: 'Centro',
+            street: 'Rua A',
+            number: '123',
+            complement: 'Apto 456',
+          },
+        }
+      );
+  
+      mockTaskService.update.mockResolvedValue(expectedResult);
+  
+      const updateTaskDto = {
+        title: 'Task1',
+        completed: false,
+        userId: mockedUser.id,
+        orderId: 'order1',
+        sector: Sector.OPERACIONAL,
+        clientId: 'client1',
+        driverId: 'driver1',
+        collectProduct: false,
+        departureForDelivery: false,
+        arrival: false,
+        collectSignature: false,
+      };
+  
+      const response = await controller.update('task1', updateTaskDto);
+  
+      expect(response.message).toEqual('Tarefa atualizada com sucesso');
+      expect(response.task).toEqual(expectedResult);
+  
+      expect(mockTaskService.update).toHaveBeenCalledWith('task1', updateTaskDto);
+    });
+  });
+  
 
   describe('remove', ()=>{
     it('should remove task by id', async ()=>{

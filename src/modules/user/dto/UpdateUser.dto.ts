@@ -1,7 +1,6 @@
 import { IsNotEmpty, IsEmail, MinLength, IsOptional, IsEnum, IsBoolean } from "class-validator";
 import { Role } from "src/modules/roles/enums/roles.enum";
 import { Sector } from "src/modules/service-order/enums/sector.enum";
-import { UniqueEmail } from "src/modules/user/validation/UniqueEmail.validation";
 
 export class UpdateUserDTO{
     @IsNotEmpty({ message: 'O campo `name` não pode ser vazio.' })
