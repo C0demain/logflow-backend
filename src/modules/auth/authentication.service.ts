@@ -1,14 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { Role } from '../roles/enums/roles.enum';
 import { UserService } from '../user/user.service';
 import { Sector } from '../service-order/enums/sector.enum';
+import { RoleEntity } from '../roles/roles.entity';
 
 export interface UserPayload {
   sub: string;
   username: string;
-  roles: Role;
+  role: RoleEntity;
   sector: Sector;
 }
 
@@ -35,14 +35,15 @@ export class AuthenticationService {
     const payload: UserPayload = {
       sub: user.id,
       username: user.name,
-      roles: user.role,
+      role: user.role,
       sector: user.sector
     };
 
     return {
       id: user.id,
       token: await this.jwtService.signAsync(payload),
-      sector: user.sector
+      sector: user.sector,
+      role: user.role.name
     };
   }
 }

@@ -21,7 +21,6 @@ import {
 } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../auth/authentication.guard';
 import { Roles } from '../roles/roles.decorator';
-import { Role } from '../roles/enums/roles.enum';
 
 @ApiTags('service-order')
 @UseGuards(AuthenticationGuard)
@@ -60,14 +59,13 @@ export class ServiceOrderController {
           userId: orderCreated.user.id,
           userName: orderCreated.user.name,
           userEmail: orderCreated.user.email,
-          userRole: orderCreated.user.role,
+          userRole: "",
         },
       ),
     };
   }
 
   @Get()
-  @Roles(Role.MANAGER)
   @ApiOperation({
     summary: 'Listar todos as ordens de serviço',
     description: 'Rota acessível apenas para administradores',
@@ -152,7 +150,6 @@ export class ServiceOrderController {
   }
 
   @Delete(':id')
-  @Roles(Role.MANAGER)
   @ApiOperation({
     summary: 'Deletar uma ordem de serviço',
     description: 'Rota acessível apenas para administradores',

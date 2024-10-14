@@ -18,13 +18,12 @@ import { AuthenticationGuard } from '../auth/authentication.guard';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { RolesGuard } from '../roles/roles.guard';
 import { Roles } from '../roles/roles.decorator';
-import { Role } from '../roles/enums/roles.enum';
+import { RoleEntity } from '../roles/roles.entity';
 
 @ApiTags('users')
 @ApiBearerAuth()
 @Controller('/api/v1/users')
-@UseGuards(AuthenticationGuard, RolesGuard)
-@Roles(Role.MANAGER)
+@UseGuards(AuthenticationGuard)
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -51,7 +50,7 @@ export class UserController {
       user: new ListUsersDTO(
         userCreated.id,
         userCreated.name,
-        userCreated.role,
+        userCreated.role.name,
         userCreated.isActive,
         userCreated.email,
         userCreated.sector
