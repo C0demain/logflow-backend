@@ -42,7 +42,8 @@ export class AuthenticationService {
     return {
       id: user.id,
       token: await this.jwtService.signAsync(payload),
-      sector: user.sector
+      sector: user.sector,
+      role: user.role.name
     };
   }
 }
