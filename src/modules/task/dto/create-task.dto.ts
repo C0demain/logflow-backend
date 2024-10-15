@@ -15,6 +15,7 @@ export class CreateTaskDto {
     @IsUUID()
     userId: string;
 
+    @IsOptional()
     @IsBoolean()
     completed: boolean
 

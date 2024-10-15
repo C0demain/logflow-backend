@@ -69,9 +69,12 @@ export class ServiceOrderService {
 
     where.isActive = filters.active === undefined ? true : filters.active;
 
-    const orders = await this.serviceOrderRepository.find({ where });
-
-    console.log(orders);
+    const orders = await this.serviceOrderRepository.find({
+      where,
+      relations: {
+        serviceOrderLogs: true,
+      },
+    });
 
     if (!orders || orders.length === 0) {
       throw new InternalServerErrorException(
@@ -100,6 +103,10 @@ export class ServiceOrderService {
           userEmail: user.email,
           userRole: user.role.name,
         },
+        serviceOrder.serviceOrderLogs.map((log) => ({
+          changedTo: log.changedTo,
+          atDate: log.creationDate,
+        })),
       );
     });
 

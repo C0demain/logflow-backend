@@ -138,6 +138,12 @@ describe('ServiceOrderService', () => {
             email: 'user@test.com',
             role: 'EMPLOYEE',
           },
+          serviceOrderLogs: [
+            {
+              changedTo: Sector.OPERACIONAL,
+              atDate: new Date(),
+            },
+          ],
         },
       ];
 
@@ -149,6 +155,9 @@ describe('ServiceOrderService', () => {
       expect(result[0].id).toEqual('order-123');
       expect(mockServiceOrderRepository.find).toHaveBeenCalledWith({
         where: filters,
+        relations: {
+          serviceOrderLogs: true,
+        },
       });
     });
 
