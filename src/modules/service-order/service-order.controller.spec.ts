@@ -89,7 +89,6 @@ describe('ServiceOrderController', () => {
             userId: result.user.id,
             userName: result.user.name,
             userEmail: result.user.email,
-            userRole: result.user.role ?? '',
           }
         ),
       );
