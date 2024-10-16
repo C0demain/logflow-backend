@@ -41,11 +41,11 @@ export class SeederService {
       user.email = userEmail;
 
       // Atribuir role padrão ao usuário
-      const defaultRole = await this.roleRepository.findOne({ where: { name: 'Gerente Operacional' } });
+      const defaultRole = await this.roleRepository.findOne({ where: { name: 'Administrador' } });
       if(defaultRole){
       user.role = defaultRole;
       }
-      user.sector = Sector.OPERACIONAL;
+      user.sector = Sector.DIRETORIA;
       user.password = await this.hashPasswordPipe.transform(userPassword);
 
       await this.userRepository.save(user);
@@ -64,6 +64,7 @@ export class SeederService {
   // Método para injetar as roles no banco de dados
   private async seedRoles(): Promise<void> {
     const roles = [
+      { name: 'Administrador', description: 'administrador geral', sector: Sector.DIRETORIA },
       { name: 'Vendedor', description: 'Responsável pelas vendas', sector: Sector.VENDAS },
       { name: 'SAC', description: 'Atendimento ao cliente', sector: Sector.OPERACIONAL },
       { name: 'Motorista', description: 'Responsável pelas entregas', sector: Sector.OPERACIONAL },
