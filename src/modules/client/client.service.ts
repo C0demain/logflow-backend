@@ -15,7 +15,7 @@ export class ClientService {
   constructor(
     @InjectRepository(Client)
     private readonly clientRepository: Repository<Client>,
-  ) {}
+  ) { }
 
   async create(createClientDto: CreateClientDto) {
     const clientCreated = new Client();
@@ -104,45 +104,45 @@ export class ClientService {
   }
 
   async update(id: string, updateClientDto: UpdateClientDto) {
-  const clientFound = await this.clientRepository.findOne({ where: { id } });
+    const clientFound = await this.clientRepository.findOne({ where: { id } });
 
-  if (!clientFound) {
-    throw new NotFoundException(`Cliente com id ${id} não encontrado.`);
+    if (!clientFound) {
+      throw new NotFoundException(`Cliente com id ${id} não encontrado.`);
+    }
+
+    const updatedClient = new Client();
+
+    // Atribuição de valores obrigatórios
+    updatedClient.id = clientFound.id; // Mantém o ID do cliente existente
+    updatedClient.name = updateClientDto.name || clientFound.name; // Usa o valor atual se não fornecido
+    updatedClient.phone = updateClientDto.phone || clientFound.phone;
+    updatedClient.cnpj = updateClientDto.cnpj || clientFound.cnpj;
+    updatedClient.email = updateClientDto.email || clientFound.email;
+
+    // Atribuição do endereço
+    updatedClient.address = {
+      zipCode: updateClientDto.address?.zipCode || clientFound.address.zipCode,
+      state: updateClientDto.address?.state || clientFound.address.state,
+      city: updateClientDto.address?.city || clientFound.address.city,
+      neighborhood: updateClientDto.address?.neighborhood || clientFound.address.neighborhood,
+      street: updateClientDto.address?.street || clientFound.address.street,
+      number: updateClientDto.address?.number || clientFound.address.number,
+      complement: updateClientDto.address?.complement || clientFound.address.complement,
+    };
+
+    const savedClient = await this.clientRepository.save(updatedClient);
+
+    return {
+      client: {
+        id: savedClient.id,
+        name: savedClient.name,
+        phone: savedClient.phone,
+        cnpj: savedClient.cnpj,
+        email: savedClient.email,
+        address: savedClient.address,
+      },
+    };
   }
-
-  const updatedClient = new Client();
-
-  // Atribuição de valores obrigatórios
-  updatedClient.id = clientFound.id; // Mantém o ID do cliente existente
-  updatedClient.name = updateClientDto.name || clientFound.name; // Usa o valor atual se não fornecido
-  updatedClient.phone = updateClientDto.phone || clientFound.phone;
-  updatedClient.cnpj = updateClientDto.cnpj || clientFound.cnpj;
-  updatedClient.email = updateClientDto.email || clientFound.email;
-
-  // Atribuição do endereço
-  updatedClient.address = {
-    zipCode: updateClientDto.address?.zipCode || clientFound.address.zipCode,
-    state: updateClientDto.address?.state || clientFound.address.state,
-    city: updateClientDto.address?.city || clientFound.address.city,
-    neighborhood: updateClientDto.address?.neighborhood || clientFound.address.neighborhood,
-    street: updateClientDto.address?.street || clientFound.address.street,
-    number: updateClientDto.address?.number || clientFound.address.number,
-    complement: updateClientDto.address?.complement || clientFound.address.complement,
-  };
-
-  const savedClient = await this.clientRepository.save(updatedClient);
-
-  return {
-    client: {
-      id: savedClient.id,
-      name: savedClient.name,
-      phone: savedClient.phone,
-      cnpj: savedClient.cnpj,
-      email: savedClient.email,
-      address: savedClient.address,
-    },
-  };
-}
 
 
   async remove(id: string) {
@@ -152,24 +152,24 @@ export class ClientService {
     });
 
     let message = "";
-  
+
     if (!clientFound) {
       throw new NotFoundException(`Cliente com id: ${id}, não encontrado`);
     }
-  
+
     if (clientFound.serviceOrder && clientFound.serviceOrder.length === 0) {
       message = `cliente com id: ${id} excluído com sucesso`;
       await this.clientRepository.delete(id);
-    }else{
+    } else {
       clientFound.isActive = false;
       message = `cliente com id: ${id} arquivado com sucesso`
       await this.clientRepository.save(clientFound);
     }
-  
-    return{
+
+    return {
       clientRemoved: clientFound,
       message: message
     };
   }
-  
+
 }

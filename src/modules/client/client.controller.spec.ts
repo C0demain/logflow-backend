@@ -4,6 +4,7 @@ import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { AuthenticationGuard } from '../auth/authentication.guard';
+import { AddressDto } from './dto/address.dto';
 
 const mockClientService = {
   create: jest.fn(),
@@ -45,13 +46,15 @@ describe('ClientController', () => {
           email: 'client@example.com',
           cnpj: '12.345.678/9012-34',
           phone: '(12) 3456-3789',
-          zipCode: '12345-678',
-          state: 'SP',
-          city: 'São Paulo',
-          neighborhood: 'Centro',
-          street: 'Rua X',
-          number: '123',
-          complement: 'Apt 101',
+          address: {
+            zipCode: '12345-678',
+            state: 'SP',
+            city: 'São Paulo',
+            neighborhood: 'Centro',
+            street: 'Rua X',
+            number: '123',
+            complement: 'Apt 101',
+          }
       };
 
       const createdClient = { id: '1', ...createClientDto };
@@ -169,6 +172,9 @@ describe('ClientController', () => {
       const updateClientDto: UpdateClientDto = {
         name: 'Updated Client',
         email: 'updated@example.com',
+        phone: '(12) 4002-8922',
+        cnpj: '12.345.678/9012-34',
+        address: new AddressDto
       };
 
       const updatedClient = { id: '1', ...updateClientDto };

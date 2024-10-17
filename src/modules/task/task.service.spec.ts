@@ -10,13 +10,13 @@ import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { NotFoundException } from '@nestjs/common';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { ClientService } from '../client/client.service';
+import { AddressDto } from '../client/dto/address.dto';
 
 describe('TaskService', () => {
   let service: TaskService;
   let repo: Repository<Task>;
   let userService: UserService;
   let serviceOrderService: ServiceOrderService;
-  let clientService: ClientService;
 
   const mockRepository = {
     save: jest.fn(),
@@ -31,18 +31,8 @@ describe('TaskService', () => {
     email: 'user1@gmail.com'
   }
 
-  const mockedClient = {
-    id: 'client1',
-    name: 'Client1',
-    email: 'client1@gmail.com'
-  }
-
   const mockUserService = {
     findById: jest.fn().mockResolvedValue(mockedUser),
-  };
-
-  const mockClientService = {
-    findById: jest.fn().mockResolvedValue(mockedClient),
   };
 
   const mockedServiceOrder = {
@@ -70,10 +60,6 @@ describe('TaskService', () => {
           provide: ServiceOrderService,
           useValue: mockServiceOrderService
         },
-        {
-          provide: ClientService,
-          useValue: mockClientService
-        }
       ],
     }).compile();
 
@@ -81,7 +67,6 @@ describe('TaskService', () => {
     repo = module.get<Repository<Task>>(getRepositoryToken(Task));
     userService = module.get<UserService>(UserService);
     serviceOrderService = module.get<ServiceOrderService>(ServiceOrderService);
-    clientService = module.get<ClientService>(ClientService);
   });
 
   it('should be defined', () => {
@@ -96,12 +81,6 @@ describe('TaskService', () => {
       orderId: 'order1',
       userId: 'user1',
       sector: Sector.OPERACIONAL,
-      collectProduct: false,
-      departureForDelivery: false,
-      arrival: false,
-      collectSignature: false,
-      driverId: 'driver1',
-      clientId: 'client1',
       completed: false
     }
 
@@ -252,12 +231,7 @@ describe('TaskService', () => {
         title: 'Task2', completed: false, userId: 'user1',
         orderId: 'order1',
         sector: Sector.OPERACIONAL,
-        clientId: 'client1',
-        driverId: 'driver1',
-        collectProduct: false,
-        departureForDelivery: false,
-        arrival: false,
-        collectSignature: false
+        address: new AddressDto
       })
 
       expect(task).toEqual(expectedResult)
@@ -271,12 +245,7 @@ describe('TaskService', () => {
         title: 'Task2', completed: false, userId: 'user1',
         orderId: 'order2',
         sector: Sector.OPERACIONAL,
-        clientId: 'client2',
-        driverId: 'driver2',
-        collectProduct: false,
-        departureForDelivery: false,
-        arrival: false,
-        collectSignature: false
+        address: new AddressDto
       })).rejects.toBeInstanceOf(NotFoundException)
     })
   })
