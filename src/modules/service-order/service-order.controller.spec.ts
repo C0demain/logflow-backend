@@ -72,7 +72,7 @@ describe('ServiceOrderController', () => {
 
       const response = await controller.create(createServiceOrderDto);
 
-      expect(response.message).toEqual('ordem de serviço cadastrada');
+      expect(response.message).toEqual('ordem de serviço cadastrada, tarefas padrões criadas');
       expect(response.serviceOrder).toEqual(
         new ListServiceOrderDto(
           result.id,

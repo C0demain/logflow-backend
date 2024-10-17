@@ -81,6 +81,7 @@ describe('TaskService', () => {
       orderId: 'order1',
       userId: 'user1',
       sector: Sector.OPERACIONAL,
+      role: 'role1',
       completed: false
     }
 
