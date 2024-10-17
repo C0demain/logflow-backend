@@ -6,7 +6,7 @@ export class RoleEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'name', length: 100, nullable: false })
+  @Column({ name: 'name', length: 100, nullable: false, unique:true })
   name: string;
 
   @Column({ name: 'description', length: 255, nullable: false })

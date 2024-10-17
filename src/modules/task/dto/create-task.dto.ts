@@ -14,6 +14,9 @@ export class CreateTaskDto {
     @IsEnum(Sector)
     sector: Sector;
 
+    @IsString()
+    role: string;
+
     @IsOptional()
     @IsUUID()
     userId: string;

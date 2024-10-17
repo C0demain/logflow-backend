@@ -17,6 +17,7 @@ describe('TaskController', () => {
     userId: 'user1',
     completed: false,
     sector: Sector.OPERACIONAL,
+    role: 'role1'
   };
 
   const mockedUser = {
@@ -74,13 +75,13 @@ describe('TaskController', () => {
         Sector.OPERACIONAL,
         false,
         {
-          id: 'order1',
-          title: 'Order1',
-        },
-        {
           id: 'user1',
           name: 'User1',
           email: 'user1@gmail.com',
+        },
+        {
+          id: 'order1',
+          title: 'Order1',
         },
       );
       mockTaskService.create.mockResolvedValue(expectedResult);
@@ -149,13 +150,13 @@ describe('TaskController', () => {
         Sector.OPERACIONAL,
         false,
         {
-          id: 'order1',
-          title: 'Order1',
-        },
-        {
           id: 'user1',
           name: 'User1',
           email: 'user1@gmail.com',
+        },
+        {
+          id: 'order1',
+          title: 'Order1',
         },
         {
           zipCode: '12345-678',

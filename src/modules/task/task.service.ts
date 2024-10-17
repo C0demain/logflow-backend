@@ -38,6 +38,7 @@ export class TaskService {
     
     // Opcionais
     taskDb.assignedUser = userId;
+    taskDb.role = userId.role;
     taskDb.completed = createTaskDto.completed;
 
     const createdTask = await this.taskRepository.save(taskDb);
@@ -69,7 +70,7 @@ export class TaskService {
     }
 
 
-    const tasks = await this.taskRepository.find({ where })
+    const tasks = await this.taskRepository.find({ where, order: {createdAt: "asc"} })
 
     const taskList = tasks.map(task => {
       const parsedTask = parseToGetTaskDTO(task)

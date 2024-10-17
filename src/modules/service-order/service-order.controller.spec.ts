@@ -66,7 +66,7 @@ describe('ServiceOrderController', () => {
           id: 'user-123',
           name: 'User Test',
           email: 'user@test.com',
-          role: '',
+          role: 'EMPLOYEE',
         },
       };
 

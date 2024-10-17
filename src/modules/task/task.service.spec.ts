@@ -81,6 +81,7 @@ describe('TaskService', () => {
       orderId: 'order1',
       userId: 'user1',
       sector: Sector.OPERACIONAL,
+      role: 'role1',
       completed: false
     }
 
@@ -123,7 +124,7 @@ describe('TaskService', () => {
       const tasks = await service.findAll({})
 
       expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: {} })
+      expect(mockRepository.find).toHaveBeenCalledWith({ where: {}, order: {createdAt: "asc"} })
     })
 
     it('should return tasks filtered by title', async ()=>{
@@ -143,7 +144,7 @@ describe('TaskService', () => {
       const tasks = await service.findAll({title: 'Task1'})
 
       expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: { title: 'Task1'} })
+      expect(mockRepository.find).toHaveBeenCalledWith({ where: { title: 'Task1'}, order: {createdAt: "asc"} })
     })
 
     it('should return tasks filtered by serviceOrderId', async ()=>{
@@ -163,7 +164,7 @@ describe('TaskService', () => {
       const tasks = await service.findAll({serviceOrderId: 'order1'})
 
       expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: { serviceOrder: { id: 'order1' } } })
+      expect(mockRepository.find).toHaveBeenCalledWith({ where: { serviceOrder: { id: 'order1' } }, order: {createdAt: "asc"} })
     })
 
     it('should return tasks filtered by assignedUserId', async ()=>{
@@ -183,7 +184,7 @@ describe('TaskService', () => {
       const tasks = await service.findAll({assignedUserId: 'user1'})
 
       expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: { assignedUser: { id: 'user1' } } })
+      expect(mockRepository.find).toHaveBeenCalledWith({ where: { assignedUser: { id: 'user1' } }, order: {createdAt: "asc"} })
     })
   })
 
