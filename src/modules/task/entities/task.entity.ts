@@ -9,6 +9,7 @@ import {
     PrimaryGeneratedColumn,
     ManyToOne,
     JoinColumn,
+    CreateDateColumn,
 } from "typeorm";
 
 @Entity({name: 'task'})
@@ -38,4 +39,7 @@ export class Task {
     @ManyToOne(() => RoleEntity, { eager: true })
     @JoinColumn({ name: 'role_name', referencedColumnName: 'name' })
     role: RoleEntity;
+
+    @CreateDateColumn()
+    createdAt: Date
 }
