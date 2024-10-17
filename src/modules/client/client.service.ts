@@ -21,13 +21,13 @@ export class ClientService {
     const clientCreated = new Client();
 
     clientCreated.address = {
-      zipCode: createClientDto.zipCode,
-      state: createClientDto.state,
-      city: createClientDto.city,
-      neighborhood: createClientDto.neighborhood,
-      street: createClientDto.street,
-      number: createClientDto.number,
-      complement: createClientDto.complement,
+      zipCode: createClientDto.address.zipCode,
+      state: createClientDto.address.state,
+      city: createClientDto.address.city,
+      neighborhood: createClientDto.address.neighborhood,
+      street: createClientDto.address.street,
+      number: createClientDto.address.number,
+      complement: createClientDto.address.complement,
     };
 
     clientCreated.cnpj = createClientDto.cnpj;
@@ -104,28 +104,46 @@ export class ClientService {
   }
 
   async update(id: string, updateClientDto: UpdateClientDto) {
-    const clientFound = await this.clientRepository.findOne({ where: { id } });
+  const clientFound = await this.clientRepository.findOne({ where: { id } });
 
-    if (!clientFound) {
-      throw new NotFoundException(`cliente com id ${id} não encotrado`);
-    }
-
-    Object.assign(clientFound, updateClientDto as Client);
-    Object.assign(clientFound.address, updateClientDto as Client);
-
-    const updatedClient = await this.clientRepository.save(clientFound);
-
-    return {
-      client: {
-        id: updatedClient.id,
-        name: updatedClient.name,
-        phone: updatedClient.phone,
-        cnpj: updatedClient.cnpj,
-        email: updatedClient.email,
-        address: updatedClient.address,
-      },
-    };
+  if (!clientFound) {
+    throw new NotFoundException(`Cliente com id ${id} não encontrado.`);
   }
+
+  const updatedClient = new Client();
+
+  // Atribuição de valores obrigatórios
+  updatedClient.id = clientFound.id; // Mantém o ID do cliente existente
+  updatedClient.name = updateClientDto.name || clientFound.name; // Usa o valor atual se não fornecido
+  updatedClient.phone = updateClientDto.phone || clientFound.phone;
+  updatedClient.cnpj = updateClientDto.cnpj || clientFound.cnpj;
+  updatedClient.email = updateClientDto.email || clientFound.email;
+
+  // Atribuição do endereço
+  updatedClient.address = {
+    zipCode: updateClientDto.address?.zipCode || clientFound.address.zipCode,
+    state: updateClientDto.address?.state || clientFound.address.state,
+    city: updateClientDto.address?.city || clientFound.address.city,
+    neighborhood: updateClientDto.address?.neighborhood || clientFound.address.neighborhood,
+    street: updateClientDto.address?.street || clientFound.address.street,
+    number: updateClientDto.address?.number || clientFound.address.number,
+    complement: updateClientDto.address?.complement || clientFound.address.complement,
+  };
+
+  const savedClient = await this.clientRepository.save(updatedClient);
+
+  return {
+    client: {
+      id: savedClient.id,
+      name: savedClient.name,
+      phone: savedClient.phone,
+      cnpj: savedClient.cnpj,
+      email: savedClient.email,
+      address: savedClient.address,
+    },
+  };
+}
+
 
   async remove(id: string) {
     const clientFound = await this.clientRepository.findOne({

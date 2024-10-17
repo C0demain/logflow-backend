@@ -5,14 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Task } from 'src/modules/task/entities/task.entity';
 import { ServiceOrderModule } from 'src/modules/service-order/service-order.module';
 import { UserModule } from 'src/modules/user/user.module';
-import { ClientModule } from '../client/client.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Task]),
     ServiceOrderModule,
-    UserModule,
-    ClientModule
+    UserModule
   ],
   controllers: [TaskController],
   providers: [TaskService],

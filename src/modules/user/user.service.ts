@@ -50,9 +50,10 @@ export class UserService {
       where: { email },
     });
 
-    if (checkEmail === null)
+    if (checkEmail === null){
       throw new NotFoundException('O email não foi encontrado.');
-
+    }
+    
     return checkEmail;
   }
 
@@ -61,8 +62,9 @@ export class UserService {
       where: { id },
     });
 
-    if (checkId === null)
-      throw new NotFoundException('O email não foi encontrado.');
+    if (checkId === null) {
+      throw new NotFoundException(`O id ${id} não foi encontrado.`);
+    }
 
     return checkId;
   }

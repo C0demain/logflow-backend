@@ -11,38 +11,14 @@ export class CreateTaskDto {
     @IsNotEmpty()
     orderId: string;
 
+    @IsEnum(Sector)
+    sector: Sector;
+
     @IsOptional()
     @IsUUID()
     userId: string;
 
     @IsOptional()
     @IsBoolean()
-    completed: boolean
-
-    @IsEnum(Sector)
-    sector: Sector;
-
-    @IsOptional()
-    @IsUUID()
-    clientId: string
-
-    @IsOptional()
-    @IsUUID()
-    driverId: string;
-
-    @IsOptional()
-    @IsBoolean()
-    collectProduct: boolean;
-
-    @IsOptional()
-    @IsBoolean()
-    departureForDelivery: boolean;
-
-    @IsOptional()
-    @IsBoolean()
-    arrival: boolean;
-
-    @IsOptional()
-    @IsBoolean()
-    collectSignature: boolean;
+    completed: boolean;
 }
