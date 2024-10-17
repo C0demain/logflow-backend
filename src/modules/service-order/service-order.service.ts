@@ -60,15 +60,13 @@ export class ServiceOrderService {
     const tasks = [
       this.createTask('Documentos de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
       this.createTask('Endereço de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Motorista: (vincular motorista)', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Assinatura de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Trazer p/ Galpão', Sector.OPERACIONAL, operacionalRole, serviceOrder),
+      this.createTask('Motorista: Assinatura de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
+      this.createTask('Motorista: Trazer p/ Galpão', Sector.OPERACIONAL, operacionalRole, serviceOrder),
   
       this.createTask('Documentos de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
       this.createTask('Endereço de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Motorista: (vincular motorista)', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Assinatura de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Devolução de Documentos', Sector.OPERACIONAL, operacionalRole, serviceOrder),
+      this.createTask('Motorista: Assinatura de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
+      this.createTask('Motorista: Devolução de Documentos', Sector.OPERACIONAL, operacionalRole, serviceOrder),
   
       this.createTask('Confirmação de Entrega', Sector.FINANCEIRO, financeiroRole, serviceOrder),
       this.createTask('Emissão de NF/BOLETO', Sector.FINANCEIRO, financeiroRole, serviceOrder),
