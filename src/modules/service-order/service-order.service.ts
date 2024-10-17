@@ -14,32 +14,84 @@ import { Status } from './enums/status.enum';
 import { Sector } from './enums/sector.enum';
 import { ClientService } from '../client/client.service';
 import { ServiceOrderLog } from './entities/service-order-log.entity';
+import { Task } from '../task/entities/task.entity';
+import { RoleEntity } from '../roles/roles.entity';
 
 @Injectable()
 export class ServiceOrderService {
   constructor(
     @InjectRepository(ServiceOrder)
     private readonly serviceOrderRepository: Repository<ServiceOrder>,
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
+    @InjectRepository(RoleEntity)
+    private roleRepository: Repository<RoleEntity>,
     private readonly userService: UserService,
     private readonly clientService: ClientService,
   ) {}
 
-  async create(createServiceOrderDto: CreateServiceOrderDto) {
+  async create(createServiceOrderDto: CreateServiceOrderDto): Promise<ServiceOrder> {
     const serviceDb = new ServiceOrder();
-
+  
     const user = await this.userService.findById(createServiceOrderDto.userId);
-    const client = await this.clientService.findById(
-      createServiceOrderDto.clientId,
-    );
-
+    const client = await this.clientService.findById(createServiceOrderDto.clientId);
+  
     serviceDb.title = createServiceOrderDto.title;
     serviceDb.client = client;
     serviceDb.status = createServiceOrderDto.status;
     serviceDb.sector = createServiceOrderDto.sector;
     serviceDb.user = user;
-
-    return await this.serviceOrderRepository.save(serviceDb);
+  
+    const savedServiceOrder = await this.serviceOrderRepository.save(serviceDb);
+  
+    await this.createTasksForServiceOrder(savedServiceOrder);
+  
+    return savedServiceOrder;
   }
+  
+  private async createTasksForServiceOrder(serviceOrder: ServiceOrder) {
+    const motoristaRole = await this.roleRepository.findOne({ where: { name: 'Motorista' } });
+    const financeiroRole = await this.roleRepository.findOne({ where: { name: 'Analista Administrativo "Financeiro"' } });
+    const operacionalRole = await this.roleRepository.findOne({ where: { name: 'Gerente Operacional' } });
+  
+    if(!motoristaRole || !financeiroRole || !operacionalRole){
+      throw new NotFoundException("roles nao encontradas")
+    }
+    const tasks = [
+      this.createTask('Documentos de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
+      this.createTask('Endereço de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
+      this.createTask('Motorista: (vincular motorista)', Sector.OPERACIONAL, motoristaRole, serviceOrder),
+      this.createTask('Assinatura de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
+      this.createTask('Trazer p/ Galpão', Sector.OPERACIONAL, operacionalRole, serviceOrder),
+  
+      this.createTask('Documentos de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
+      this.createTask('Endereço de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
+      this.createTask('Motorista: (vincular motorista)', Sector.OPERACIONAL, motoristaRole, serviceOrder),
+      this.createTask('Assinatura de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
+      this.createTask('Devolução de Documentos', Sector.OPERACIONAL, operacionalRole, serviceOrder),
+  
+      this.createTask('Confirmação de Entrega', Sector.FINANCEIRO, financeiroRole, serviceOrder),
+      this.createTask('Emissão de NF/BOLETO', Sector.FINANCEIRO, financeiroRole, serviceOrder),
+      this.createTask('Confirmação de Recebimento', Sector.FINANCEIRO, financeiroRole, serviceOrder),
+    ];
+  
+    await this.taskRepository.save(tasks);
+  }
+  
+  private createTask(
+    title: string,
+    sector: Sector,
+    role: RoleEntity,
+    serviceOrder: ServiceOrder
+  ): Task {
+    const task = new Task();
+    task.title = title;
+    task.sector = sector;
+    task.role = role;
+    task.serviceOrder = serviceOrder;
+    return task;
+  }
+  
 
   async findAll(filters: {
     id?: string;

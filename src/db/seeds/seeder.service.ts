@@ -74,7 +74,7 @@ export class SeederService {
       { name: 'Diretor Administrativo', description: 'Diretor do setor administrativo', sector: Sector.FINANCEIRO },
       { name: 'Analista de RH', description: 'Responsável pelo RH', sector: Sector.FINANCEIRO },
       { name: 'Analista Administrativo "Financeiro"', description: 'Administração financeira', sector: Sector.FINANCEIRO },
-      { name: 'Ass. Adminstrativo "RH"', description: 'Assistente administrativo de RH', sector: Sector.FINANCEIRO },
+      { name: 'Ass. Administrativo "RH"', description: 'Assistente administrativo de RH', sector: Sector.FINANCEIRO },
       { name: 'Ass. Administrativo "Operacional"', description: 'Assistente administrativo operacional', sector: Sector.OPERACIONAL },
       { name: 'Ass. Administrativo "Financeiro"', description: 'Assistente administrativo financeiro', sector: Sector.FINANCEIRO },
       { name: 'Gerente Operacional', description: 'Gerente do setor operacional', sector: Sector.OPERACIONAL },

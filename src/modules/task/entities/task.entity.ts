@@ -1,4 +1,5 @@
 import { Address } from "src/modules/client/entities/address.entity";
+import { RoleEntity } from "src/modules/roles/roles.entity";
 import { ServiceOrder } from "src/modules/service-order/entities/service-order.entity";
 import { Sector } from "src/modules/service-order/enums/sector.enum";
 import { UserEntity } from "src/modules/user/entities/user.entity";
@@ -7,6 +8,7 @@ import {
     Column,
     PrimaryGeneratedColumn,
     ManyToOne,
+    JoinColumn,
 } from "typeorm";
 
 @Entity({name: 'task'})
@@ -27,8 +29,13 @@ export class Task {
     serviceOrder: ServiceOrder;
 
     @ManyToOne(() => UserEntity, user => user.tasks, {eager:true})
+    @JoinColumn({ name: 'assignedUserId'})
     assignedUser: UserEntity;
 
     @Column(() => Address)
     address: Address;
+
+    @ManyToOne(() => RoleEntity, { eager: true })
+    @JoinColumn({ name: 'role_name', referencedColumnName: 'name' })
+    role: RoleEntity;
 }
