@@ -70,7 +70,7 @@ export class TaskService {
     }
 
 
-    const tasks = await this.taskRepository.find({ where })
+    const tasks = await this.taskRepository.find({ where, order: {createdAt: "asc"} })
 
     const taskList = tasks.map(task => {
       const parsedTask = parseToGetTaskDTO(task)

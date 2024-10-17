@@ -73,7 +73,9 @@ export class ServiceOrderService {
       this.createTask('Confirmação de Recebimento', Sector.FINANCEIRO, financeiroRole, serviceOrder),
     ];
   
-    await this.taskRepository.save(tasks);
+    for(let t of tasks){
+      await this.taskRepository.insert(t)
+    }
   }
   
   private createTask(
