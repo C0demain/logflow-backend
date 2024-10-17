@@ -38,6 +38,7 @@ export class TaskService {
     
     // Opcionais
     taskDb.assignedUser = userId;
+    taskDb.role = userId.role;
     taskDb.completed = createTaskDto.completed;
 
     const createdTask = await this.taskRepository.save(taskDb);

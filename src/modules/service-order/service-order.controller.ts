@@ -43,7 +43,7 @@ export class ServiceOrderController {
     });
 
     return {
-      message: 'ordem de serviço cadastrada',
+      message: 'ordem de serviço cadastrada, tarefas padrões criadas',
       serviceOrder: new ListServiceOrderDto(
         orderCreated.id,
         orderCreated.title,

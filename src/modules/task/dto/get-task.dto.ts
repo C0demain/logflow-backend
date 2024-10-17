@@ -6,11 +6,11 @@ export class GetTaskDto {
     readonly title: string;
     readonly sector: Sector;
     readonly completed: boolean;
-    readonly serviceOrder: {
+    readonly serviceOrder?: {
         id: string,
         title: string
     };
-    readonly assignedUser: {
+    readonly assignedUser?: {
         id: string,
         name: string,
         email: string
@@ -30,14 +30,14 @@ export class GetTaskDto {
         title: string,
         sector: Sector,
         completed: boolean,
-        serviceOrder: {
-            id: string,
-            title: string
-        },
-        assignedUser: {
+        assignedUser?: {
             id: string,
             name: string,
             email: string
+        },
+        serviceOrder?: {
+            id: string,
+            title: string
         },
         address?: {
             zipCode: string,
@@ -61,15 +61,19 @@ export class GetTaskDto {
 }
 
 export function parseToGetTaskDTO(task: Task): GetTaskDto {
-    const serviceOrder = {
+    const serviceOrder = task.serviceOrder ? {
         id: task.serviceOrder.id,
         title: task.serviceOrder.title,
-    };
+    } : undefined;
 
-    const assignedUser = {
+    const assignedUser = task.assignedUser ? {
         id: task.assignedUser.id,
         name: task.assignedUser.name,
         email: task.assignedUser.email,
+    } : {
+        id: "null",
+        name: "nenhum usuário atribuído a esta tarefa",
+        email: "null",
     };
 
     const address = task.address ? {
@@ -87,8 +91,8 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
         task.title, 
         task.sector, 
         task.completed, 
-        serviceOrder, 
         assignedUser, 
+        serviceOrder, 
         address
     );
-} 
+}
