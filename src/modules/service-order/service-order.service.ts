@@ -38,6 +38,10 @@ export class ServiceOrderService {
     serviceDb.sector = createServiceOrderDto.sector;
     serviceDb.user = user;
 
+    // Opcionais
+    serviceDb.description = createServiceOrderDto.description;
+    serviceDb.value = createServiceOrderDto.value;
+
     return await this.serviceOrderRepository.save(serviceDb);
   }
 

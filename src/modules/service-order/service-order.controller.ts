@@ -20,7 +20,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../auth/authentication.guard';
-import { Roles } from '../roles/roles.decorator';
 
 @ApiTags('service-order')
 @UseGuards(AuthenticationGuard)
@@ -32,7 +31,7 @@ export class ServiceOrderController {
   @Post()
   @ApiOperation({ summary: 'Criar ordem de serviço' })
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    const { title, clientId, status, sector, userId } = createServiceOrderDto;
+    const { title, clientId, status, sector, userId, description, value } = createServiceOrderDto;
 
     const orderCreated = await this.serviceOrderService.create({
       title: title,
@@ -40,6 +39,8 @@ export class ServiceOrderController {
       status: status,
       sector: sector,
       userId: userId,
+      description: description,
+      value: value
     });
 
     return {

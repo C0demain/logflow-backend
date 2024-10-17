@@ -59,4 +59,10 @@ export class ServiceOrder {
 
   @Column({ name: 'isActive', default: true, nullable: false })
   isActive: boolean;
+
+  @Column()
+  description: string;
+
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
+  value: number;
 }
