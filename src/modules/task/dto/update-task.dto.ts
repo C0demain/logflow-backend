@@ -1,47 +1,30 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { AddressDto } from 'src/modules/client/dto/address.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
 
 export class UpdateTaskDto {
     @IsString()
     @IsNotEmpty()
-    title: string
+    title: string;
 
     @IsUUID()
     @IsNotEmpty()
     orderId: string;
 
-    @IsOptional()
-    @IsNotEmpty()
-    @IsUUID()
-    userId: string
-
-    @IsBoolean()
-    completed: boolean
-
     @IsEnum(Sector)
     sector: Sector;
 
     @IsOptional()
+    @IsNotEmpty()
     @IsUUID()
-    clientId: string
+    userId: string;
 
-    @IsOptional()
-    @IsUUID()
-    driverId: string;
-
-    @IsOptional()
     @IsBoolean()
-    collectProduct: boolean;
+    completed: boolean;
 
     @IsOptional()
-    @IsBoolean()
-    departureForDelivery: boolean;
-
-    @IsOptional()
-    @IsBoolean()
-    arrival: boolean;
-
-    @IsOptional()
-    @IsBoolean()
-    collectSignature: boolean;
+    @ValidateNested()
+    @Type(() => AddressDto)
+    address: AddressDto;
 }

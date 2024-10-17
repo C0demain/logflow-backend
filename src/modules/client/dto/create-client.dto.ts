@@ -1,8 +1,9 @@
-import { IsString, IsNotEmpty, IsEmail, Length, IsIn } from "class-validator";
+import { IsString, IsNotEmpty, IsEmail, Length, IsIn, ValidateNested } from "class-validator";
 import { UniqueEmail } from "src/modules/user/validation/UniqueEmail.validation";
 import { IsBrazilianPhoneNumber } from "src/modules/client/validations/brazilianPhoneNumberValidator";
-import { IsZipCode } from "src/modules/client/validations/brazilianZipCodeValidator";
 import { IsCNPJ } from "src/modules/client/validations/brazilianCNPJValidator";
+import { Type } from "class-transformer";
+import { AddressDto } from "./address.dto";
 
 export class CreateClientDto {
 
@@ -27,35 +28,7 @@ export class CreateClientDto {
     @UniqueEmail({ message: 'Já existe um usuário ou um cliente com este email.' })
     email: string;
 
-    @IsString()
-    @IsNotEmpty({message: 'o campo `zipCode` não pode estar vazio'})
-    @IsZipCode()
-    zipCode: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "O campo `state` não pode estar vazio" })
-    @IsIn(['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 
-        'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 
-        'RR', 'SC', 'SP', 'SE', 'TO'], 
-        { message: "O campo `state` deve ser uma sigla de estado válida" })
-    state: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "O campo `city` não pode estar vazio" })
-    city: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "O campo `neighborhood` não pode estar vazio" })
-    neighborhood: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "O campo `street` não pode estar vazio" })
-    street: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "O campo `number` não pode estar vazio" })
-    number: string;
-
-    @IsString()
-    complement?: string;
+    @ValidateNested()
+    @Type(() => AddressDto)
+    address: AddressDto;
 }

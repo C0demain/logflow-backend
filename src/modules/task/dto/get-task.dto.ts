@@ -15,25 +15,15 @@ export class GetTaskDto {
         name: string,
         email: string
     };
-    readonly driverInfo?: {
-        id: string,
-        name: string,
-        email: string
-    };
-    readonly clientInfo?: {
-        id: string,
-        name: string,
-        email: string,
-        address?: {
-            zipCode: string,
-            state: string,
-            city: string,
-            neighborhood: string,
-            street: string,
-            number: string,
-            complement?: string
-        }
-    };
+    readonly address?: {
+        zipCode: string,
+        state: string,
+        city: string,
+        neighborhood: string,
+        street: string,
+        number: string,
+        complement?: string,
+    }
 
     constructor(
         id: string,
@@ -49,25 +39,16 @@ export class GetTaskDto {
             name: string,
             email: string
         },
-        driverInfo?: {
-            id: string,
-            name: string,
-            email: string
-        },
-        clientInfo?: {
-            id: string,
-            name: string,
-            email: string,
-            address?: {
-                zipCode: string,
-                state: string,
-                city: string,
-                neighborhood: string,
-                street: string,
-                number: string,
-                complement?: string
-            }
+        address?: {
+            zipCode: string,
+            state: string,
+            city: string,
+            neighborhood: string,
+            street: string,
+            number: string,
+            complement?: string,
         }
+        
     ) {
         this.id = id;
         this.title = title;
@@ -75,8 +56,7 @@ export class GetTaskDto {
         this.sector = sector;
         this.assignedUser = assignedUser;
         this.serviceOrder = serviceOrder;
-        this.driverInfo = driverInfo;
-        this.clientInfo = clientInfo;
+        this.address = address;
     };
 }
 
@@ -92,30 +72,15 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
         email: task.assignedUser.email,
     };
 
-    const driverInfo = task.driver ? 
-    {
-        id: task.driver.id,
-        name: task.driver.name,
-        email: task.driver.email,
-    } 
-    : undefined;
-
-    const clientInfo = task.client ? 
-    {
-        id: task.client.id,
-        name: task.client.name,
-        email: task.client.email,
-        address: task.client.address ? {
-            zipCode: task.client.address.zipCode,
-            state: task.client.address.state,
-            city: task.client.address.city,
-            neighborhood: task.client.address.neighborhood,
-            street: task.client.address.street,
-            number: task.client.address.number,
-            complement: task.client.address.complement
-        } : undefined
-    }
-    : undefined;
+    const address = task.address ? {
+        zipCode: task.address.zipCode,
+        state: task.address.state,
+        city: task.address.city,
+        neighborhood: task.address.neighborhood,
+        street: task.address.street,
+        number: task.address.number,
+        complement: task.address.complement,
+    } : undefined;
     
     return new GetTaskDto(
         task.id, 
@@ -124,7 +89,6 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
         task.completed, 
         serviceOrder, 
         assignedUser, 
-        driverInfo,
-        clientInfo
+        address
     );
 } 
