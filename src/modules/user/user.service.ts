@@ -63,7 +63,7 @@ export class UserService {
     });
 
     if (checkId === null) {
-      throw new NotFoundException(`O id ${id} não foi encontrado.`);
+      throw new NotFoundException(`Usuário com id ${id} não foi encontrado.`);
     }
 
     return checkId;

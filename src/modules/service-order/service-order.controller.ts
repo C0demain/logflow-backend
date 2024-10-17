@@ -44,7 +44,7 @@ export class ServiceOrderController {
     });
 
     return {
-      message: 'ordem de serviço cadastrada',
+      message: 'Ordem de serviço cadastrada.',
       serviceOrder: new ListServiceOrderDto(
         orderCreated.id,
         orderCreated.title,
@@ -62,6 +62,9 @@ export class ServiceOrderController {
           userEmail: orderCreated.user.email,
           userRole: orderCreated.user.role.name,
         },
+        orderCreated.serviceOrderLogs,
+        orderCreated.description,
+        orderCreated.value
       ),
     };
   }
