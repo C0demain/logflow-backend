@@ -74,7 +74,7 @@ export class ServiceOrderService {
     ];
   
     for(let t of tasks){
-      await this.taskRepository.insert(t)
+      await this.taskRepository.save(t)
     }
   }
   
