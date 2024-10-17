@@ -1,4 +1,3 @@
-import { ServiceOrderLog } from '../entities/service-order-log.entity';
 import { Sector } from '../enums/sector.enum';
 import { Status } from '../enums/status.enum';
 
@@ -21,8 +20,10 @@ export class ListServiceOrderDto {
       userRole?: string;
     },
     readonly logs?: {
-      changedTo: Sector;
-      atDate: Date;
+      changedTo?: Sector;
+      atDate?: Date;
     }[],
+    readonly description?: string,
+    readonly value?: Number,
   ) {}
 }

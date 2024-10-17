@@ -88,6 +88,8 @@ describe('ServiceOrderService', () => {
         status: Status.PENDENTE,
         sector: Sector.OPERACIONAL,
         userId: 'user-id-123',
+        description: 'anything',
+        value: 100
       };
 
       const userMock = {

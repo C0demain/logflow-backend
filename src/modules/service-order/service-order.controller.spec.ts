@@ -47,6 +47,8 @@ describe('ServiceOrderController', () => {
         status: Status.PENDENTE,
         sector: Sector.OPERACIONAL,
         userId: 'user-123',
+        description: 'anything',
+        value: 100
       };
 
       const result = {
@@ -64,7 +66,7 @@ describe('ServiceOrderController', () => {
           id: 'user-123',
           name: 'User Test',
           email: 'user@test.com',
-          role: '',
+          role: 'EMPLOYEE',
         },
       };
 
@@ -72,7 +74,7 @@ describe('ServiceOrderController', () => {
 
       const response = await controller.create(createServiceOrderDto);
 
-      expect(response.message).toEqual('ordem de serviço cadastrada, tarefas padrões criadas');
+      expect(response.message).toEqual('Ordem de serviço cadastrada.');
       expect(response.serviceOrder).toEqual(
         new ListServiceOrderDto(
           result.id,
