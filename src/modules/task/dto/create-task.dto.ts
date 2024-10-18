@@ -15,6 +15,7 @@ export class CreateTaskDto {
     sector: Sector;
 
     @IsString()
+    @IsOptional()
     role: string;
 
     @IsOptional()

@@ -36,7 +36,7 @@ export class Task {
     @Column(() => Address)
     address: Address;
 
-    @ManyToOne(() => RoleEntity, { eager: true })
+    @ManyToOne(() => RoleEntity, { eager: true , nullable:true})
     @JoinColumn({ name: 'role_name', referencedColumnName: 'name' })
     role: RoleEntity;
 
