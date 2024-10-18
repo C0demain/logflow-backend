@@ -68,7 +68,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/v1/service-order/ADMINISTRATIVO",
+							"raw": "http://localhost:8000/api/v1/service-order/FINANCEIRO",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -78,7 +78,7 @@
 								"api",
 								"v1",
 								"service-order",
-								"ADMINISTRATIVO"
+								"FINANCEIRO"
 							],
 							"query": [
 								{
@@ -135,7 +135,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"ordem de serviço\",\r\n    \"clientId\": \"ef898ec8-d1fb-4138-b13e-d99b1b1ade56\",\r\n    \"status\": \"PENDENTE\",\r\n    \"sector\": \"RH\",\r\n    \"userId\": \"4d21c314-ae64-4908-96ce-6ff74b81c051\"\r\n}",
+							"raw": "{\r\n    \"title\": \"ordem de serviço\",\r\n    \"clientId\": \"58ff58c2-44b6-40a2-8678-fd4514517b78\",\r\n    \"status\": \"PENDENTE\",\r\n    \"sector\": \"RH\",\r\n    \"userId\": \"8f87f1f2-4657-4c05-a2d0-2e6051865311\",\r\n\r\n    // opcionais\r\n    \"description\": \"anything\",\r\n    \"value\": 100\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -175,7 +175,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"title\": \"teste de update\",\r\n    \"clientRelated\": \"jose\",\r\n    \"status\": \"pendente\",\r\n    \"expirationDate\": \"10/10/2024\"\r\n}",
+							"raw": "{\r\n    \"title\": \"ordem de serviço\",\r\n    \"clientId\": \"58ff58c2-44b6-40a2-8678-fd4514517b78\",\r\n    \"status\": \"PENDENTE\",\r\n    \"sector\": \"RH\",\r\n    \"userId\": \"8f87f1f2-4657-4c05-a2d0-2e6051865311\",\r\n\r\n    // opcionais\r\n    \"description\": \"anything\",\r\n    \"value\": 100\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -254,7 +254,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"ronielson\",\r\n    \"email\":\"ronielson2341@gmail.com\",\r\n    \"password\": \"rony123\",\r\n    \"role\": \"DRIVER\",\r\n    \"sector\": \"DIRETORIA\"\r\n}",
+							"raw": "{\r\n    \"name\": \"ronielson\",\r\n    \"email\":\"ronielson231@gmail.com\",\r\n    \"password\": \"rony123\",\r\n    \"role\": \"Vendedor\",\r\n    \"sector\": \"DIRETORIA\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -483,7 +483,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"name\": \"cliente2\",\r\n  \"phone\": \"(31) 97303-1123\",\r\n  \"cnpj\": \"12.234.444/1233-12\",\r\n  \"email\": \"cliente1@gmail.com\",\r\n  \"zipCode\": \"13203-340\",\r\n  \"state\": \"SP\",\r\n  \"city\": \"jacareí\",\r\n  \"neighborhood\": \"parque santo antonio\",\r\n  \"street\": \"rua 12\",\r\n  \"number\": \"123\",\r\n  \"complement\": \"casa\"\r\n}",
+							"raw": "{\r\n  \"name\": \"cliente2\",\r\n  \"phone\": \"(31) 97303-1123\",\r\n  \"cnpj\": \"12.234.444/1233-12\",\r\n  \"email\": \"cliente1@gmail.com\",\r\n  \"address\": {\r\n    \"zipCode\": \"13203-340\",\r\n    \"state\": \"SP\",\r\n    \"city\": \"jacareí\",\r\n    \"neighborhood\": \"parque santo antonio\",\r\n    \"street\": \"rua 12\",\r\n    \"number\": \"123\",\r\n    \"complement\": \"casa\"\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -554,7 +554,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"name\": \"cliente2 atualizado\",\r\n  \"phone\": \"(31) 97303-1123\",\r\n  \"cnpj\": \"12.234.444/1233-12\",\r\n  \"email\": \"cliente1@gmail.com\",\r\n  \"zipCode\": \"13203-340\",\r\n  \"state\": \"SP\",\r\n  \"city\": \"jacareí\",\r\n  \"neighborhood\": \"parque santo antonio\",\r\n  \"street\": \"rua 12\",\r\n  \"number\": \"123\",\r\n  \"complement\": \"casa\"\r\n}",
+							"raw": "{\r\n  \"name\": \"cliente2\",\r\n  \"phone\": \"(31) 97303-1123\",\r\n  \"cnpj\": \"12.234.444/1233-12\",\r\n  \"email\": \"cliente1@gmail.com\",\r\n  \"address\": {\r\n    \"zipCode\": \"13203-340\",\r\n    \"state\": \"SP\",\r\n    \"city\": \"jacareí\",\r\n    \"neighborhood\": \"parque santo antonio\",\r\n    \"street\": \"rua 12\",\r\n    \"number\": \"123\",\r\n    \"complement\": \"casa\"\r\n  }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -562,7 +562,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/v1/client/ef898ec8-d1fb-4138-b13e-d99b1b1ade56",
+							"raw": "http://localhost:8000/api/v1/client/7b74366f-f2cf-480d-9ab0-13c50f3d8d31",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -572,7 +572,7 @@
 								"api",
 								"v1",
 								"client",
-								"ef898ec8-d1fb-4138-b13e-d99b1b1ade56"
+								"7b74366f-f2cf-480d-9ab0-13c50f3d8d31"
 							]
 						}
 					},
@@ -594,7 +594,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/v1/client/835f71dd-7b47-471f-aea8-f8ce93cfe3ed",
+							"raw": "http://localhost:8000/api/v1/client/id",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -604,7 +604,7 @@
 								"api",
 								"v1",
 								"client",
-								"835f71dd-7b47-471f-aea8-f8ce93cfe3ed"
+								"id"
 							]
 						}
 					},
@@ -632,7 +632,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    // Obrigatórios:\r\n    \"title\": \"teste 11111\",\r\n    \"orderId\": \"19d4944b-0d89-4b1f-a559-648ac0f5bd80\",\r\n    \"userId\": \"4d21c314-ae64-4908-96ce-6ff74b81c051\",\r\n    \"sector\": \"VENDAS\",\r\n\r\n    // Opcionais:\r\n    \"clientId\": \"835f71dd-7b47-471f-aea8-f8ce93cfe3ed\",\r\n    \"driverId\": \"28d01169-a1a1-43dc-8108-03fc5df4cb4f\",\r\n    \"collectProduct\": true,\r\n    \"departureForDelivery\": true,\r\n    \"arrival\": true,\r\n    \"collectSignature\": true,\r\n    \"completed\": false\r\n}",
+							"raw": "{\r\n    \"title\": \"teste 11111\",\r\n    \"orderId\": \"a178e62c-97cc-48c1-99cb-b06b17d58786\",\r\n    \"userId\": \"a1759244-cd46-4db6-bd0d-251f4d762af0\",\r\n    \"sector\": \"VENDAS\",\r\n    \"completed\": false\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -672,7 +672,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    // Obrigatórios:\r\n    \"title\": \"teste\",\r\n    \"orderId\": \"19d4944b-0d89-4b1f-a559-648ac0f5bd80\",\r\n    \"userId\": \"4d21c314-ae64-4908-96ce-6ff74b81c051\",\r\n    \"sector\": \"VENDAS\",\r\n    \r\n    // Opcionais:\r\n    \"clientId\": \"835f71dd-7b47-471f-aea8-f8ce93cfe3ed\",\r\n    \"driverId\": \"28d01169-a1a1-43dc-8108-03fc5df4cb4f\",\r\n    \"collectProduct\": true,\r\n    \"departureForDelivery\": true,\r\n    \"arrival\": true,\r\n    \"collectSignature\": true,\r\n    \"completed\": false\r\n}",
+							"raw": "{\r\n    \"title\": \"teste atualização\",\r\n    \"orderId\": \"a178e62c-97cc-48c1-99cb-b06b17d58786\",\r\n    \"userId\": \"a1759244-cd46-4db6-bd0d-251f4d762af0\",\r\n    \"sector\": \"VENDAS\",\r\n    \"completed\": false,\r\n    \"address\": {\r\n        \"zipCode\": \"13234-340\",\r\n        \"state\": \"SP\",\r\n        \"city\": \"sjc\",\r\n        \"neighborhood\": \"jardim aquarius\",\r\n        \"street\": \"rua 122\",\r\n        \"number\": \"1209\",\r\n        \"complement\": \"predio\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -680,7 +680,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/v1/task/c7b29857-101d-41aa-b58b-01d145e986fe",
+							"raw": "http://localhost:8000/api/v1/task/id",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -690,7 +690,7 @@
 								"api",
 								"v1",
 								"task",
-								"c7b29857-101d-41aa-b58b-01d145e986fe"
+								"id"
 							]
 						}
 					},
@@ -712,7 +712,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/v1/task/c0518076-0eb3-4572-82cf-b63d775463c8",
+							"raw": "http://localhost:8000/api/v1/task/id",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -722,7 +722,7 @@
 								"api",
 								"v1",
 								"task",
-								"c0518076-0eb3-4572-82cf-b63d775463c8"
+								"id"
 							]
 						}
 					},
