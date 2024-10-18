@@ -11,17 +11,17 @@ export class UpdateUserDTO{
 
     @IsOptional()
     @MinLength(6, {message: 'O campo `password` precisa ter pelo menos 6 caracteres.',})
-    password: string;
+    password?: string;
 
     @IsOptional()
     @IsString()
-    role: string;
+    role?: string;
 
     @IsOptional()
     @IsEnum(Sector, {message: 'O campo `sector` precisa estar dentro dos padrôes estabelecidos.',})
-    sector: Sector;
+    sector?: Sector;
 
     @IsOptional()
     @IsBoolean({ message: 'O campo `isActive` precisa ser `true` ou `false`.' })
-    isActive: boolean;
+    isActive?: boolean;
 }

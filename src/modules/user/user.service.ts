@@ -75,10 +75,6 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('O usuário não foi encontrado.');
     }
-  
-    if(newData.password){
-      user.password
-    }
 
     if (newData.role) {
       const role = await this.roleRepository.findOne({
@@ -90,19 +86,10 @@ export class UserService {
       }
 
       user.role = role
-
+      delete newData.role
     }
 
-    if(newData.isActive){
-      user.isActive = newData.isActive
-    }
-
-    if(newData.sector){
-      user.sector = newData.sector
-    }
-
-    user.name = newData.name;
-    user.email = newData.email;
+    Object.assign(user, newData)
   
     return this.userRepository.save(user);
   }
