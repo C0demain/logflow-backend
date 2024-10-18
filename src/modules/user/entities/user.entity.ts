@@ -14,6 +14,7 @@ import { Task } from 'src/modules/task/entities/task.entity';
 import { ServiceOrder } from 'src/modules/service-order/entities/service-order.entity';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { RoleEntity } from 'src/modules/roles/roles.entity';
+import { Message } from 'src/modules/chat/chat.entity';
 
 @ApiTags('users')
 @Entity({ name: 'users' })
@@ -49,5 +50,8 @@ export class UserEntity {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
+
+  @OneToMany(() => Message, (message) => message.user)
+  messages: Message[];
 
 }
