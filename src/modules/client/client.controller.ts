@@ -89,11 +89,11 @@ export class ClientController {
   @Delete(':id')
   @ApiOperation({ summary: 'Remover cliente' })
   async remove(@Param('id') id: string) {
-    const clientRemoved = await this.clientService.remove(id);
+    const {clientRemoved, message} = await this.clientService.remove(id);
 
     return {
-      message: 'Cliente removido com sucesso',
-      client: clientRemoved,
+      message,
+      client: clientRemoved
     };
   }
 }

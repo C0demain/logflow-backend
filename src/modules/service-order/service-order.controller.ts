@@ -20,20 +20,18 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../auth/authentication.guard';
-import { Roles } from '../roles/roles.decorator';
-import { Role } from '../roles/enums/roles.enum';
 
 @ApiTags('service-order')
 @UseGuards(AuthenticationGuard)
 @Controller('/api/v1/service-order')
 @ApiBearerAuth()
 export class ServiceOrderController {
-  constructor(private readonly serviceOrderService: ServiceOrderService) {}
+  constructor(private readonly serviceOrderService: ServiceOrderService) { }
 
   @Post()
   @ApiOperation({ summary: 'Criar ordem de serviço' })
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    const { title, clientId, status, sector, userId } = createServiceOrderDto;
+    const { title, clientId, status, sector, userId, description, value } = createServiceOrderDto;
 
     const orderCreated = await this.serviceOrderService.create({
       title: title,
@@ -41,14 +39,17 @@ export class ServiceOrderController {
       status: status,
       sector: sector,
       userId: userId,
+      description: description,
+      value: value
     });
 
     return {
-      message: 'ordem de serviço cadastrada',
+      message: 'Ordem de serviço cadastrada.',
       serviceOrder: new ListServiceOrderDto(
         orderCreated.id,
         orderCreated.title,
         {
+          clientId: orderCreated.client.id,
           clientName: orderCreated.client.name,
           clientEmail: orderCreated.client.email,
           clientCnpj: orderCreated.client.cnpj,
@@ -59,14 +60,16 @@ export class ServiceOrderController {
           userId: orderCreated.user.id,
           userName: orderCreated.user.name,
           userEmail: orderCreated.user.email,
-          userRole: orderCreated.user.role,
+          userRole: orderCreated.user.role.name,
         },
+        orderCreated.serviceOrderLogs,
+        orderCreated.description,
+        orderCreated.value
       ),
     };
   }
 
   @Get()
-  @Roles(Role.MANAGER)
   @ApiOperation({
     summary: 'Listar todos as ordens de serviço',
     description: 'Rota acessível apenas para administradores',
@@ -151,7 +154,6 @@ export class ServiceOrderController {
   }
 
   @Delete(':id')
-  @Roles(Role.MANAGER)
   @ApiOperation({
     summary: 'Deletar uma ordem de serviço',
     description: 'Rota acessível apenas para administradores',

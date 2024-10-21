@@ -6,9 +6,11 @@ on:
 jobs:
     tests:
       uses: C0demain/logflow-backend/.github/workflows/unit-tests.yml@dev
+    testDockerBuild:
+      uses: C0demain/logflow-backend/.github/workflows/docker-image.yml@dev
     build:
       name: push docker image to docker hub
-      needs: [tests]
+      needs: [tests, testDockerBuild]
       runs-on: ubuntu-latest
       steps:
         - name: check repository

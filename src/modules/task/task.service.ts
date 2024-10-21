@@ -15,73 +15,76 @@ export class TaskService {
   constructor(
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
     private readonly serviceOrderService: ServiceOrderService,
-    private readonly userService: UserService
-  ){}
+    private readonly userService: UserService,
+  ) { }
 
   async create(createTaskDto: CreateTaskDto) {
-    const taskDb = new Task()
+    const taskDb = new Task();
 
-    const serviceOrder = await this.serviceOrderService.findById(createTaskDto.orderId)
-
-    if(serviceOrder === null){
-      throw new NotFoundException('Ordem de serviço não encontrada')
+    const serviceOrder = await this.serviceOrderService.findById(createTaskDto.orderId);
+    if (serviceOrder === null) {
+      throw new NotFoundException('Ordem de serviço não encontrada.');
     }
 
-    const user = await this.userService.findById(createTaskDto.userId)
-
-    if(user === null){
-      throw new NotFoundException('Usuário não encontrado')
+    const userId = await this.userService.findById(createTaskDto.userId);
+    if (userId === null) {
+      throw new NotFoundException('Usuário não encontrado.');
     }
 
-    taskDb.title = createTaskDto.title
-    taskDb.sector = createTaskDto.sector
-    taskDb.serviceOrder = serviceOrder
-    taskDb.assignedUser = user
+    // Obrigatórios
+    taskDb.title = createTaskDto.title;
+    taskDb.serviceOrder = serviceOrder;
+    taskDb.sector = createTaskDto.sector;
+    
+    // Opcionais
+    taskDb.assignedUser = userId;
+    taskDb.role = userId.role;
+    taskDb.completed = createTaskDto.completed;
 
-    const createdTask =  await this.taskRepository.save(taskDb)
-    return parseToGetTaskDTO(createdTask)
+    const createdTask = await this.taskRepository.save(taskDb);
+    return parseToGetTaskDTO(createdTask);
   }
 
-  async findAll(filters: {title?: string, assignedUserId?: string, serviceOrderId?: string, completed?: boolean, sector?: Sector}) {
+  async findAll(filters: { title?: string, assignedUserId?: string, serviceOrderId?: string, completed?: boolean, sector?: Sector }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<Task> = {}
 
-    if(filters.title){
+    if (filters.title) {
       where.title = filters.title
     }
-    
-    if(filters.completed){
-      where.completed = filters.completed 
+
+    if (filters.completed) {
+      where.completed = filters.completed
     }
 
-    if(filters.sector){
+    if (filters.sector) {
       where.sector = filters.sector
     }
 
-    if(filters.assignedUserId){
-      where.assignedUser = {id: filters.assignedUserId}
+    if (filters.assignedUserId) {
+      where.assignedUser = { id: filters.assignedUserId }
     }
 
-    if(filters.serviceOrderId){
-      where.serviceOrder = {id: filters.serviceOrderId}
+    if (filters.serviceOrderId) {
+      where.serviceOrder = { id: filters.serviceOrderId }
     }
 
-    
-    const tasks = await this.taskRepository.find({ where })
-    
-    const taskList = tasks.map( task => {
+
+    const tasks = await this.taskRepository.find({ where, order: {createdAt: "asc"} })
+
+    const taskList = tasks.map(task => {
       const parsedTask = parseToGetTaskDTO(task)
       return parsedTask
     })
 
     return taskList
-    
+
   }
 
   async findById(id: string) {
     const task = await this.taskRepository.findOneBy({ id })
 
-    if(task === null){
+    if (task === null) {
       throw new NotFoundException(`Tarefa com id ${id} não encontrada`)
     }
 
@@ -90,30 +93,52 @@ export class TaskService {
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {
-    const task = await this.taskRepository.findOneBy({ id })
-    if(task === null){
-      throw new NotFoundException(`Tarefa com id ${id} não encontrada`)
+    // Verifica se a tarefa existe
+    const task = await this.taskRepository.findOneBy({ id });
+    if (!task) {
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada.`);
     }
 
-    const user = await this.userService.findById(updateTaskDto.userId)
-    if(user === null){
-      throw new NotFoundException(`Usuário com id ${id} não encontrado`)
+    // Busca a ordem de serviço (obrigatório)
+    const serviceOrder = await this.serviceOrderService.findById(updateTaskDto.orderId);
+    if (!serviceOrder) {
+      throw new NotFoundException('Ordem de serviço não encontrada.');
     }
 
-    task.title = updateTaskDto.title
-    task.completed = updateTaskDto.completed
-    task.assignedUser = user
+    // Busca o usuário atribuído (opcional)
+    let user = null;
+    if (updateTaskDto.userId) {
+      user = await this.userService.findById(updateTaskDto.userId);
+      if (!user) {
+        throw new NotFoundException('Usuário não encontrado.');
+      }
+    }
 
-    const updatedTask = await this.taskRepository.save(task)
-    const parsedTask = parseToGetTaskDTO(updatedTask)
+    task.title = updateTaskDto.title;
+    task.serviceOrder = serviceOrder;
 
-    return parsedTask
+    // Atualizando os campos opcionais
+    if (user) {
+      task.assignedUser = user;
+    }
+
+    if (updateTaskDto.completed !== undefined) {
+      task.completed = updateTaskDto.completed;
+    }
+
+    if (updateTaskDto.address) {
+      task.address = updateTaskDto.address; 
+    }
+
+    const updatedTask = await this.taskRepository.save(task);
+
+    return parseToGetTaskDTO(updatedTask);
   }
 
   async remove(id: string) {
     const task = await this.taskRepository.findOneBy({ id })
 
-    if(task === null){
+    if (task === null) {
       throw new NotFoundException(`Tarefa com id ${id} não encontrada`)
     }
 

@@ -4,11 +4,15 @@ on:
   push:
     branches: [ "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
+  workflow_call:
 
 jobs:
+  tests:
+    uses: C0demain/logflow-backend/.github/workflows/unit-tests.yml@dev
 
   build:
+    needs: [tests]
 
     runs-on: ubuntu-latest
 

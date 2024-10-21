@@ -6,12 +6,20 @@ import { UpdateUserDTO } from 'src/modules/user/dto/UpdateUser.dto';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
 import { Repository } from 'typeorm';
-import { Role } from '../roles/enums/roles.enum';
+import { RoleEntity } from '../roles/roles.entity'; 
 import { Sector } from '../service-order/enums/sector.enum';
 
-describe('ServiceOrderService', () => {
+describe('UserService', () => {
   let service: UserService;
-  let repository: Repository<UserEntity>;
+  let userRepository: Repository<UserEntity>;
+  let roleRepository: Repository<RoleEntity>;
+
+  const roleMock: RoleEntity = {
+    id: 'uuid-role',
+    name: 'Gerente Operacional',
+    description: 'Gerencia as operações da empresa',
+    sector: Sector.OPERACIONAL,
+  };
 
   const userMock: UserEntity = {
     id: 'uuid-uuid',
@@ -19,7 +27,7 @@ describe('ServiceOrderService', () => {
     email: 'testuser@gmail.com',
     password: '123456',
     createdAt: '2024-01-01',
-    role: Role.MANAGER,
+    role: roleMock,
     sector: Sector.OPERACIONAL,
     isActive: true,
     orders: [],
@@ -30,7 +38,7 @@ describe('ServiceOrderService', () => {
     name: 'test-username',
     email: 'testuser@gmail.com',
     password: '123456',
-    role: Role.MANAGER,
+    role: 'Gerente Operacional',
     sector: Sector.OPERACIONAL,
     isActive: true,
   };
@@ -39,9 +47,9 @@ describe('ServiceOrderService', () => {
     name: 'test-username-updated',
     email: 'testuser@gmail.com',
     password: '123456',
-    role: Role.EMPLOYEE,
+    role: "Gerente Operacional",
     sector: Sector.OPERACIONAL,
-    isActive: true
+    isActive: true,
   };
 
   beforeEach(async () => {
@@ -53,14 +61,27 @@ describe('ServiceOrderService', () => {
           useValue: {
             save: jest.fn().mockResolvedValue(userMock),
             find: jest.fn().mockResolvedValue([userMock]),
+            findOneBy: jest.fn().mockResolvedValue(userMock),
+            findOne: jest.fn().mockResolvedValue(userMock),
+          },
+        },
+        {
+          provide: getRepositoryToken(RoleEntity),
+          useValue: {
+            save: jest.fn().mockResolvedValue(roleMock),
+            findOneBy: jest.fn().mockResolvedValue(roleMock),
+            findOne: jest.fn().mockResolvedValue(roleMock),
           },
         },
       ],
     }).compile();
 
     service = module.get<UserService>(UserService);
-    repository = module.get<Repository<UserEntity>>(
+    userRepository = module.get<Repository<UserEntity>>(
       getRepositoryToken(UserEntity),
+    );
+    roleRepository = module.get<Repository<RoleEntity>>(
+      getRepositoryToken(RoleEntity),
     );
   });
 
@@ -69,68 +90,66 @@ describe('ServiceOrderService', () => {
   });
 
   it('should create user', async () => {
-    repository.save = jest.fn().mockResolvedValue(userMock);
+    userRepository.save = jest.fn().mockResolvedValue(userMock);
     const newUser = await service.createUser(createUserMock);
 
     expect(newUser).toEqual(userMock);
-    expect(repository.save).toHaveBeenCalled();
+    expect(userRepository.save).toHaveBeenCalled();
   });
 
   it('should list all users', async () => {
-    repository.find = jest.fn().mockResolvedValue([userMock]);
+    userRepository.find = jest.fn().mockResolvedValue([userMock]);
 
     const userList = await service.listUsers();
 
-    expect(userList).toEqual([
-      {
+    expect(userList).toEqual([{
         id: 'uuid-uuid',
         name: 'test-username',
-        role: Role.MANAGER,
+        role: 'Gerente Operacional',
         isActive: true,
         email: "testuser@gmail.com",
-        sector: Sector.OPERACIONAL
+        sector: Sector.OPERACIONAL,
       },
     ]);
 
-    expect(repository.find).toHaveBeenCalled();
+    expect(userRepository.find).toHaveBeenCalled();
   });
 
   it('should return user by email', async () => {
-    repository.findOne = jest.fn().mockResolvedValue(userMock);
+    userRepository.findOne = jest.fn().mockResolvedValue(userMock);
 
     const userList = await service.findByEmail(userMock.email);
 
     expect(userList).toEqual(userMock);
-    expect(repository.findOne).toHaveBeenCalledWith({
+    expect(userRepository.findOne).toHaveBeenCalledWith({
       where: { email: userMock.email },
     });
   });
 
   it('should update user', async () => {
-    repository.findOneBy = jest.fn().mockResolvedValue(userMock);
+    userRepository.findOneBy = jest.fn().mockResolvedValue(userMock);
 
     const updatedUser = await service.updateUser(userMock.id, updateUserMock);
-    const newUser = userMock;
-    newUser.name = 'test-username-updated';
+    const newUser = { ...userMock, name: 'test-username-updated' };
 
     expect(updatedUser).toEqual(newUser);
-    expect(repository.findOneBy).toHaveBeenCalledWith({ id: userMock.id });
-    expect(repository.save).toHaveBeenCalledWith(newUser);
+    expect(userRepository.findOneBy).toHaveBeenCalledWith({ id: userMock.id });
+    expect(userRepository.save).toHaveBeenCalledWith(newUser);
   });
 
   it('should delete user', async () => {
-    repository.save = jest.fn().mockResolvedValue(userMock);
-    repository.findOneBy = jest.fn().mockResolvedValue(userMock);
+    userRepository.save = jest.fn().mockResolvedValue(userMock);
+    userRepository.findOneBy = jest.fn().mockResolvedValue(userMock);
 
     const oldUser = await service.deleteUser(userMock.id);
 
     expect(oldUser).toEqual(userMock);
-    expect(repository.findOneBy).toHaveBeenCalledWith({ id: userMock.id });
-    expect(repository.save).toHaveBeenCalledWith(userMock);
+    expect(userRepository.findOneBy).toHaveBeenCalledWith({ id: userMock.id });
+    expect(userRepository.save).toHaveBeenCalledWith(userMock);
   });
 
   it('should throw NotFoundException when user is not found in findByEmail', async () => {
-    repository.findOne = jest.fn().mockResolvedValue(null);
+    userRepository.findOne = jest.fn().mockResolvedValue(null);
 
     await expect(
       service.findByEmail('notvalidemail@gmail.com'),
@@ -138,15 +157,15 @@ describe('ServiceOrderService', () => {
   });
 
   it('should throw NotFoundException when user is not found in update', async () => {
-    repository.findOneBy = jest.fn().mockResolvedValue(null);
+    userRepository.findOneBy = jest.fn().mockResolvedValue(null);
 
-    await expect(service.updateUser('uu1d-uu1d', userMock)).rejects.toThrow(
+    await expect(service.updateUser('uu1d-uu1d', updateUserMock)).rejects.toThrow(
       NotFoundException,
     );
   });
 
   it('should throw NotFoundException when user is not found in delete', async () => {
-    repository.findOneBy = jest.fn().mockResolvedValue(null);
+    userRepository.findOneBy = jest.fn().mockResolvedValue(null);
 
     await expect(service.deleteUser('uu1d-uu1d')).rejects.toThrow(
       NotFoundException,

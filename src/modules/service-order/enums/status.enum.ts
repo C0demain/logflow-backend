@@ -1,5 +1,5 @@
 export enum Status{
     PENDENTE = 'PENDENTE',
-    OPERACIONAL = 'OPERACIONAL',
+    ATIVO = 'ATIVO',
     FINALIZADO = 'FINALIZADO'
 }

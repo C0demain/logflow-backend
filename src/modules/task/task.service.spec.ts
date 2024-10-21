@@ -8,8 +8,9 @@ import { ServiceOrderService } from 'src/modules/service-order/service-order.ser
 import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
 import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { NotFoundException } from '@nestjs/common';
-import { title } from 'process';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { ClientService } from '../client/client.service';
+import { AddressDto } from '../client/dto/address.dto';
 
 describe('TaskService', () => {
   let service: TaskService;
@@ -58,7 +59,7 @@ describe('TaskService', () => {
         {
           provide: ServiceOrderService,
           useValue: mockServiceOrderService
-        }
+        },
       ],
     }).compile();
 
@@ -79,7 +80,9 @@ describe('TaskService', () => {
       title: 'task-title',
       orderId: 'order1',
       userId: 'user1',
-      sector: Sector.OPERACIONAL
+      sector: Sector.OPERACIONAL,
+      role: 'role1',
+      completed: false
     }
 
     const expectedResult: GetTaskDto = {
@@ -121,7 +124,7 @@ describe('TaskService', () => {
       const tasks = await service.findAll({})
 
       expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: {} })
+      expect(mockRepository.find).toHaveBeenCalledWith({ where: {}, order: {createdAt: "asc"} })
     })
 
     it('should return tasks filtered by title', async ()=>{
@@ -141,7 +144,7 @@ describe('TaskService', () => {
       const tasks = await service.findAll({title: 'Task1'})
 
       expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: { title: 'Task1'} })
+      expect(mockRepository.find).toHaveBeenCalledWith({ where: { title: 'Task1'}, order: {createdAt: "asc"} })
     })
 
     it('should return tasks filtered by serviceOrderId', async ()=>{
@@ -161,7 +164,7 @@ describe('TaskService', () => {
       const tasks = await service.findAll({serviceOrderId: 'order1'})
 
       expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: { serviceOrder: { id: 'order1' } } })
+      expect(mockRepository.find).toHaveBeenCalledWith({ where: { serviceOrder: { id: 'order1' } }, order: {createdAt: "asc"} })
     })
 
     it('should return tasks filtered by assignedUserId', async ()=>{
@@ -181,7 +184,7 @@ describe('TaskService', () => {
       const tasks = await service.findAll({assignedUserId: 'user1'})
 
       expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: { assignedUser: { id: 'user1' } } })
+      expect(mockRepository.find).toHaveBeenCalledWith({ where: { assignedUser: { id: 'user1' } }, order: {createdAt: "asc"} })
     })
   })
 
@@ -225,7 +228,12 @@ describe('TaskService', () => {
       mockRepository.findOneBy.mockResolvedValue({...expectedResult, ...{title: 'Task1'} })
       mockRepository.save.mockResolvedValue(expectedResult)
 
-      const task = await service.update('task1', {title: 'Task2', completed: false, userId: 'user1'})
+      const task = await service.update('task1', {
+        title: 'Task2', completed: false, userId: 'user1',
+        orderId: 'order1',
+        sector: Sector.OPERACIONAL,
+        address: new AddressDto
+      })
 
       expect(task).toEqual(expectedResult)
     })
@@ -234,7 +242,12 @@ describe('TaskService', () => {
       
       mockRepository.findOneBy.mockResolvedValue(null)
 
-      expect(service.update('task1', {title: 'Task2', completed: false, userId: 'user1'})).rejects.toBeInstanceOf(NotFoundException)
+      expect(service.update('task1', {
+        title: 'Task2', completed: false, userId: 'user1',
+        orderId: 'order2',
+        sector: Sector.OPERACIONAL,
+        address: new AddressDto
+      })).rejects.toBeInstanceOf(NotFoundException)
     })
   })
 

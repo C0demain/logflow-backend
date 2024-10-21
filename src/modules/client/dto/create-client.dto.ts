@@ -1,5 +1,9 @@
-import { IsString, IsNotEmpty, IsEmail, IsUUID, Length } from "class-validator";
+import { IsString, IsNotEmpty, IsEmail, Length, IsIn, ValidateNested } from "class-validator";
 import { UniqueEmail } from "src/modules/user/validation/UniqueEmail.validation";
+import { IsBrazilianPhoneNumber } from "src/modules/client/validations/brazilianPhoneNumberValidator";
+import { IsCNPJ } from "src/modules/client/validations/brazilianCNPJValidator";
+import { Type } from "class-transformer";
+import { AddressDto } from "./address.dto";
 
 export class CreateClientDto {
 
@@ -10,12 +14,12 @@ export class CreateClientDto {
 
     @IsString()
     @IsNotEmpty({ message: "O campo `phone` não pode estar vazio" })
-    @Length(10, 12, { message: "O campo `phone` deve ter entre 10 e 12 caracteres" })
+    @IsBrazilianPhoneNumber()
     phone: string;
 
     @IsString()
     @IsNotEmpty({ message: "O campo `cnpj` não pode estar vazio" })
-    @Length(14, 15, { message: "O campo `cnpj` deve ter entre 14 e 15 caracteres" })
+    @IsCNPJ()
     cnpj: string;
 
     @IsEmail({}, { message: "O campo `email` deve ser um e-mail válido" })
@@ -24,30 +28,7 @@ export class CreateClientDto {
     @UniqueEmail({ message: 'Já existe um usuário ou um cliente com este email.' })
     email: string;
 
-    @IsString()
-    @IsNotEmpty({message: 'o campo `zipCode` não pode estar vazio'})
-    zipCode: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "O campo `state` não pode estar vazio" })
-    state: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "O campo `city` não pode estar vazio" })
-    city: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "O campo `neighborhood` não pode estar vazio" })
-    neighborhood: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "O campo `street` não pode estar vazio" })
-    street: string;
-
-    @IsString()
-    @IsNotEmpty({ message: "O campo `number` não pode estar vazio" })
-    number: string;
-
-    @IsString()
-    complement?: string;
+    @ValidateNested()
+    @Type(() => AddressDto)
+    address: AddressDto;
 }

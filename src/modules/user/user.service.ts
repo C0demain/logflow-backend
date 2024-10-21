@@ -6,20 +6,28 @@ import { CreateUserDTO } from './dto/CreateUser.dto';
 import { ListUsersDTO } from './dto/ListUser.dto';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { FindOptionsWhere } from 'typeorm'
+import { RoleEntity } from '../roles/roles.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(RoleEntity) 
+    private readonly roleRepository: Repository<RoleEntity>
   ) {}
 
   async createUser(createUserDTO: CreateUserDTO) {
     const userEntity = new UserEntity();
 
+    const role = await this.roleRepository.findOne({where: {name: createUserDTO.role}})
+    if(!role){
+      throw new NotFoundException(`role ${createUserDTO.role} não encontrada`)  
+    }
+
     userEntity.name = createUserDTO.name;
     userEntity.email = createUserDTO.email;
-    userEntity.role = createUserDTO.role;
+    userEntity.role = role;
     userEntity.sector = createUserDTO.sector;
     userEntity.password = createUserDTO.password;
     userEntity.isActive = createUserDTO.isActive;
@@ -32,7 +40,7 @@ export class UserService {
     where.isActive = isActive === undefined ? true : isActive
     const usersSaved = await this.userRepository.find({where})
     const usersList = usersSaved.map(
-      (user) => new ListUsersDTO(user.id, user.name, user.role, user.isActive, user.email, user.sector),
+      (user) => new ListUsersDTO(user.id, user.name, user.role.name, user.isActive, user.email, user.sector),
     );
     return usersList;
   }
@@ -42,9 +50,10 @@ export class UserService {
       where: { email },
     });
 
-    if (checkEmail === null)
+    if (checkEmail === null){
       throw new NotFoundException('O email não foi encontrado.');
-
+    }
+    
     return checkEmail;
   }
 
@@ -53,20 +62,35 @@ export class UserService {
       where: { id },
     });
 
-    if (checkId === null)
-      throw new NotFoundException('O email não foi encontrado.');
+    if (checkId === null) {
+      throw new NotFoundException(`Usuário com id ${id} não foi encontrado.`);
+    }
 
     return checkId;
   }
 
   async updateUser(id: string, newData: UpdateUserDTO) {
     const user = await this.userRepository.findOneBy({ id });
-
-    if (user === null)
+  
+    if (!user) {
       throw new NotFoundException('O usuário não foi encontrado.');
+    }
 
-    Object.assign(user, newData as UserEntity);
+    if (newData.role) {
+      const role = await this.roleRepository.findOne({
+        where: { name: newData.role},
+      });
+  
+      if (!role) {
+        throw new NotFoundException(`Role "${newData.role}" não encontrada.`);
+      }
 
+      user.role = role
+      delete newData.role
+    }
+
+    Object.assign(user, newData)
+  
     return this.userRepository.save(user);
   }
 

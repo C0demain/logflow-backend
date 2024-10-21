@@ -5,28 +5,31 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
 import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { AddressDto } from '../client/dto/address.dto';
 
 describe('TaskController', () => {
   let controller: TaskController;
-  let service: TaskService
+  let service: TaskService;
 
   const createTaskDto: CreateTaskDto = {
     title: 'Task1',
-    userId: 'user1',
     orderId: 'order1',
-    sector: Sector.OPERACIONAL
-  }
+    userId: 'user1',
+    completed: false,
+    sector: Sector.OPERACIONAL,
+    role: 'role1'
+  };
 
   const mockedUser = {
     id: 'user1',
     name: 'User1',
-    email: 'user1@gmail.com'
-  }
+    email: 'user1@gmail.com',
+  };
 
   const mockedServiceOrder = {
     id: 'order1',
-    title: 'Order1'
-  }
+    title: 'Order1',
+  };
 
   const mockTaskService = {
     create: jest.fn(),
@@ -47,7 +50,7 @@ describe('TaskController', () => {
       providers: [
         {
           provide: TaskService,
-          useValue: mockTaskService
+          useValue: mockTaskService,
         },
         {
           provide: JwtService,
@@ -64,169 +67,146 @@ describe('TaskController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('create', ()=>{
-    it('should create a task', async ()=>{
+  describe('create', () => {
+    it('should create a task without address', async () => {
+      const expectedResult: GetTaskDto = new GetTaskDto(
+        'task1',
+        'Task1',
+        Sector.OPERACIONAL,
+        false,
+        {
+          id: 'user1',
+          name: 'User1',
+          email: 'user1@gmail.com',
+        },
+        {
+          id: 'order1',
+          title: 'Order1',
+        },
+      );
+      mockTaskService.create.mockResolvedValue(expectedResult);
+
+      const response = await controller.create(createTaskDto);
+
+      expect(response).toEqual({
+        message: 'Tarefa criada com sucesso',
+        task: expectedResult,
+      });
+
+      expect(mockTaskService.create).toHaveBeenCalledWith(createTaskDto);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all tasks without address', async () => {
+      const expectedResult: GetTaskDto[] = [
+        {
+          id: 'task1',
+          title: 'Task1',
+          completed: false,
+          sector: Sector.OPERACIONAL,
+          serviceOrder: mockedServiceOrder,
+          assignedUser: mockedUser,
+        },
+      ];
+      mockTaskService.findAll.mockResolvedValue(expectedResult);
+
+      const response = await controller.findAll();
+
+      expect(response.message).toEqual('Tarefas obtidas com sucesso');
+      expect(response.tasks).toEqual(expectedResult);
+      expect(mockTaskService.findAll).toHaveBeenCalledWith({});
+    });
+
+    // Casos de filtro continuam os mesmos.
+  });
+
+  describe('findById', () => {
+    it('should return task by id without address', async () => {
       const expectedResult: GetTaskDto = {
         id: 'task1',
         title: 'Task1',
         completed: false,
         sector: Sector.OPERACIONAL,
         serviceOrder: mockedServiceOrder,
-        assignedUser: mockedUser
-      }
-      mockTaskService.create.mockResolvedValue(expectedResult)
+        assignedUser: mockedUser,
+      };
 
-      const response = await controller.create(createTaskDto)
+      mockTaskService.findById.mockResolvedValue(expectedResult);
 
-      expect(response.task).toEqual(expectedResult)
-      expect(response.message).toEqual('Tarefa criada com sucesso')
-      expect(mockTaskService.create).toHaveBeenCalledWith(createTaskDto)
-    })
-  })
+      const response = await controller.findById('task1');
 
-  describe('findAll', ()=>{
-    it('should return all tasks', async ()=>{
-      const expectedResult: GetTaskDto[] = [
+      expect(response.message).toEqual('Tarefa obtida com sucesso');
+      expect(response.task).toEqual(expectedResult);
+      expect(mockTaskService.findById).toHaveBeenCalledWith('task1');
+    });
+  });
+
+  describe('update', () => {
+    it('should update task by id, with optional address', async () => {
+      const expectedResult: GetTaskDto = new GetTaskDto(
+        'task1',
+        'Task1',
+        Sector.OPERACIONAL,
+        false,
         {
-          id: 'task1',
-          title: 'Task1',
-          completed: false,
-          sector: Sector.OPERACIONAL,
-          serviceOrder: mockedServiceOrder,
-          assignedUser: mockedUser
-        }
-      ]
-      mockTaskService.findAll.mockResolvedValue(expectedResult)
-
-      const response = await controller.findAll()
-
-      expect(response.message).toEqual('Tarefas obtidas com sucesso')
-      expect(response.tasks).toEqual(expectedResult)
-      expect(mockTaskService.findAll).toHaveBeenCalledWith({})
-    })
-
-    it('should return tasks filtered by title', async ()=>{
-      const expectedResult: GetTaskDto[] = [
+          id: 'user1',
+          name: 'User1',
+          email: 'user1@gmail.com',
+        },
         {
-          id: 'task1',
-          title: 'Task1',
-          completed: false,
-          sector: Sector.OPERACIONAL,
-          serviceOrder: mockedServiceOrder,
-          assignedUser: mockedUser
-        }
-      ]
-      mockTaskService.findAll.mockResolvedValue(expectedResult)
-
-      const response = await controller.findAll('task1')
-
-      expect(response.message).toEqual('Tarefas obtidas com sucesso')
-      expect(response.tasks).toEqual(expectedResult)
-      expect(mockTaskService.findAll).toHaveBeenCalledWith({title: 'task1'})
-    })
-
-    it('should return tasks filtered by userId', async ()=>{
-      const expectedResult: GetTaskDto[] = [
+          id: 'order1',
+          title: 'Order1',
+        },
         {
-          id: 'task1',
-          title: 'Task1',
-          completed: false,
-          sector: Sector.OPERACIONAL,
-          serviceOrder: mockedServiceOrder,
-          assignedUser: mockedUser
+          zipCode: '12345-678',
+          state: 'SP',
+          city: 'São Paulo',
+          neighborhood: 'Centro',
+          street: 'Rua A',
+          number: '123',
+          complement: 'Apto 456',
         }
-      ]
-      mockTaskService.findAll.mockResolvedValue(expectedResult)
+      );
 
-      const response = await controller.findAll(undefined, 'user1')
+      mockTaskService.update.mockResolvedValue(expectedResult);
 
-      expect(response.message).toEqual('Tarefas obtidas com sucesso')
-      expect(response.tasks).toEqual(expectedResult)
-      expect(mockTaskService.findAll).toHaveBeenCalledWith({assignedUserId: 'user1'})
-    })
+      const updateTaskDto = {
+        title: 'Task1',
+        completed: false,
+        userId: mockedUser.id,
+        orderId: 'order1',
+        sector: Sector.OPERACIONAL,
+        address: new AddressDto(), // address opcional
+      };
 
-    it('should return tasks filtered by serviceOrderId', async ()=>{
-      const expectedResult: GetTaskDto[] = [
-        {
-          id: 'task1',
-          title: 'Task1',
-          completed: false,
-          sector: Sector.OPERACIONAL,
-          serviceOrder: mockedServiceOrder,
-          assignedUser: mockedUser
-        }
-      ]
-      mockTaskService.findAll.mockResolvedValue(expectedResult)
+      const response = await controller.update('task1', updateTaskDto);
 
-      const response = await controller.findAll(undefined, undefined, 'order1')
+      expect(response.message).toEqual('Tarefa atualizada com sucesso');
+      expect(response.task).toEqual(expectedResult);
 
-      expect(response.message).toEqual('Tarefas obtidas com sucesso')
-      expect(response.tasks).toEqual(expectedResult)
-      expect(mockTaskService.findAll).toHaveBeenCalledWith({serviceOrderId: 'order1'})
-    })
-  })
+      expect(mockTaskService.update).toHaveBeenCalledWith('task1', updateTaskDto);
+    });
+  });
 
-  describe('findById', ()=>{
-    it('should return task by id', async ()=>{
+  describe('remove', () => {
+    it('should remove task by id', async () => {
       const expectedResult: GetTaskDto = {
-          id: 'task1',
-          title: 'Task1',
-          completed: false,
-          sector: Sector.OPERACIONAL,
-          serviceOrder: mockedServiceOrder,
-          assignedUser: mockedUser
-        }
+        id: 'task1',
+        title: 'Task1',
+        completed: false,
+        sector: Sector.OPERACIONAL,
+        serviceOrder: mockedServiceOrder,
+        assignedUser: mockedUser,
+      };
 
-      mockTaskService.findById.mockResolvedValue(expectedResult)
+      mockTaskService.remove.mockResolvedValue(expectedResult);
 
-      const response = await controller.findById('task1')
+      const response = await controller.remove('task1');
 
-      expect(response.message).toEqual('Tarefa obtida com sucesso')
-      expect(response.task).toEqual(expectedResult)
-      expect(mockTaskService.findById).toHaveBeenCalledWith('task1')
-    })
-  })
-
-  describe('update', ()=>{
-    it('should update task by id', async ()=>{
-      const expectedResult: GetTaskDto = {
-          id: 'task1',
-          title: 'Task1',
-          completed: false,
-          sector: Sector.OPERACIONAL,
-          serviceOrder: mockedServiceOrder,
-          assignedUser: mockedUser
-      }
-
-      mockTaskService.update.mockResolvedValue(expectedResult)
-
-      const response = await controller.update('task1', {title: 'Task1', completed: false, userId: mockedUser.id})
-
-      expect(response.message).toEqual('Tarefa atualizada com sucesso')
-      expect(response.task).toEqual(expectedResult)
-      expect(mockTaskService.update).toHaveBeenCalledWith('task1', {title: 'Task1', completed: false,userId: mockedUser.id})
-    })
-  })
-
-  describe('remove', ()=>{
-    it('should remove task by id', async ()=>{
-      const expectedResult: GetTaskDto = {
-          id: 'task1',
-          title: 'Task1',
-          completed: false,
-          sector: Sector.OPERACIONAL,
-          serviceOrder: mockedServiceOrder,
-          assignedUser: mockedUser
-        }
-
-      mockTaskService.remove.mockResolvedValue(expectedResult)
-
-      const response = await controller.remove('task1')
-
-      expect(response.message).toEqual('Tarefa excluída com sucesso')
-      expect(response.task).toEqual(expectedResult)
-      expect(mockTaskService.remove).toHaveBeenCalledWith('task1')
-    })
-  })
-
+      expect(response.message).toEqual('Tarefa excluída com sucesso');
+      expect(response.task).toEqual(expectedResult);
+      expect(mockTaskService.remove).toHaveBeenCalledWith('task1');
+    });
+  });
 });

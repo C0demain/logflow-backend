@@ -6,7 +6,6 @@ import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
 import { Status } from './enums/status.enum';
 import { Sector } from './enums/sector.enum';
-import { Role } from '../roles/enums/roles.enum';
 import { AuthenticationGuard } from '../auth/authentication.guard';
 
 describe('ServiceOrderController', () => {
@@ -48,12 +47,15 @@ describe('ServiceOrderController', () => {
         status: Status.PENDENTE,
         sector: Sector.OPERACIONAL,
         userId: 'user-123',
+        description: 'anything',
+        value: 100
       };
 
       const result = {
         id: 'order-123',
         title: 'Test Order',
         client: {
+          id: "client-123",
           name: 'Client X',
           email: 'client@gmail.com',
           cnpj: '12345',
@@ -64,7 +66,7 @@ describe('ServiceOrderController', () => {
           id: 'user-123',
           name: 'User Test',
           email: 'user@test.com',
-          role: Role.EMPLOYEE,
+          role: 'EMPLOYEE',
         },
       };
 
@@ -72,12 +74,13 @@ describe('ServiceOrderController', () => {
 
       const response = await controller.create(createServiceOrderDto);
 
-      expect(response.message).toEqual('ordem de serviço cadastrada');
+      expect(response.message).toEqual('Ordem de serviço cadastrada.');
       expect(response.serviceOrder).toEqual(
         new ListServiceOrderDto(
           result.id,
           result.title,
           {
+            clientId: result.client.id,
             clientName: result.client.name,
             clientEmail: result.client.email,
             clientCnpj: result.client.cnpj,
@@ -88,7 +91,6 @@ describe('ServiceOrderController', () => {
             userId: result.user.id,
             userName: result.user.name,
             userEmail: result.user.email,
-            userRole: result.user.role,
           }
         ),
       );
@@ -102,6 +104,7 @@ describe('ServiceOrderController', () => {
           'order-123',
           'Filtered Order',
           {
+            clientId: "client-123",
             clientName: 'Client X',
             clientEmail: 'client@gmail.com',
             clientCnpj: '12345',
@@ -112,7 +115,7 @@ describe('ServiceOrderController', () => {
             userId: 'user-123', 
             userName: 'User Test',
             userEmail: 'user@test.com',
-            userRole: Role.EMPLOYEE,
+            userRole: '',
           },
         ),
       ];
@@ -131,6 +134,7 @@ describe('ServiceOrderController', () => {
           'order-123',
           'Filtered Order',
           {
+            clientId: "client-123",
             clientName: 'Client X',
             clientEmail: 'client@gmail.com',
             clientCnpj: '12345',
@@ -141,7 +145,7 @@ describe('ServiceOrderController', () => {
             userId: 'user-123', 
             userName: 'User Test',
             userEmail: 'user@test.com',
-            userRole: Role.EMPLOYEE,
+            userRole: '',
           },
         ),
       ];
@@ -171,6 +175,7 @@ describe('ServiceOrderController', () => {
           'order-123',
           'Filtered Order',
           {
+            clientId: "client-123",
             clientName: 'Client X',
             clientEmail: 'client@gmail.com',
             clientCnpj: '12345',
@@ -181,7 +186,7 @@ describe('ServiceOrderController', () => {
             userId: 'user-123', 
             userName: 'User Test',
             userEmail: 'user@test.com',
-            userRole: Role.EMPLOYEE,
+            userRole: '',
           },
         ),
       ];

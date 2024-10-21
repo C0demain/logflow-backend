@@ -15,6 +15,7 @@ import { SeederModule } from './db/seeds/seeder.module';
 import { LoggerGlobalInterceptor } from './resources/interceptors/logger-global-interceptors';
 import { ClientModule } from './modules/client/client.module';
 import { TaskModule } from './modules/task/task.module';
+import { RolesModule } from './modules/roles/roles.module'; 
 
 
 @Module({
@@ -32,6 +33,7 @@ import { TaskModule } from './modules/task/task.module';
     SeederModule,
     ClientModule,
     TaskModule,
+    RolesModule,
   ],
   controllers: [RedirectController],
   providers: [

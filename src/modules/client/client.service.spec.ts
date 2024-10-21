@@ -10,6 +10,7 @@ import {
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { ListClientDto } from './dto/list-client.dto';
+import { AddressDto } from './dto/address.dto';
 
 const mockClientRepository = {
   save: jest.fn(),
@@ -46,15 +47,17 @@ describe('ClientService', () => {
       const createClientDto: CreateClientDto = {
         name: 'Client X',
         email: 'client@gmail.com',
-        cnpj: '123456789',
-        phone: '123456789',
-        zipCode: '12345',
-        state: 'SP',
-        city: 'São Paulo',
-        neighborhood: 'Centro',
-        street: 'Rua X',
-        number: '123',
-        complement: 'Apt 101',
+        cnpj: '12.345.678/9234-12',
+        phone: '(12) 97343-1234',
+        address: {
+          zipCode: '12345-123',
+          state: 'SP',
+          city: 'São Paulo',
+          neighborhood: 'Centro',
+          street: 'Rua X',
+          number: '123',
+          complement: 'Apt 101',
+        },
       };
 
       const createdClient = {
@@ -71,6 +74,30 @@ describe('ClientService', () => {
         expect.any(Client),
       );
     });
+
+    it('should throw an error if required fields are missing or invalid', async () => {
+      const invalidClientDto: CreateClientDto = {
+        name: '', // Nome vazio para simular erro
+        email: 'invalidemail.com', // E-mail inválido
+        cnpj: '12.345.678/0000-00', // CNPJ inválido
+        phone: '123456789', // Telefone inválido
+        address: {
+          zipCode: '',
+          state: '',
+          city: '',
+          neighborhood: '',
+          street: '',
+          number: '',
+          complement: '',
+        },
+      };
+
+      mockClientRepository.save.mockImplementation(() => {
+        throw new Error('Validation failed');
+      });
+
+      await expect(service.create(invalidClientDto)).rejects.toThrow();
+    });
   });
 
   describe('findAll', () => {
@@ -82,10 +109,10 @@ describe('ClientService', () => {
           id: 'client-123',
           name: 'Client X',
           email: 'client@gmail.com',
-          cnpj: '123456789',
-          phone: '123456789',
+          cnpj: '12.345.678/9234-12',
+          phone: '(12) 97343-1234',
           address: {
-            zipCode: '12345',
+            zipCode: '12345-123',
             state: 'SP',
             city: 'São Paulo',
             neighborhood: 'Centro',
@@ -107,7 +134,7 @@ describe('ClientService', () => {
       });
     });
 
-    it('should throw an exception if no clients are found', async () => {
+    it('should throw an InternalServerErrorException if no clients are found', async () => {
       mockClientRepository.find.mockResolvedValue([]);
 
       await expect(service.findAll({})).rejects.toThrow(
@@ -122,13 +149,13 @@ describe('ClientService', () => {
         id: 'client-123',
         name: 'Client X',
         email: 'client@gmail.com',
-        cnpj: '123456789',
-        phone: '123456789',
+        cnpj: '12.345.678/9234-12',
+        phone: '(12) 97343-1234',
         address: {
-          zipCode: '12345',
+          zipCode: '12345-123',
           state: 'SP',
           city: 'São Paulo',
-          neighboord: 'Centro',
+          neighborhood: 'Centro',
           street: 'Rua X',
           number: '123',
           complement: 'Apt 101',
@@ -145,7 +172,7 @@ describe('ClientService', () => {
       });
     });
 
-    it('should throw NotFoundException if client not found', async () => {
+    it('should throw NotFoundException if client is not found', async () => {
       mockClientRepository.findOne.mockResolvedValue(null);
 
       await expect(service.findById('client-123')).rejects.toThrow(
@@ -159,33 +186,33 @@ describe('ClientService', () => {
       const updateClientDto: UpdateClientDto = {
         name: 'Updated Client',
         email: 'updatedclient@gmail.com',
+        phone: '(12) 4002-8922',
+        cnpj: '12.345.678/9012-34',
+        address: new AddressDto(),
       };
 
       const client = {
         id: 'client-123',
         name: 'Client X',
         email: 'client@gmail.com',
-        cnpj: '123456789',
-        phone: '123456789',
-        address: {
-          zipCode: '12345',
-          state: 'SP',
-          city: 'São Paulo',
-          neighborhood: 'Centro',
-          street: 'Rua X',
-          number: '123',
-          complement: 'Apt 101',
-        },
+        cnpj: '12.345.678/9234-12',
+        phone: '(12) 97343-1234',
+        address: new AddressDto()
       };
 
-      const updatedClient = { ...client, ...updateClientDto };
+      const updatedClient = {
+        id: 'client-123',
+        ...updateClientDto,
+      };
 
       mockClientRepository.findOne.mockResolvedValue(client);
       mockClientRepository.save.mockResolvedValue(updatedClient);
 
       const result = await service.update('client-123', updateClientDto);
 
-      expect(result.client).toEqual(updatedClient);
+      expect(result).toEqual({
+        client: updatedClient,
+      });
       expect(mockClientRepository.save).toHaveBeenCalledWith(updatedClient);
     });
 
@@ -199,35 +226,53 @@ describe('ClientService', () => {
   });
 
   describe('remove', () => {
-    it('should delete a client', async () => {
+    it('should delete a client if there are no service orders', async () => {
       const client = {
         id: 'client-123',
         name: 'Client X',
         email: 'client@gmail.com',
-        cnpj: '123456789',
-        phone: '123456789',
-        address: {
-          zipCode: '12345',
-          state: 'SP',
-          city: 'São Paulo',
-          neighborhood: 'Centro',
-          street: 'Rua X',
-          number: '123',
-          complement: 'Apt 101',
-        },
+        cnpj: '12.345.678/9234-12',
+        phone: '(12) 97343-1234',
         isActive: true,
+        serviceOrder: [], // Sem ordens de serviço
       };
 
       mockClientRepository.findOne.mockResolvedValue(client);
-      mockClientRepository.delete.mockResolvedValue({
-        ...client,
-        isActive: false,
-      });
+      mockClientRepository.delete.mockResolvedValue(undefined); // Simula exclusão
 
       const result = await service.remove('client-123');
 
-      expect(result.isActive).toBeFalsy();
-      expect(mockClientRepository.save).toHaveBeenCalledWith(client);
+      expect(result.clientRemoved).toEqual(client);
+      expect(result.message).toEqual(
+        `cliente com id: client-123 excluído com sucesso`,
+      );
+      expect(mockClientRepository.delete).toHaveBeenCalledWith('client-123');
+    });
+
+    it('should desactivate a client if there are service orders', async () => {
+      const client = {
+        id: 'client-123',
+        name: 'Client X',
+        email: 'client@gmail.com',
+        cnpj: '12.345.678/9234-12',
+        phone: '(12) 97343-1234',
+        isActive: true,
+        serviceOrder: [{}], // Com ordens de serviço
+      };
+
+      mockClientRepository.findOne.mockResolvedValue(client);
+      mockClientRepository.save.mockResolvedValue({ ...client, isActive: false });
+
+      const result = await service.remove('client-123');
+
+      expect(result.clientRemoved).toEqual({ ...client, isActive: false });
+      expect(result.message).toEqual(
+        `cliente com id: client-123 arquivado com sucesso`,
+      );
+      expect(mockClientRepository.save).toHaveBeenCalledWith({
+        ...client,
+        isActive: false,
+      });
     });
 
     it('should throw NotFoundException if client not found', async () => {

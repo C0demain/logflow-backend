@@ -1,7 +1,6 @@
-import { IsNotEmpty, IsEmail, MinLength, IsOptional, IsEnum, IsBoolean } from "class-validator";
-import { Role } from "src/modules/roles/enums/roles.enum";
+import { IsNotEmpty, IsEmail, MinLength, IsOptional, IsEnum, IsBoolean, IsSemVer, IsString } from "class-validator";
+import { RoleEntity } from "src/modules/roles/roles.entity";
 import { Sector } from "src/modules/service-order/enums/sector.enum";
-import { UniqueEmail } from "src/modules/user/validation/UniqueEmail.validation";
 
 export class UpdateUserDTO{
     @IsNotEmpty({ message: 'O campo `name` não pode ser vazio.' })
@@ -11,18 +10,18 @@ export class UpdateUserDTO{
     email: string;
 
     @IsOptional()
-    @IsEnum(Role, {message: `O campo 'role' precisa estar dentro dos padrôes estabelecidos. (${Role.EMPLOYEE},${Role.MANAGER})`,})
-    role: Role;
+    @MinLength(6, {message: 'O campo `password` precisa ter pelo menos 6 caracteres.',})
+    password?: string;
 
     @IsOptional()
-    @MinLength(6, {message: 'O campo `password` precisa ter pelo menos 6 caracteres.',})
-    password: string;
+    @IsString()
+    role?: string;
 
     @IsOptional()
     @IsEnum(Sector, {message: 'O campo `sector` precisa estar dentro dos padrôes estabelecidos.',})
-    sector: Sector;
+    sector?: Sector;
 
     @IsOptional()
     @IsBoolean({ message: 'O campo `isActive` precisa ser `true` ou `false`.' })
-    isActive: boolean;
+    isActive?: boolean;
 }

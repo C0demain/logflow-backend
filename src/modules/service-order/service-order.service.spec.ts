@@ -13,12 +13,22 @@ import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
 import { Status } from './enums/status.enum';
 import { Sector } from './enums/sector.enum';
+import { Task } from '../task/entities/task.entity';
+import { RoleEntity } from '../roles/roles.entity';
 
 const mockServiceOrderRepository = {
   save: jest.fn(),
   findOne: jest.fn(),
   find: jest.fn(),
   delete: jest.fn(),
+};
+
+const mockTaskRepository = {
+  save: jest.fn(),
+};
+
+const mockRoleRepository = {
+  findOne: jest.fn(),
 };
 
 const mockUserService = {
@@ -46,6 +56,14 @@ describe('ServiceOrderService', () => {
           useValue: mockUserService,
         },
         {
+          provide: getRepositoryToken(Task),
+          useValue: mockTaskRepository,
+        },
+        {
+          provide: getRepositoryToken(RoleEntity),
+          useValue: mockRoleRepository,
+        },
+        {
           provide: ClientService,
           useValue: mockClientService,
         },
@@ -63,20 +81,22 @@ describe('ServiceOrderService', () => {
   });
 
   describe('create', () => {
-    it('should create a new service order', async () => {
+    it('should create a new service order and tasks', async () => {
       const createServiceOrderDto: CreateServiceOrderDto = {
         title: 'Test Order',
         clientId: 'client-id-123',
         status: Status.PENDENTE,
         sector: Sector.OPERACIONAL,
         userId: 'user-id-123',
+        description: 'anything',
+        value: 100
       };
 
       const userMock = {
         id: 'user-id-123',
         name: 'User Test',
         email: 'user@test.com',
-        role: 'EMPLOYEE',
+        role: { name: 'EMPLOYEE' },
       };
       const clientMock = {
         id: 'client-id-123',
@@ -85,8 +105,15 @@ describe('ServiceOrderService', () => {
         cnpj: '12345',
       };
 
+      const motoristaRoleMock = { id: 'role-1', name: 'Motorista' };
+      const financeiroRoleMock = { id: 'role-2', name: 'Analista Administrativo "Financeiro"' };
+      const operacionalRoleMock = { id: 'role-3', name: 'Gerente Operacional' };
+
       mockUserService.findById.mockResolvedValue(userMock);
       mockClientService.findById.mockResolvedValue(clientMock);
+      mockRoleRepository.findOne.mockResolvedValueOnce(motoristaRoleMock);
+      mockRoleRepository.findOne.mockResolvedValueOnce(financeiroRoleMock);
+      mockRoleRepository.findOne.mockResolvedValueOnce(operacionalRoleMock);
 
       const savedOrder = {
         id: 'order-123',
@@ -111,6 +138,9 @@ describe('ServiceOrderService', () => {
           user: userMock,
         }),
       );
+      
+      expect(mockTaskRepository.save).toHaveBeenCalled();
+      expect(mockRoleRepository.findOne).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -138,6 +168,12 @@ describe('ServiceOrderService', () => {
             email: 'user@test.com',
             role: 'EMPLOYEE',
           },
+          serviceOrderLogs: [
+            {
+              changedTo: Sector.OPERACIONAL,
+              atDate: new Date(),
+            },
+          ],
         },
       ];
 
@@ -149,6 +185,9 @@ describe('ServiceOrderService', () => {
       expect(result[0].id).toEqual('order-123');
       expect(mockServiceOrderRepository.find).toHaveBeenCalledWith({
         where: filters,
+        relations: {
+          serviceOrderLogs: true,
+        },
       });
     });
 
@@ -184,6 +223,7 @@ describe('ServiceOrderService', () => {
       expect(result.title).toEqual('Updated Order');
       expect(result.status).toEqual(Status.FINALIZADO);
       expect(mockServiceOrderRepository.findOne).toHaveBeenCalledWith({
+        relations: { serviceOrderLogs: true },
         where: { id: 'order-123' },
       });
       expect(mockServiceOrderRepository.save).toHaveBeenCalledWith({
