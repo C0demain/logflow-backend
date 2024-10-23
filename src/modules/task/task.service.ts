@@ -8,6 +8,7 @@ import { ServiceOrderService } from 'src/modules/service-order/service-order.ser
 import { UserService } from 'src/modules/user/user.service';
 import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { createReadStream } from 'fs';
 
 @Injectable()
 export class TaskService {
@@ -16,7 +17,7 @@ export class TaskService {
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
     private readonly serviceOrderService: ServiceOrderService,
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
   async create(createTaskDto: CreateTaskDto) {
     const taskDb = new Task();
@@ -35,6 +36,7 @@ export class TaskService {
     taskDb.title = createTaskDto.title;
     taskDb.serviceOrder = serviceOrder;
     taskDb.sector = createTaskDto.sector;
+    taskDb.stage = createTaskDto.stage;
     
     // Opcionais
     taskDb.assignedUser = userId;
