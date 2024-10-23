@@ -14,6 +14,7 @@ import { Task } from 'src/modules/task/entities/task.entity';
 import { ServiceOrder } from 'src/modules/service-order/entities/service-order.entity';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { RoleEntity } from 'src/modules/roles/roles.entity';
+import { FileEntity } from 'src/modules/file/entities/file.entity';
 
 @ApiTags('users')
 @Entity({ name: 'users' })
@@ -43,6 +44,9 @@ export class UserEntity {
 
   @OneToMany(() => Task, (task) => task.assignedUser)
   tasks: Task[];
+
+  @OneToMany(() => FileEntity, (file) => file.user)
+  files: FileEntity[];
 
   @Column({ name: 'isActive', default: true, nullable: false })
   isActive: boolean;
