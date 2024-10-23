@@ -141,7 +141,6 @@ export class ServiceOrderService {
     const ordersList = orders.map((serviceOrder) => {
       const user = serviceOrder.user;
       const client = serviceOrder.client;
-
       return new ListServiceOrderDto(
         serviceOrder.id,
         serviceOrder.title,
@@ -163,6 +162,8 @@ export class ServiceOrderService {
           changedTo: log.changedTo,
           atDate: log.creationDate,
         })),
+        serviceOrder.description,
+        serviceOrder.value
       );
     });
 
