@@ -8,7 +8,6 @@ import { ServiceOrderService } from 'src/modules/service-order/service-order.ser
 import { UserService } from 'src/modules/user/user.service';
 import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
-import { createReadStream } from 'fs';
 
 @Injectable()
 export class TaskService {
@@ -95,6 +94,7 @@ export class TaskService {
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {
+
     // Verifica se a tarefa existe
     const task = await this.taskRepository.findOneBy({ id });
     if (!task) {
@@ -107,7 +107,13 @@ export class TaskService {
       throw new NotFoundException('Ordem de serviço não encontrada.');
     }
 
-    // Busca o usuário atribuído (opcional)
+    // Atualizando os campos obrigatórios
+    task.title = updateTaskDto.title;
+    task.serviceOrder = serviceOrder;
+    task.sector = updateTaskDto.sector;
+    task.stage = updateTaskDto.stage;
+
+    // Atualizando os campos opcionais
     let user = null;
     if (updateTaskDto.userId) {
       user = await this.userService.findById(updateTaskDto.userId);
@@ -116,10 +122,6 @@ export class TaskService {
       }
     }
 
-    task.title = updateTaskDto.title;
-    task.serviceOrder = serviceOrder;
-
-    // Atualizando os campos opcionais
     if (user) {
       task.assignedUser = user;
     }

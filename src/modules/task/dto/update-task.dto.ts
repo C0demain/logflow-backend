@@ -27,6 +27,7 @@ export class UpdateTaskDto {
     userId: string;
 
     @IsBoolean()
+    @IsOptional()
     completed: boolean;
 
     @IsOptional()
