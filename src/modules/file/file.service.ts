@@ -54,7 +54,8 @@ export class FileService {
     return files.map(file => ({
       id: file.id,
       name: file.filename,
-      fileType: file.mimetype,         
+      fileType: file.mimetype,
+      uploadDate: file.uploadedAt,         
       userId: file.user?.id,     
       taskId: file.task?.id, 
     }));
