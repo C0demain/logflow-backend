@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query, UseGuards, NotFoundException } from '@nestjs/common';
-import { TaskService } from './task.service';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from 'src/modules/auth/authentication.guard';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskService } from './task.service';
 
 @Controller('/api/v1/task')
 @ApiBearerAuth()
@@ -33,8 +33,14 @@ export class TaskController {
   @ApiQuery({name: 'sector', required: false})
   @ApiQuery({name: 'assignedUserId', required: false})
   @ApiQuery({name: 'serviceOrderId', required: false})
-  async findAll(@Query('title') title?: string, @Query('assignedUserId') assignedUserId?: string, @Query('serviceOrderId') serviceOrderId?: string, @Query('completed') completed?: boolean, @Query('sector') sector?: Sector) {
-    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId, completed, sector });
+  async findAll(
+    @Query('title') title?: string,
+    @Query('assignedUserId') assignedUserId?: string,
+    @Query('serviceOrderId') serviceOrderId?: string,
+    @Query('completed') completedAt?: Date,
+    @Query('sector') sector?: Sector
+  ) {
+    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId, completedAt, sector });
     return {
       message: 'Tarefas obtidas com sucesso',
       tasks

@@ -20,8 +20,11 @@ export class Task {
     @Column({name: 'title', length: 50, nullable: false})
     title: string;
 
-    @Column({default: false})
-    completed: boolean;
+    @Column({name: 'started_at', nullable: true})
+    startedAt: Date;
+
+    @Column({name: 'completed_at', nullable: true})
+    completedAt: Date;
 
     @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
     sector: Sector;

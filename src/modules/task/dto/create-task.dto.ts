@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsBoolean, IsDate, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 import { Sector } from "src/modules/service-order/enums/sector.enum";
 
 export class CreateTaskDto {
@@ -23,6 +23,6 @@ export class CreateTaskDto {
     userId: string;
 
     @IsOptional()
-    @IsBoolean()
-    completed: boolean;
+    @IsDate()
+    completedAt: Date;
 }

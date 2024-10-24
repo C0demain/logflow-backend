@@ -39,13 +39,13 @@ export class TaskService {
     // Opcionais
     taskDb.assignedUser = userId;
     taskDb.role = userId.role;
-    taskDb.completed = createTaskDto.completed;
+    taskDb.completedAt = createTaskDto.completedAt;
 
     const createdTask = await this.taskRepository.save(taskDb);
     return parseToGetTaskDTO(createdTask);
   }
 
-  async findAll(filters: { title?: string, assignedUserId?: string, serviceOrderId?: string, completed?: boolean, sector?: Sector }) {
+  async findAll(filters: { title?: string, assignedUserId?: string, serviceOrderId?: string, completedAt?: Date, sector?: Sector }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<Task> = {}
 
@@ -53,8 +53,8 @@ export class TaskService {
       where.title = filters.title
     }
 
-    if (filters.completed) {
-      where.completed = filters.completed
+    if (filters.completedAt) {
+      where.completedAt = filters.completedAt
     }
 
     if (filters.sector) {
@@ -122,8 +122,8 @@ export class TaskService {
       task.assignedUser = user;
     }
 
-    if (updateTaskDto.completed !== undefined) {
-      task.completed = updateTaskDto.completed;
+    if (updateTaskDto.completedAt !== undefined) {
+      task.completedAt = updateTaskDto.completedAt;
     }
 
     if (updateTaskDto.address) {
