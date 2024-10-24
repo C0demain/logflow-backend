@@ -60,7 +60,7 @@ export class ServiceOrderService {
     const operacionalRole = await this.roleRepository.findOne({ where: { name: 'Gerente Operacional' } });
   
     if(!motoristaRole || !financeiroRole || !operacionalRole){
-      throw new NotFoundException("roles nao encontradas")
+      throw new NotFoundException("Funções não encontradas.")
     }
     const tasks = [
       this.createTask('Documentos de Coleta', Sector.OPERACIONAL, TaskStage.SALE_COMPLETED, motoristaRole, serviceOrder),
@@ -137,7 +137,7 @@ export class ServiceOrderService {
 
     if (!orders || orders.length === 0) {
       throw new InternalServerErrorException(
-        'Nenhuma ordem de serviço encontrada',
+        'Nenhuma ordem de serviço encontrada.',
       );
     }
 
@@ -180,7 +180,7 @@ export class ServiceOrderService {
 
     if (!orderFound) {
       throw new NotFoundException(
-        `Ordem de serviço com id: ${id}, não encontrada`,
+        `Ordem de serviço com id: ${id} não encontrada.`,
       );
     }
 
@@ -197,7 +197,7 @@ export class ServiceOrderService {
 
     if (!orderFound) {
       throw new NotFoundException(
-        `Ordem de serviço com id: ${id}, não encontrada`,
+        `Ordem de serviço com id: ${id} não encontrada.`,
       );
     }
 
@@ -222,7 +222,7 @@ export class ServiceOrderService {
 
     if (!orderFound) {
       throw new NotFoundException(
-        `Ordem de serviço com id: ${id}, não encontrada`,
+        `Ordem de serviço com id: ${id} não encontrada.`,
       );
     }
 

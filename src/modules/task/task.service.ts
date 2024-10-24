@@ -86,7 +86,7 @@ export class TaskService {
     const task = await this.taskRepository.findOneBy({ id })
 
     if (task === null) {
-      throw new NotFoundException(`Tarefa com id ${id} não encontrada`)
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada.`)
     }
 
     const parsedTask = parseToGetTaskDTO(task)
@@ -143,7 +143,7 @@ export class TaskService {
     const task = await this.taskRepository.findOneBy({ id })
 
     if (task === null) {
-      throw new NotFoundException(`Tarefa com id ${id} não encontrada`)
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada.`)
     }
 
     await this.taskRepository.delete(id)

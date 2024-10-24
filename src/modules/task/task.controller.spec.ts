@@ -92,7 +92,7 @@ describe('TaskController', () => {
       const response = await controller.create(createTaskDto);
 
       expect(response).toEqual({
-        message: 'Tarefa criada com sucesso',
+        message: 'Tarefa criada com sucesso.',
         task: expectedResult,
       });
 
@@ -117,7 +117,7 @@ describe('TaskController', () => {
 
       const response = await controller.findAll();
 
-      expect(response.message).toEqual('Tarefas obtidas com sucesso');
+      expect(response.message).toEqual('Tarefas obtidas com sucesso.');
       expect(response.tasks).toEqual(expectedResult);
       expect(mockTaskService.findAll).toHaveBeenCalledWith({});
     });
@@ -141,7 +141,7 @@ describe('TaskController', () => {
 
       const response = await controller.findById('task1');
 
-      expect(response.message).toEqual('Tarefa obtida com sucesso');
+      expect(response.message).toEqual('Tarefa obtida com sucesso.');
       expect(response.task).toEqual(expectedResult);
       expect(mockTaskService.findById).toHaveBeenCalledWith('task1');
     });
@@ -189,7 +189,7 @@ describe('TaskController', () => {
 
       const response = await controller.update('task1', updateTaskDto);
 
-      expect(response.message).toEqual('Tarefa atualizada com sucesso');
+      expect(response.message).toEqual('Tarefa atualizada com sucesso.');
       expect(response.task).toEqual(expectedResult);
 
       expect(mockTaskService.update).toHaveBeenCalledWith('task1', updateTaskDto);
@@ -212,7 +212,7 @@ describe('TaskController', () => {
 
       const response = await controller.remove('task1');
 
-      expect(response.message).toEqual('Tarefa excluída com sucesso');
+      expect(response.message).toEqual('Tarefa excluída com sucesso.');
       expect(response.task).toEqual(expectedResult);
       expect(mockTaskService.remove).toHaveBeenCalledWith('task1');
     });

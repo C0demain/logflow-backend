@@ -22,7 +22,7 @@ export class UserService {
 
     const role = await this.roleRepository.findOne({where: {name: createUserDTO.role}})
     if(!role){
-      throw new NotFoundException(`role ${createUserDTO.role} não encontrada`)  
+      throw new NotFoundException(`Função ${createUserDTO.role} não encontrada.`)  
     }
 
     userEntity.name = createUserDTO.name;
@@ -82,7 +82,7 @@ export class UserService {
       });
   
       if (!role) {
-        throw new NotFoundException(`Role "${newData.role}" não encontrada.`);
+        throw new NotFoundException(`Função "${newData.role}" não encontrada.`);
       }
 
       user.role = role
@@ -98,7 +98,7 @@ export class UserService {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
-      throw new NotFoundException('O usuário não foi encontrado');
+      throw new NotFoundException('O usuário não foi encontrado.');
     }
 
     user.isActive = false;
