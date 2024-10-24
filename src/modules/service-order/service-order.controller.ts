@@ -95,18 +95,18 @@ export class ServiceOrderController {
 
       if (!orders || orders.length === 0) {
         return {
-          message: 'Nenhuma ordem de serviço encontrada',
+          message: 'Nenhuma ordem de serviço encontrada.',
           orders: orders,
         };
       }
 
       return {
-        message: 'Ordens de serviço encontradas',
+        message: 'Ordens de serviço encontradas.',
         orders: orders,
       };
     } catch (error) {
       return {
-        message: 'Nenhuma ordem de serviço encontrada',
+        message: 'Nenhuma ordem de serviço encontrada.',
         orders: [],
       };
     }
@@ -122,18 +122,18 @@ export class ServiceOrderController {
 
       if (!ordersBySector || ordersBySector.length === 0) {
         return {
-          message: `Nenhuma ordem de serviço encontrada para o setor: ${sector}`,
+          message: `Nenhuma ordem de serviço encontrada para o setor: ${sector}.`,
           orders: ordersBySector,
         };
       }
 
       return {
-        message: `Ordens de serviço do setor ${sector} encontradas`,
+        message: `Ordens de serviço do setor ${sector} encontradas.`,
         orders: ordersBySector,
       };
     } catch (error) {
       return {
-        message: 'Nenhuma ordem de serviço encontrada',
+        message: 'Nenhuma ordem de serviço encontrada.',
         orders: [],
       };
     }
@@ -148,7 +148,7 @@ export class ServiceOrderController {
     const orderUpdated = await this.serviceOrderService.update(id, newData);
 
     return {
-      message: `ordem de serviço atualizada`,
+      message: `Ordem de serviço atualizada.`,
       serviceOrder: orderUpdated,
     };
   }
@@ -162,7 +162,7 @@ export class ServiceOrderController {
     const orderRemoved = await this.serviceOrderService.remove(id);
 
     return {
-      message: `ordem de serviço deletada`,
+      message: `Ordem de serviço deletada.`,
       serviceOrder: orderRemoved,
     };
   }

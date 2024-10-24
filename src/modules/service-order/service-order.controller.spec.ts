@@ -124,7 +124,7 @@ describe('ServiceOrderController', () => {
 
       const response = await controller.findAllOrders();
 
-      expect(response.message).toEqual('Ordens de serviço encontradas');
+      expect(response.message).toEqual('Ordens de serviço encontradas.');
       expect(response.orders).toEqual(result);
     });
 
@@ -162,7 +162,7 @@ describe('ServiceOrderController', () => {
 
       const response = await controller.findAllOrders();
 
-      expect(response.message).toEqual('Nenhuma ordem de serviço encontrada');
+      expect(response.message).toEqual('Nenhuma ordem de serviço encontrada.');
       expect(response.orders).toEqual([]);
     });
   });
@@ -195,7 +195,7 @@ describe('ServiceOrderController', () => {
 
       const response = await controller.findOrdersBySector(sector);
 
-      expect(response.message).toEqual(`Ordens de serviço do setor ${sector} encontradas`);
+      expect(response.message).toEqual(`Ordens de serviço do setor ${sector} encontradas.`);
       expect(response.orders).toEqual(result);
     });
 
@@ -206,7 +206,7 @@ describe('ServiceOrderController', () => {
 
       const response = await controller.findOrdersBySector(sector);
 
-      expect(response.message).toEqual(`Nenhuma ordem de serviço encontrada para o setor: ${sector}`);
+      expect(response.message).toEqual(`Nenhuma ordem de serviço encontrada para o setor: ${sector}.`);
       expect(response.orders).toEqual([]);
     });
   });
@@ -240,7 +240,7 @@ describe('ServiceOrderController', () => {
       const result = await controller.update('uuid', updateServiceOrderDto);
 
       expect(result).toEqual({
-        message: 'ordem de serviço atualizada',
+        message: 'Ordem de serviço atualizada.',
         serviceOrder: updatedOrder,
       });
       expect(mockServiceOrderService.update).toHaveBeenCalledWith('uuid', updateServiceOrderDto);
@@ -270,7 +270,7 @@ describe('ServiceOrderController', () => {
       const result = await controller.remove('uuid');
 
       expect(result).toEqual({
-        message: 'ordem de serviço deletada',
+        message: 'Ordem de serviço deletada.',
         serviceOrder: orderToRemove,
       });
       expect(mockServiceOrderService.remove).toHaveBeenCalledWith('uuid');

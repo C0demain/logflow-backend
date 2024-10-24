@@ -10,7 +10,7 @@ export class IsFutureDateConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage() {
-    return 'The date must be in the future.';
+    return 'A data deve estar no futuro.';
   }
 }
 

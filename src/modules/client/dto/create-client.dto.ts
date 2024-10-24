@@ -8,24 +8,24 @@ import { AddressDto } from "./address.dto";
 export class CreateClientDto {
 
     @IsString()
-    @IsNotEmpty({ message: "O campo `name` não pode estar vazio" })
-    @Length(1, 100, { message: "O campo `name` deve ter entre 1 e 100 caracteres" })
+    @IsNotEmpty({ message: "O campo 'Nome' não pode estar vazio." })
+    @Length(1, 100, { message: "O campo 'Nome' deve ter entre 1 e 100 caracteres" })
     name: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo `phone` não pode estar vazio" })
+    @IsNotEmpty({ message: "O campo 'Telefone' não pode estar vazio." })
     @IsBrazilianPhoneNumber()
     phone: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo `cnpj` não pode estar vazio" })
+    @IsNotEmpty({ message: "O campo 'CNPJ' não pode estar vazio." })
     @IsCNPJ()
     cnpj: string;
 
-    @IsEmail({}, { message: "O campo `email` deve ser um e-mail válido" })
-    @IsNotEmpty({ message: "O campo `email` não pode estar vazio" })
-    @Length(1, 40, { message: "O campo `email` deve ter até 40 caracteres" })
-    @UniqueEmail({ message: 'Já existe um usuário ou um cliente com este email.' })
+    @IsEmail({}, { message: "O campo 'Email' deve ser um e-mail válido." })
+    @IsNotEmpty({ message: "O campo 'Email' não pode estar vazio." })
+    @Length(1, 40, { message: "O campo 'Email' deve possuir no máximo 40 caracteres." })
+    @UniqueEmail({ message: "Email já associado a um usuário ou cliente." })
     email: string;
 
     @ValidateNested()

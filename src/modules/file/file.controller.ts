@@ -46,18 +46,18 @@ export class FileController {
 
       if (!files || files.length === 0) {
         return {
-          message: 'Nenhum arquivo encontrado',
+          message: 'Nenhum arquivo encontrado.',
           files: [],
         };
       }
 
       return {
-        message: 'Arquivos encontrados',
+        message: 'Arquivos encontrados.',
         files: files,
       };
     } catch (error) {
       return {
-        message: 'Erro ao buscar arquivos',
+        message: 'Erro ao buscar arquivos.',
         files: [],
       };
     }
@@ -74,6 +74,6 @@ export class FileController {
   async deleteFile(@Param('id') id: string) {
     const arquivo = await this.fileService.deleteFile(id);
     return {
-       message:`arquivo ${arquivo?.filename} deletado`};
+       message:`Arquivo ${arquivo?.filename} deletado.`};
   }
 }
