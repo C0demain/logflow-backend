@@ -15,7 +15,7 @@ describe('TaskController', () => {
     title: 'Task1',
     orderId: 'order1',
     userId: 'user1',
-    completed: false,
+    completedAt: new Date(),
     sector: Sector.OPERACIONAL,
     role: 'role1'
   };
@@ -73,7 +73,7 @@ describe('TaskController', () => {
         'task1',
         'Task1',
         Sector.OPERACIONAL,
-        false,
+        undefined,
         {
           id: 'user1',
           name: 'User1',
@@ -103,7 +103,7 @@ describe('TaskController', () => {
         {
           id: 'task1',
           title: 'Task1',
-          completed: false,
+          completedAt: undefined,
           sector: Sector.OPERACIONAL,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser,
@@ -126,7 +126,7 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
         id: 'task1',
         title: 'Task1',
-        completed: false,
+        completedAt: undefined,
         sector: Sector.OPERACIONAL,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
@@ -148,7 +148,7 @@ describe('TaskController', () => {
         'task1',
         'Task1',
         Sector.OPERACIONAL,
-        false,
+        undefined,
         {
           id: 'user1',
           name: 'User1',
@@ -173,7 +173,7 @@ describe('TaskController', () => {
 
       const updateTaskDto = {
         title: 'Task1',
-        completed: false,
+        completedAt: new Date(),
         userId: mockedUser.id,
         orderId: 'order1',
         sector: Sector.OPERACIONAL,
@@ -194,7 +194,7 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
         id: 'task1',
         title: 'Task1',
-        completed: false,
+        completedAt: undefined,
         sector: Sector.OPERACIONAL,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
