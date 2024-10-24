@@ -26,7 +26,7 @@ export class FileService {
     if(userId){
     const user = await this.userRepository.findOneBy({id:userId});
     if(!user){
-      throw new NotFoundException("usuario não encontrado");
+      throw new NotFoundException("Usuário não encontrado.");
     }
     newFile.user = user;
     }
@@ -34,7 +34,7 @@ export class FileService {
     if(taskId){
       const task = await this.taskRepository.findOneBy({id:taskId});
       if(!task){
-        throw new NotFoundException("tarefa nao encontrada");
+        throw new NotFoundException("Tarefa não encontrada.");
       }
       newFile.task = task;
     }
@@ -64,7 +64,7 @@ export class FileService {
   async getFileByName(id: string): Promise<FileEntity> {
     const file = await this.fileRepository.findOneBy({id});
     if (!file) {
-      throw new NotFoundException(`arquivo com id ${id} nao encontrado`);
+      throw new NotFoundException(`Arquivo com id ${id} não encontrado.`);
     }
     return file;
   }
@@ -75,7 +75,7 @@ export class FileService {
     const arquivo = await this.fileRepository.findOneBy({id})
     const result = await this.fileRepository.delete({id});
     if (result.affected === 0) {
-      throw new NotFoundException(`arquivo com id${id} não econtrado`);
+      throw new NotFoundException(`Arquivo com id${id} não econtrado.`);
     }
     return arquivo;
   }

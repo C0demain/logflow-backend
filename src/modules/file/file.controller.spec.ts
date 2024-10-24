@@ -74,7 +74,7 @@ describe('FileController', () => {
 
       const result = await controller.getAll('user-id', 'task-id');
       expect(result).toEqual({
-        message: 'Arquivos encontrados',
+        message: 'Arquivos encontrados.',
         files: mockFiles,
       });
       expect(fileService.findAll).toHaveBeenCalledWith({
@@ -88,7 +88,7 @@ describe('FileController', () => {
 
       const result = await controller.getAll('user-id', 'task-id');
       expect(result).toEqual({
-        message: 'Nenhum arquivo encontrado',
+        message: 'Nenhum arquivo encontrado.',
         files: [],
       });
     });
@@ -98,7 +98,7 @@ describe('FileController', () => {
 
       const result = await controller.getAll('user-id', 'task-id');
       expect(result).toEqual({
-        message: 'Erro ao buscar arquivos',
+        message: 'Erro ao buscar arquivos.',
         files: [],
       });
     });
@@ -135,7 +135,7 @@ describe('FileController', () => {
       mockFileService.deleteFile.mockResolvedValue(mockFile);
 
       const result = await controller.deleteFile('file-id');
-      expect(result).toEqual({ message: `arquivo ${mockFile.filename} deletado` });
+      expect(result).toEqual({ message: `Arquivo ${mockFile.filename} deletado.` });
       expect(fileService.deleteFile).toHaveBeenCalledWith('file-id');
     });
 

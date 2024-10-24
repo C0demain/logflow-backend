@@ -13,7 +13,7 @@ export class RolesService {
     const roles = await this.repository.find()
 
     if(!roles){
-      throw new NotFoundException("roles nao encontradas");
+      throw new NotFoundException("Funções não encontradas.");
     }
 
     return roles;

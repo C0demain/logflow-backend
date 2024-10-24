@@ -13,15 +13,19 @@ import {
     CreateDateColumn,
     OneToMany,
 } from "typeorm";
+import { TaskStage } from "../enums/task.stage.enum";
 
 @Entity({name: 'task'})
 export class Task {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({name: 'title', length: 50, nullable: false})
+    @Column({ name: 'title', length: 50, nullable: false})
     title: string;
 
+    @Column({ name: 'stage', type: 'enum', enum: TaskStage, nullable: false })
+    stage: TaskStage;
+    
     @Column({default: false})
     completed: boolean;
 

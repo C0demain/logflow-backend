@@ -18,10 +18,14 @@ export class TaskController {
   @ApiQuery({ name: 'title', required: true })
   @ApiQuery({ name: 'orderId', required: true })
   @ApiQuery({ name: 'sector', required: true})
+  @ApiQuery({ name: 'stage', required: true })
+  @ApiQuery({ name: 'role', required: false})
+  @ApiQuery({ name: 'userId', required: false })
+  @ApiQuery({ name: 'completed', required: false })
   async create(@Body() createTaskDto: CreateTaskDto) {
     const task = await this.taskService.create(createTaskDto)
     return {
-      message: 'Tarefa criada com sucesso',
+      message: 'Tarefa criada com sucesso.',
       task
     }
   }
@@ -36,7 +40,7 @@ export class TaskController {
   async findAll(@Query('title') title?: string, @Query('assignedUserId') assignedUserId?: string, @Query('serviceOrderId') serviceOrderId?: string, @Query('completed') completed?: boolean, @Query('sector') sector?: Sector) {
     const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId, completed, sector });
     return {
-      message: 'Tarefas obtidas com sucesso',
+      message: 'Tarefas obtidas com sucesso.',
       tasks
     }
   }
@@ -46,7 +50,7 @@ export class TaskController {
   async findById(@Param('id') id: string) {
     const task = await this.taskService.findById(id)
     return {
-      message: 'Tarefa obtida com sucesso',
+      message: 'Tarefa obtida com sucesso.',
       task
     }
       
@@ -57,7 +61,7 @@ export class TaskController {
   async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     const task = await this.taskService.update(id, updateTaskDto)
     return {
-      message: 'Tarefa atualizada com sucesso',
+      message: 'Tarefa atualizada com sucesso.',
       task
     }
   }
@@ -67,7 +71,7 @@ export class TaskController {
   async remove(@Param('id') id: string) {
     const task = await this.taskService.remove(id)
     return {
-      message: 'Tarefa excluída com sucesso',
+      message: 'Tarefa excluída com sucesso.',
       task
     }
   }

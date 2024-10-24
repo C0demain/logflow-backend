@@ -63,7 +63,7 @@ describe('ClientController', () => {
       const result = await controller.create(createClientDto);
 
       expect(result).toEqual({
-        message: 'Cliente cadastrado com sucesso',
+        message: 'Cliente cadastrado com sucesso.',
         client: createdClient,
       });
       expect(mockClientService.create).toHaveBeenCalledWith(createClientDto);
@@ -97,7 +97,7 @@ describe('ClientController', () => {
       const result = await controller.findAll();
 
       expect(result).toEqual({
-        message: 'Clientes encontrados',
+        message: 'Clientes encontrados.',
         clients: clients,
       });
       expect(mockClientService.findAll).toHaveBeenCalledWith({
@@ -141,7 +141,7 @@ describe('ClientController', () => {
       );
 
       expect(result).toEqual({
-        message: 'Clientes encontrados',
+        message: 'Clientes encontrados.',
         clients: clients,
       });
       expect(mockClientService.findAll).toHaveBeenCalledWith({
@@ -155,13 +155,13 @@ describe('ClientController', () => {
 
     it('should return an empty list if no clients are found', async () => {
       mockClientService.findAll.mockRejectedValue(
-        new Error('nenhum cliente encontrado'),
+        new Error('Nenhum cliente encontrado.'),
       );
 
       const result = await controller.findAll();
 
       expect(result).toEqual({
-        message: 'nenhum cliente encontrado',
+        message: 'Nenhum cliente encontrado.',
         clients: [],
       });
     });
@@ -183,7 +183,7 @@ describe('ClientController', () => {
       const result = await controller.update('1', updateClientDto);
 
       expect(result).toEqual({
-        message: 'Cliente atualizado com sucesso',
+        message: 'Cliente atualizado com sucesso.',
         client: { client: updatedClient },
       });
       expect(mockClientService.update).toHaveBeenCalledWith(
@@ -196,7 +196,7 @@ describe('ClientController', () => {
   describe('remove', () => {
     it('should remove a client and return success message', async () => {
       const removedClient = { id: '1', name: 'Test Client' };
-      const expectedMessage = 'Cliente removido com sucesso';
+      const expectedMessage = 'Cliente removido com sucesso.';
   
       mockClientService.remove.mockResolvedValue({
         clientRemoved: removedClient,

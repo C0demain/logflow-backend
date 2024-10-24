@@ -9,8 +9,8 @@ import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
 import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { NotFoundException } from '@nestjs/common';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
-import { ClientService } from '../client/client.service';
 import { AddressDto } from '../client/dto/address.dto';
+import { TaskStage } from './enums/task.stage.enum';
 
 describe('TaskService', () => {
   let service: TaskService;
@@ -81,6 +81,7 @@ describe('TaskService', () => {
       orderId: 'order1',
       userId: 'user1',
       sector: Sector.OPERACIONAL,
+      stage: TaskStage.SALE_COMPLETED,
       role: 'role1',
       completed: false
     }
@@ -90,6 +91,7 @@ describe('TaskService', () => {
       title: 'task-title',
       completed: false,
       sector: Sector.OPERACIONAL,
+      stage: TaskStage.SALE_COMPLETED,
       serviceOrder: mockedServiceOrder,
       assignedUser: mockedUser
     }
@@ -114,6 +116,7 @@ describe('TaskService', () => {
           title: 'Task1',
           completed: false,
           sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -134,6 +137,7 @@ describe('TaskService', () => {
           title: 'Task1',
           completed: false,
           sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -154,6 +158,7 @@ describe('TaskService', () => {
           title: 'Task1',
           completed: false,
           sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -174,6 +179,7 @@ describe('TaskService', () => {
           title: 'Task1',
           completed: false,
           sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -195,6 +201,7 @@ describe('TaskService', () => {
           title: 'Task1',
           completed: false,
           sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -221,6 +228,7 @@ describe('TaskService', () => {
           title: 'Task2',
           completed: false,
           sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
@@ -232,10 +240,18 @@ describe('TaskService', () => {
         title: 'Task2', completed: false, userId: 'user1',
         orderId: 'order1',
         sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
         address: new AddressDto
       })
 
       expect(task).toEqual(expectedResult)
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 'task1' });
+      expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({
+        id: 'task1',
+        title: 'Task2',
+      }));
+      expect(mockUserService.findById).toHaveBeenCalledWith('user1');
+      expect(mockServiceOrderService.findById).toHaveBeenCalledWith('order1');
     })
 
     it('should throw NotFoundException when id is invalid', async ()=>{
@@ -246,6 +262,7 @@ describe('TaskService', () => {
         title: 'Task2', completed: false, userId: 'user1',
         orderId: 'order2',
         sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
         address: new AddressDto
       })).rejects.toBeInstanceOf(NotFoundException)
     })
@@ -258,6 +275,7 @@ describe('TaskService', () => {
           title: 'Task1',
           completed: false,
           sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }

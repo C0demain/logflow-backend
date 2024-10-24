@@ -25,11 +25,11 @@ export class AuthenticationService {
     const userAuthenticated = await bcrypt.compare(password, user.password);
 
     if (!userAuthenticated) {
-      throw new UnauthorizedException('The email or password is incorrect.');
+      throw new UnauthorizedException('O email ou a senha estão incorretos.');
     }
 
     if (user.isActive === false) {
-      throw new UnauthorizedException('The user must be active.');
+      throw new UnauthorizedException('O usuário deve ser ativo no sistema.');
     }
 
     const payload: UserPayload = {
