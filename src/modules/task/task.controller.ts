@@ -18,6 +18,10 @@ export class TaskController {
   @ApiQuery({ name: 'title', required: true })
   @ApiQuery({ name: 'orderId', required: true })
   @ApiQuery({ name: 'sector', required: true})
+  @ApiQuery({ name: 'stage', required: true })
+  @ApiQuery({ name: 'role', required: false})
+  @ApiQuery({ name: 'userId', required: false })
+  @ApiQuery({ name: 'completed', required: false })
   async create(@Body() createTaskDto: CreateTaskDto) {
     const task = await this.taskService.create(createTaskDto)
     return {

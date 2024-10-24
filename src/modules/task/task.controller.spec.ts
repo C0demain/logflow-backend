@@ -6,6 +6,7 @@ import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
 import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { AddressDto } from '../client/dto/address.dto';
+import { TaskStage } from './enums/task.stage.enum';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -17,6 +18,7 @@ describe('TaskController', () => {
     userId: 'user1',
     completed: false,
     sector: Sector.OPERACIONAL,
+    stage: TaskStage.SALE_COMPLETED,
     role: 'role1'
   };
 
@@ -73,6 +75,7 @@ describe('TaskController', () => {
         'task1',
         'Task1',
         Sector.OPERACIONAL,
+        TaskStage.SALE_COMPLETED,
         false,
         {
           id: 'user1',
@@ -105,6 +108,7 @@ describe('TaskController', () => {
           title: 'Task1',
           completed: false,
           sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser,
         },
@@ -128,6 +132,7 @@ describe('TaskController', () => {
         title: 'Task1',
         completed: false,
         sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };
@@ -148,6 +153,7 @@ describe('TaskController', () => {
         'task1',
         'Task1',
         Sector.OPERACIONAL,
+        TaskStage.SALE_COMPLETED,
         false,
         {
           id: 'user1',
@@ -177,6 +183,7 @@ describe('TaskController', () => {
         userId: mockedUser.id,
         orderId: 'order1',
         sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
         address: new AddressDto(), // address opcional
       };
 
@@ -196,6 +203,7 @@ describe('TaskController', () => {
         title: 'Task1',
         completed: false,
         sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };
