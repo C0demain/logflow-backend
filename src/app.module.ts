@@ -16,6 +16,7 @@ import { LoggerGlobalInterceptor } from './resources/interceptors/logger-global-
 import { ClientModule } from './modules/client/client.module';
 import { TaskModule } from './modules/task/task.module';
 import { RolesModule } from './modules/roles/roles.module'; 
+import { FileModule } from './modules/file/file.module';
 
 
 @Module({
@@ -34,6 +35,7 @@ import { RolesModule } from './modules/roles/roles.module';
     ClientModule,
     TaskModule,
     RolesModule,
+    FileModule,
   ],
   controllers: [RedirectController],
   providers: [

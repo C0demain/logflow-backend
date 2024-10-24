@@ -1,4 +1,5 @@
 import { Address } from "src/modules/client/entities/address.entity";
+import { FileEntity } from "src/modules/file/entities/file.entity";
 import { RoleEntity } from "src/modules/roles/roles.entity";
 import { ServiceOrder } from "src/modules/service-order/entities/service-order.entity";
 import { Sector } from "src/modules/service-order/enums/sector.enum";
@@ -10,6 +11,7 @@ import {
     ManyToOne,
     JoinColumn,
     CreateDateColumn,
+    OneToMany,
 } from "typeorm";
 
 @Entity({name: 'task'})
@@ -39,6 +41,9 @@ export class Task {
     @ManyToOne(() => RoleEntity, { eager: true , nullable:true})
     @JoinColumn({ name: 'role_name', referencedColumnName: 'name' })
     role: RoleEntity;
+
+    @OneToMany(() => FileEntity, (file) => file.task)
+    files: FileEntity[];
 
     @CreateDateColumn()
     createdAt: Date
