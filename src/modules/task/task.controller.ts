@@ -68,6 +68,26 @@ export class TaskController {
     }
   }
 
+  @Put(':id/complete')
+  @ApiOperation({summary: 'Concluir uma tarefa'})
+  async complete(@Param('id') id: string) {
+    const task = await this.taskService.complete(id)
+    return {
+      message: 'Tarefa marcada como concluída com sucesso',
+      task
+    }
+  }
+
+  @Put(':id/uncomplete')
+  @ApiOperation({summary: 'Concluir uma tarefa'})
+  async uncomplete(@Param('id') id: string) {
+    const task = await this.taskService.uncomplete(id)
+    return {
+      message: 'Tarefa marcada como não concluída com sucesso',
+      task
+    }
+  }
+
   @Delete(':id')
   @ApiOperation({summary: 'Deletar uma tarefa'})
   async remove(@Param('id') id: string) {

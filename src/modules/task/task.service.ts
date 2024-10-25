@@ -135,6 +135,30 @@ export class TaskService {
     return parseToGetTaskDTO(updatedTask);
   }
 
+  async complete(id: string) {
+    const task = await this.taskRepository.findOneBy({ id });
+
+    if (task === null) {
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
+    }
+
+    task.completedAt = new Date();
+    const completedTask = await this.taskRepository.save(task);
+    return parseToGetTaskDTO(completedTask);
+  }
+
+  async uncomplete(id: string) {
+    const task = await this.taskRepository.findOneBy({ id });
+
+    if (task === null) {
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
+    }
+
+    task.completedAt = null;
+    const completedTask = await this.taskRepository.save(task);
+    return parseToGetTaskDTO(completedTask);
+  }
+
   async remove(id: string) {
     const task = await this.taskRepository.findOneBy({ id })
 
