@@ -4,9 +4,19 @@ import { useContainer } from "class-validator";
 import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { SeederService } from "./db/seeds/seeder.service";
+import * as fs from 'fs'; 
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+
+  const httpsOptions = {
+    key: fs.readFileSync('./src/cert/key.pem'),
+    cert: fs.readFileSync('./src/cert/cert.pem'),
+  };
+
+  const app = await NestFactory.create(
+    AppModule, 
+    { httpsOptions }
+  );
 
   const seeder = app.get(SeederService);
   try {
@@ -34,7 +44,7 @@ async function bootstrap() {
     .setVersion("1.0")
     .addTag("users")
     .addTag("service-order")
-    .addServer("http://localhost:8000", "Development Server")
+    .addServer("https://localhost:8000", "Development Server")
     .addBearerAuth()
     .setLicense("MIT License", "https://opensource.org/licenses/MIT")
     .build();
