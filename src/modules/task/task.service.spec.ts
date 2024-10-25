@@ -334,9 +334,9 @@ describe('TaskService', () => {
         title: 'Task1',
         completedAt: new Date(),
         sector: Sector.OPERACIONAL,
-        stage: TaskStage.SALE_COMPLETED,
-        address: new AddressDto(),
-      }
+        assignedUser: mockedUser,
+        serviceOrder: mockedServiceOrder,
+      };
     
       mockRepository.findOneBy.mockResolvedValue({
         ...expectedResult,
