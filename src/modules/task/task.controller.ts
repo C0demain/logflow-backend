@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, Query, UseGuards, NotFoundException } from '@nestjs/common';
-import { TaskService } from './task.service';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from 'src/modules/auth/authentication.guard';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
+import { TaskService } from './task.service';
 
 @Controller('/api/v1/task')
 @ApiBearerAuth()
@@ -37,8 +37,14 @@ export class TaskController {
   @ApiQuery({name: 'sector', required: false})
   @ApiQuery({name: 'assignedUserId', required: false})
   @ApiQuery({name: 'serviceOrderId', required: false})
-  async findAll(@Query('title') title?: string, @Query('assignedUserId') assignedUserId?: string, @Query('serviceOrderId') serviceOrderId?: string, @Query('completed') completed?: boolean, @Query('sector') sector?: Sector) {
-    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId, completed, sector });
+  async findAll(
+    @Query('title') title?: string,
+    @Query('assignedUserId') assignedUserId?: string,
+    @Query('serviceOrderId') serviceOrderId?: string,
+    @Query('completed') completedAt?: Date,
+    @Query('sector') sector?: Sector
+  ) {
+    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId, completedAt, sector });
     return {
       message: 'Tarefas obtidas com sucesso.',
       tasks
@@ -62,6 +68,26 @@ export class TaskController {
     const task = await this.taskService.update(id, updateTaskDto)
     return {
       message: 'Tarefa atualizada com sucesso.',
+      task
+    }
+  }
+
+  @Patch(':id/start')
+  @ApiOperation({summary: 'Iniciar uma tarefa'})
+  async start(@Param('id') id: string) {
+    const task = await this.taskService.start(id)
+    return {
+      message: 'Tarefa iniciada com sucesso',
+      task
+    }
+  }
+
+  @Patch(':id/complete')
+  @ApiOperation({summary: 'Concluir uma tarefa'})
+  async complete(@Param('id') id: string) {
+    const task = await this.taskService.complete(id)
+    return {
+      message: 'Data de conclusão da tarefa alterada com sucesso',
       task
     }
   }

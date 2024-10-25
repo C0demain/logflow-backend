@@ -23,11 +23,13 @@ export class Task {
     @Column({ name: 'title', length: 50, nullable: false})
     title: string;
 
+    @Column({name: 'started_at', type:"timestamptz",nullable: true})
+    startedAt: Date | null;
+
+    @Column({name: 'completed_at', type:"timestamptz", nullable: true})
+    completedAt: Date | null;
     @Column({ name: 'stage', type: 'enum', enum: TaskStage, nullable: false })
     stage: TaskStage;
-    
-    @Column({default: false})
-    completed: boolean;
 
     @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
     sector: Sector;

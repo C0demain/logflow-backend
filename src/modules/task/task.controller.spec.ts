@@ -6,6 +6,7 @@ import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
 import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { AddressDto } from '../client/dto/address.dto';
+import { start } from 'repl';
 import { TaskStage } from './enums/task.stage.enum';
 
 describe('TaskController', () => {
@@ -16,7 +17,7 @@ describe('TaskController', () => {
     title: 'Task1',
     orderId: 'order1',
     userId: 'user1',
-    completed: false,
+    completedAt: new Date(),
     sector: Sector.OPERACIONAL,
     stage: TaskStage.SALE_COMPLETED,
     role: 'role1'
@@ -38,6 +39,8 @@ describe('TaskController', () => {
     findAll: jest.fn(),
     findById: jest.fn(),
     update: jest.fn(),
+    start: jest.fn(),
+    complete: jest.fn(),
     remove: jest.fn(),
   };
 
@@ -74,9 +77,10 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = new GetTaskDto(
         'task1',
         'Task1',
+        null,
+        null,
         Sector.OPERACIONAL,
         TaskStage.SALE_COMPLETED,
-        false,
         {
           id: 'user1',
           name: 'User1',
@@ -106,7 +110,8 @@ describe('TaskController', () => {
         {
           id: 'task1',
           title: 'Task1',
-          completed: false,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           stage: TaskStage.SALE_COMPLETED,
           serviceOrder: mockedServiceOrder,
@@ -130,7 +135,8 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
         id: 'task1',
         title: 'Task1',
-        completed: false,
+        startedAt: null,
+        completedAt: null,
         sector: Sector.OPERACIONAL,
         stage: TaskStage.SALE_COMPLETED,
         serviceOrder: mockedServiceOrder,
@@ -152,9 +158,10 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = new GetTaskDto(
         'task1',
         'Task1',
+        null,
+        null,
         Sector.OPERACIONAL,
         TaskStage.SALE_COMPLETED,
-        false,
         {
           id: 'user1',
           name: 'User1',
@@ -172,14 +179,15 @@ describe('TaskController', () => {
           street: 'Rua A',
           number: '123',
           complement: 'Apto 456',
-        }
+        },
       );
 
       mockTaskService.update.mockResolvedValue(expectedResult);
 
       const updateTaskDto = {
         title: 'Task1',
-        completed: false,
+        startedAt: new Date(),
+        completedAt: new Date(),
         userId: mockedUser.id,
         orderId: 'order1',
         sector: Sector.OPERACIONAL,
@@ -192,7 +200,81 @@ describe('TaskController', () => {
       expect(response.message).toEqual('Tarefa atualizada com sucesso.');
       expect(response.task).toEqual(expectedResult);
 
-      expect(mockTaskService.update).toHaveBeenCalledWith('task1', updateTaskDto);
+      expect(mockTaskService.update).toHaveBeenCalledWith(
+        'task1',
+        updateTaskDto,
+      );
+    });
+  });
+
+  describe('start', () => {
+    it('should start a task', async () => {
+      const expectedResult: GetTaskDto = {
+        id: 'task1',
+        title: 'Task1',
+        startedAt: new Date(),
+        completedAt: null,
+        stage: TaskStage.SALE_COMPLETED,
+        sector: Sector.OPERACIONAL,
+        serviceOrder: mockedServiceOrder,
+        assignedUser: mockedUser,
+      };
+
+      mockTaskService.start.mockResolvedValue(expectedResult);
+
+      const response = await controller.start('task1');
+
+      expect(response.message).toEqual('Tarefa iniciada com sucesso');
+      expect(response.task).toEqual(expectedResult);
+      expect(mockTaskService.start).toHaveBeenCalledWith('task1');
+    });
+  });
+
+  describe('complete', () => {
+    it('should mark a task as completed', async () => {
+      const expectedResult: GetTaskDto = {
+        id: 'task1',
+        title: 'Task1',
+        startedAt: null,
+        completedAt: new Date(),
+        sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
+        serviceOrder: mockedServiceOrder,
+        assignedUser: mockedUser,
+      };
+
+      mockTaskService.complete.mockResolvedValue(expectedResult);
+
+      const response = await controller.complete('task1');
+
+      expect(response.message).toEqual(
+        'Data de conclusão da tarefa alterada com sucesso',
+      );
+      expect(response.task).toEqual(expectedResult);
+      expect(mockTaskService.complete).toHaveBeenCalledWith('task1');
+    });
+
+    it('should mark a task as not completed', async () => {
+      const expectedResult: GetTaskDto = {
+        id: 'task1',
+        title: 'Task1',
+        startedAt: null,
+        completedAt: null,
+        sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
+        serviceOrder: mockedServiceOrder,
+        assignedUser: mockedUser,
+      };
+
+      mockTaskService.complete.mockResolvedValue(expectedResult);
+
+      const response = await controller.complete('task1');
+
+      expect(response.message).toEqual(
+        'Data de conclusão da tarefa alterada com sucesso',
+      );
+      expect(response.task).toEqual(expectedResult);
+      expect(mockTaskService.complete).toHaveBeenCalledWith('task1');
     });
   });
 
@@ -201,7 +283,8 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = {
         id: 'task1',
         title: 'Task1',
-        completed: false,
+        startedAt: null,
+        completedAt: null,
         sector: Sector.OPERACIONAL,
         stage: TaskStage.SALE_COMPLETED,
         serviceOrder: mockedServiceOrder,

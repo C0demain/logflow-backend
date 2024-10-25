@@ -28,8 +28,8 @@ describe('TaskService', () => {
   const mockedUser = {
     id: 'user1',
     name: 'User1',
-    email: 'user1@gmail.com'
-  }
+    email: 'user1@gmail.com',
+  };
 
   const mockUserService = {
     findById: jest.fn().mockResolvedValue(mockedUser),
@@ -37,8 +37,8 @@ describe('TaskService', () => {
 
   const mockedServiceOrder = {
     id: 'order1',
-    title: 'Order1'
-  }
+    title: 'Order1',
+  };
 
   const mockServiceOrderService = {
     findById: jest.fn().mockResolvedValue(mockedServiceOrder),
@@ -50,15 +50,15 @@ describe('TaskService', () => {
         TaskService,
         {
           provide: getRepositoryToken(Task),
-          useValue: mockRepository
+          useValue: mockRepository,
         },
         {
           provide: UserService,
-          useValue: mockUserService
+          useValue: mockUserService,
         },
         {
           provide: ServiceOrderService,
-          useValue: mockServiceOrderService
+          useValue: mockServiceOrderService,
         },
       ],
     }).compile();
@@ -73,7 +73,6 @@ describe('TaskService', () => {
     expect(service).toBeDefined();
   });
 
-  
   describe('create', () => {
     it('should create a task', async ()=>{
     const createTaskDto: CreateTaskDto = {
@@ -83,13 +82,14 @@ describe('TaskService', () => {
       sector: Sector.OPERACIONAL,
       stage: TaskStage.SALE_COMPLETED,
       role: 'role1',
-      completed: false
+      completedAt: new Date(),
     }
 
     const expectedResult: GetTaskDto = {
       id: 'task1',
       title: 'task-title',
-      completed: false,
+      startedAt: null,
+      completedAt: null,
       sector: Sector.OPERACIONAL,
       stage: TaskStage.SALE_COMPLETED,
       serviceOrder: mockedServiceOrder,
@@ -100,10 +100,11 @@ describe('TaskService', () => {
 
     const createdTask = await service.create(createTaskDto)
     expect(createdTask).toEqual(expectedResult)
-    expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'task-title',
-      serviceOrder: mockedServiceOrder,
-      assignedUser: mockedUser
+    expect(mockRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'task-title',
+        serviceOrder: mockedServiceOrder,
+        assignedUser: mockedUser
     }));
 
   })})
@@ -114,130 +115,154 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
-          completed: false,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
-          serviceOrder: mockedServiceOrder
-        }
-      ]
+          serviceOrder: mockedServiceOrder,
+        },
+      ];
 
-      mockRepository.find.mockResolvedValue(expectedResult)
+      mockRepository.find.mockResolvedValue(expectedResult);
 
-      const tasks = await service.findAll({})
+      const tasks = await service.findAll({});
 
-      expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: {}, order: {createdAt: "asc"} })
-    })
+      expect(tasks).toEqual(expectedResult);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: {},
+        order: { createdAt: 'asc' },
+      });
+    });
 
-    it('should return tasks filtered by title', async ()=>{
+    it('should return tasks filtered by title', async () => {
       const expectedResult: GetTaskDto[] = [
         {
           id: 'task1',
           title: 'Task1',
-          completed: false,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
-          serviceOrder: mockedServiceOrder
-        }
-      ]
+          serviceOrder: mockedServiceOrder,
+        },
+      ];
 
-      mockRepository.find.mockResolvedValue(expectedResult)
+      mockRepository.find.mockResolvedValue(expectedResult);
 
-      const tasks = await service.findAll({title: 'Task1'})
+      const tasks = await service.findAll({ title: 'Task1' });
 
-      expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: { title: 'Task1'}, order: {createdAt: "asc"} })
-    })
+      expect(tasks).toEqual(expectedResult);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { title: 'Task1' },
+        order: { createdAt: 'asc' },
+      });
+    });
 
-    it('should return tasks filtered by serviceOrderId', async ()=>{
+    it('should return tasks filtered by serviceOrderId', async () => {
       const expectedResult: GetTaskDto[] = [
         {
           id: 'task1',
           title: 'Task1',
-          completed: false,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
-          serviceOrder: mockedServiceOrder
-        }
-      ]
+          serviceOrder: mockedServiceOrder,
+        },
+      ];
 
-      mockRepository.find.mockResolvedValue(expectedResult)
+      mockRepository.find.mockResolvedValue(expectedResult);
 
-      const tasks = await service.findAll({serviceOrderId: 'order1'})
+      const tasks = await service.findAll({ serviceOrderId: 'order1' });
 
-      expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: { serviceOrder: { id: 'order1' } }, order: {createdAt: "asc"} })
-    })
+      expect(tasks).toEqual(expectedResult);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { serviceOrder: { id: 'order1' } },
+        order: { createdAt: 'asc' },
+      });
+    });
 
-    it('should return tasks filtered by assignedUserId', async ()=>{
+    it('should return tasks filtered by assignedUserId', async () => {
       const expectedResult: GetTaskDto[] = [
         {
           id: 'task1',
           title: 'Task1',
-          completed: false,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
-          serviceOrder: mockedServiceOrder
-        }
-      ]
+          serviceOrder: mockedServiceOrder,
+        },
+      ];
 
-      mockRepository.find.mockResolvedValue(expectedResult)
+      mockRepository.find.mockResolvedValue(expectedResult);
 
-      const tasks = await service.findAll({assignedUserId: 'user1'})
+      const tasks = await service.findAll({ assignedUserId: 'user1' });
 
-      expect(tasks).toEqual(expectedResult)
-      expect(mockRepository.find).toHaveBeenCalledWith({ where: { assignedUser: { id: 'user1' } }, order: {createdAt: "asc"} })
-    })
-  })
+      expect(tasks).toEqual(expectedResult);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { assignedUser: { id: 'user1' } },
+        order: { createdAt: 'asc' },
+      });
+    });
+  });
 
-  describe('findById', ()=>{
-    it('should return a task by id', async ()=>{
+  describe('findById', () => {
+    it('should return a task by id', async () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
-          completed: false,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
-      
-      mockRepository.findOneBy.mockResolvedValue(expectedResult)
 
-      const task = await service.findById('task1')
+      mockRepository.findOneBy.mockResolvedValue(expectedResult);
 
-      expect(task).toEqual(expectedResult)
-    })
+      const task = await service.findById('task1');
 
-    it('should throw NotFoundException when id is invalid', async ()=>{
-      
-      mockRepository.findOneBy.mockResolvedValue(null)
+      expect(task).toEqual(expectedResult);
+    });
 
-      expect(service.findById('task1')).rejects.toBeInstanceOf(NotFoundException)
-    })
-  })
+    it('should throw NotFoundException when id is invalid', async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
 
-  describe('update', ()=>{
-    it('should update a task by id', async ()=>{
+      expect(service.findById('task1')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('update', () => {
+    it('should update a task by id', async () => {
       const expectedResult = {
           id: 'task1',
           title: 'Task2',
-          completed: false,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder
         }
       
-      mockRepository.findOneBy.mockResolvedValue({...expectedResult, ...{title: 'Task1'} })
-      mockRepository.save.mockResolvedValue(expectedResult)
+      mockRepository.findOneBy.mockResolvedValue({
+        ...expectedResult,
+        ...{ title: 'Task1' },
+      });
+      mockRepository.save.mockResolvedValue(expectedResult);
 
       const task = await service.update('task1', {
-        title: 'Task2', completed: false, userId: 'user1',
+        title: 'Task2',
+        startedAt: new Date(),
+        completedAt: new Date(),
+        userId: 'user1',
         orderId: 'order1',
         sector: Sector.OPERACIONAL,
         stage: TaskStage.SALE_COMPLETED,
@@ -254,26 +279,105 @@ describe('TaskService', () => {
       expect(mockServiceOrderService.findById).toHaveBeenCalledWith('order1');
     })
 
-    it('should throw NotFoundException when id is invalid', async ()=>{
-      
-      mockRepository.findOneBy.mockResolvedValue(null)
+    it('should throw NotFoundException when id is invalid', async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
 
-      expect(service.update('task1', {
-        title: 'Task2', completed: false, userId: 'user1',
-        orderId: 'order2',
+      expect(
+        service.update('task1', {
+          title: 'Task2',
+          startedAt: new Date(),
+          completedAt: new Date(),
+          userId: 'user1',
+          orderId: 'order2',
+          sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
+          address: new AddressDto(),
+        }),
+      ).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
+  describe('start', () => {
+    it('should start a task', async () => {
+      const expectedResult = {
+        id: 'task1',
+        title: 'Task1',
+        startedAt: new Date(),
+        completedAt: null,
         sector: Sector.OPERACIONAL,
-        stage: TaskStage.SALE_COMPLETED,
-        address: new AddressDto
-      })).rejects.toBeInstanceOf(NotFoundException)
-    })
-  })
+        serviceOrder: mockedServiceOrder,
+        assignedUser: mockedUser,
+      };
 
-  describe('remove', ()=>{
-    it('should remove a task by id', async ()=>{
+      mockRepository.findOneBy.mockResolvedValue({
+        ...expectedResult,
+        ...{ completedAt: null },
+      });
+      mockRepository.save.mockResolvedValue(expectedResult);
+      
+      const task = await service.start('task1');
+
+      expect(task).toEqual(expectedResult);
+    });
+
+    it('should throw NotFoundException when id is invalid', async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      expect(service.start('task1')).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
+  describe('complete', () => {
+    it('should mark a task as completed', async () => {
+      const expectedResult = {
+        id: 'task1',
+        title: 'Task1',
+        completedAt: new Date(),
+        sector: Sector.OPERACIONAL,
+        assignedUser: mockedUser,
+        serviceOrder: mockedServiceOrder,
+      };
+    
+      mockRepository.findOneBy.mockResolvedValue({
+        ...expectedResult,
+        ...{ completedAt: null },
+      });
+      mockRepository.save.mockResolvedValue(expectedResult);
+
+      const task = await service.complete('task1');
+
+      expect(task).toEqual(expectedResult);
+    });
+
+    it('should mark a task as not completed', async () => {
+      const expectedResult = {
+        id: 'task1',
+        title: 'Task1',
+        completedAt: null,
+        sector: Sector.OPERACIONAL,
+        assignedUser: mockedUser,
+        serviceOrder: mockedServiceOrder,
+      };
+
+      mockRepository.findOneBy.mockResolvedValue({
+        ...expectedResult,
+        ...{ completedAt: new Date() },
+      });
+      mockRepository.save.mockResolvedValue(expectedResult);
+
+      const task = await service.complete('task1');
+
+      expect(task).toEqual(expectedResult);
+    });
+  });
+
+  describe('remove', () => {
+    it('should remove a task by id', async () => {
       const expectedResult: GetTaskDto = {
           id: 'task1',
           title: 'Task1',
-          completed: false,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           stage: TaskStage.SALE_COMPLETED,
           assignedUser: mockedUser,
@@ -282,17 +386,19 @@ describe('TaskService', () => {
       
       mockRepository.findOneBy.mockResolvedValue(expectedResult)
 
-      const task = await service.remove('task1')
+      mockRepository.findOneBy.mockResolvedValue(expectedResult);
 
-      expect(task).toEqual(expectedResult)
-    })
+      const task = await service.remove('task1');
 
-    it('should throw NotFoundException when id is invalid', async ()=>{
-      
-      mockRepository.findOneBy.mockResolvedValue(null)
+      expect(task).toEqual(expectedResult);
+    });
 
-      expect(service.findById('task1')).rejects.toBeInstanceOf(NotFoundException)
-    })
-  })
-  
+    it('should throw NotFoundException when id is invalid', async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      expect(service.findById('task1')).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+    });
+  });
 });
