@@ -135,6 +135,18 @@ export class TaskService {
     return parseToGetTaskDTO(updatedTask);
   }
 
+  async start(id: string) {
+    const task = await this.taskRepository.findOneBy({ id });
+
+    if (task === null) {
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
+    }
+
+    task.startedAt = new Date();
+    const startedTask = await this.taskRepository.save(task);
+    return parseToGetTaskDTO(startedTask);
+  }
+
   async complete(id: string) {
     const task = await this.taskRepository.findOneBy({ id });
 
@@ -142,19 +154,7 @@ export class TaskService {
       throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
     }
 
-    task.completedAt = new Date();
-    const completedTask = await this.taskRepository.save(task);
-    return parseToGetTaskDTO(completedTask);
-  }
-
-  async uncomplete(id: string) {
-    const task = await this.taskRepository.findOneBy({ id });
-
-    if (task === null) {
-      throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
-    }
-
-    task.completedAt = null;
+    task.completedAt = task.completedAt === null ? new Date() : null;
     const completedTask = await this.taskRepository.save(task);
     return parseToGetTaskDTO(completedTask);
   }

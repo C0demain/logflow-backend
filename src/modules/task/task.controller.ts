@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from 'src/modules/auth/authentication.guard';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
@@ -68,22 +68,22 @@ export class TaskController {
     }
   }
 
-  @Put(':id/complete')
-  @ApiOperation({summary: 'Concluir uma tarefa'})
-  async complete(@Param('id') id: string) {
-    const task = await this.taskService.complete(id)
+  @Patch(':id/start')
+  @ApiOperation({summary: 'Iniciar uma tarefa'})
+  async start(@Param('id') id: string) {
+    const task = await this.taskService.start(id)
     return {
-      message: 'Tarefa marcada como concluída com sucesso',
+      message: 'Tarefa iniciada com sucesso',
       task
     }
   }
 
-  @Put(':id/uncomplete')
+  @Patch(':id/complete')
   @ApiOperation({summary: 'Concluir uma tarefa'})
-  async uncomplete(@Param('id') id: string) {
-    const task = await this.taskService.uncomplete(id)
+  async complete(@Param('id') id: string) {
+    const task = await this.taskService.complete(id)
     return {
-      message: 'Tarefa marcada como não concluída com sucesso',
+      message: 'Data de conclusão da tarefa alterada com sucesso',
       task
     }
   }
