@@ -77,6 +77,8 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = new GetTaskDto(
         'task1',
         'Task1',
+        null,
+        null,
         Sector.OPERACIONAL,
         TaskStage.SALE_COMPLETED,
         {
@@ -156,9 +158,9 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = new GetTaskDto(
         'task1',
         'Task1',
+        null,
+        null,
         Sector.OPERACIONAL,
-        null,
-        null,
         TaskStage.SALE_COMPLETED,
         {
           id: 'user1',
@@ -212,6 +214,7 @@ describe('TaskController', () => {
         title: 'Task1',
         startedAt: new Date(),
         completedAt: null,
+        stage: TaskStage.SALE_COMPLETED,
         sector: Sector.OPERACIONAL,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
@@ -235,6 +238,7 @@ describe('TaskController', () => {
         startedAt: null,
         completedAt: new Date(),
         sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };
@@ -257,6 +261,7 @@ describe('TaskController', () => {
         startedAt: null,
         completedAt: null,
         sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };

@@ -88,6 +88,7 @@ describe('TaskService', () => {
     const expectedResult: GetTaskDto = {
       id: 'task1',
       title: 'task-title',
+      startedAt: null,
       completedAt: null,
       sector: Sector.OPERACIONAL,
       stage: TaskStage.SALE_COMPLETED,
@@ -289,6 +290,7 @@ describe('TaskService', () => {
           userId: 'user1',
           orderId: 'order2',
           sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
           address: new AddressDto(),
         }),
       ).rejects.toBeInstanceOf(NotFoundException);
@@ -333,11 +335,9 @@ describe('TaskService', () => {
         completedAt: new Date(),
         sector: Sector.OPERACIONAL,
         stage: TaskStage.SALE_COMPLETED,
-        address: new AddressDto
-      })).rejects.toBeInstanceOf(NotFoundException)
-    })
-  })
-
+        address: new AddressDto(),
+      }
+    
       mockRepository.findOneBy.mockResolvedValue({
         ...expectedResult,
         ...{ completedAt: null },
