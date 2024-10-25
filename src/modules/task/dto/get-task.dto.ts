@@ -1,5 +1,6 @@
 import { Sector } from "src/modules/service-order/enums/sector.enum"
 import { Task } from "src/modules/task/entities/task.entity"
+import { TaskStage } from "../enums/task.stage.enum";
 
 export class GetTaskDto {
     readonly id: string;
@@ -7,6 +8,7 @@ export class GetTaskDto {
     readonly sector: Sector;
     readonly startedAt: Date | null;
     readonly completedAt: Date | null;
+    readonly stage: TaskStage;
     readonly serviceOrder?: {
         id: string,
         title: string
@@ -32,6 +34,7 @@ export class GetTaskDto {
         sector: Sector,
         startedAt: Date | null,
         completedAt: Date | null,
+        stage: TaskStage,
         assignedUser?: {
             id: string,
             name: string,
@@ -57,6 +60,8 @@ export class GetTaskDto {
         this.startedAt = startedAt;
         this.completedAt = completedAt;
         this.sector = sector;
+        this.stage = stage;
+        this.completed = completed;
         this.assignedUser = assignedUser;
         this.serviceOrder = serviceOrder;
         this.address = address;
@@ -92,9 +97,10 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
     return new GetTaskDto(
         task.id, 
         task.title, 
-        task.sector, 
+        task.sector,
         task.startedAt, 
         task.completedAt, 
+        task.stage,
         assignedUser, 
         serviceOrder, 
         address

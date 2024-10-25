@@ -21,7 +21,7 @@ export class AuthenticationGuard implements CanActivate {
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
-      throw new UnauthorizedException('Authentication Error.');
+      throw new UnauthorizedException('Erro de autenticação com o token.');
     }
 
     try {
@@ -29,7 +29,7 @@ export class AuthenticationGuard implements CanActivate {
       request.user = payload;
       console.log(request.user);
     } catch (error) {
-      throw new UnauthorizedException('Invalid token jwt.');
+      throw new UnauthorizedException('Token JWT inválido.');
     }
     return true;
   }

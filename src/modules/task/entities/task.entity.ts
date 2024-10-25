@@ -1,4 +1,5 @@
 import { Address } from "src/modules/client/entities/address.entity";
+import { FileEntity } from "src/modules/file/entities/file.entity";
 import { RoleEntity } from "src/modules/roles/roles.entity";
 import { ServiceOrder } from "src/modules/service-order/entities/service-order.entity";
 import { Sector } from "src/modules/service-order/enums/sector.enum";
@@ -10,14 +11,16 @@ import {
     ManyToOne,
     JoinColumn,
     CreateDateColumn,
+    OneToMany,
 } from "typeorm";
+import { TaskStage } from "../enums/task.stage.enum";
 
 @Entity({name: 'task'})
 export class Task {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({name: 'title', length: 50, nullable: false})
+    @Column({ name: 'title', length: 50, nullable: false})
     title: string;
 
     @Column({name: 'started_at', type:"timestamptz",nullable: true})
@@ -25,6 +28,8 @@ export class Task {
 
     @Column({name: 'completed_at', type:"timestamptz", nullable: true})
     completedAt: Date | null;
+    @Column({ name: 'stage', type: 'enum', enum: TaskStage, nullable: false })
+    stage: TaskStage;
 
     @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
     sector: Sector;
@@ -42,6 +47,9 @@ export class Task {
     @ManyToOne(() => RoleEntity, { eager: true , nullable:true})
     @JoinColumn({ name: 'role_name', referencedColumnName: 'name' })
     role: RoleEntity;
+
+    @OneToMany(() => FileEntity, (file) => file.task)
+    files: FileEntity[];
 
     @CreateDateColumn()
     createdAt: Date

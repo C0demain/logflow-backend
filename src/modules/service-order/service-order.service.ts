@@ -16,6 +16,7 @@ import { ClientService } from '../client/client.service';
 import { ServiceOrderLog } from './entities/service-order-log.entity';
 import { Task } from '../task/entities/task.entity';
 import { RoleEntity } from '../roles/roles.entity';
+import { TaskStage } from '../task/enums/task.stage.enum';
 
 @Injectable()
 export class ServiceOrderService {
@@ -59,22 +60,22 @@ export class ServiceOrderService {
     const operacionalRole = await this.roleRepository.findOne({ where: { name: 'Gerente Operacional' } });
   
     if(!motoristaRole || !financeiroRole || !operacionalRole){
-      throw new NotFoundException("roles nao encontradas")
+      throw new NotFoundException("Funções não encontradas.")
     }
     const tasks = [
-      this.createTask('Documentos de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Endereço de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Assinatura de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Trazer p/ Galpão', Sector.OPERACIONAL, operacionalRole, serviceOrder),
+      this.createTask('Documentos de Coleta', Sector.OPERACIONAL, TaskStage.SALE_COMPLETED, motoristaRole, serviceOrder),
+      this.createTask('Endereço de Coleta', Sector.OPERACIONAL, TaskStage.SALE_COMPLETED, motoristaRole, serviceOrder),
+      this.createTask('Motorista: Assinatura de Coleta', Sector.OPERACIONAL, TaskStage.SALE_COMPLETED, motoristaRole, serviceOrder),
+      this.createTask('Motorista: Trazer p/ Galpão', Sector.OPERACIONAL, TaskStage.SALE_COMPLETED, operacionalRole, serviceOrder),
   
-      this.createTask('Documentos de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Endereço de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Assinatura de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Devolução de Documentos', Sector.OPERACIONAL, operacionalRole, serviceOrder),
+      this.createTask('Documentos de Entrega', Sector.OPERACIONAL, TaskStage.SALE_COMPLETED, motoristaRole, serviceOrder),
+      this.createTask('Endereço de Entrega', Sector.OPERACIONAL, TaskStage.SALE_COMPLETED, motoristaRole, serviceOrder),
+      this.createTask('Motorista: Assinatura de Entrega', Sector.OPERACIONAL, TaskStage.SALE_COMPLETED, motoristaRole, serviceOrder),
+      this.createTask('Motorista: Devolução de Documentos', Sector.OPERACIONAL, TaskStage.SALE_COMPLETED, operacionalRole, serviceOrder),
   
-      this.createTask('Confirmação de Entrega', Sector.FINANCEIRO, financeiroRole, serviceOrder),
-      this.createTask('Emissão de NF/BOLETO', Sector.FINANCEIRO, financeiroRole, serviceOrder),
-      this.createTask('Confirmação de Recebimento', Sector.FINANCEIRO, financeiroRole, serviceOrder),
+      this.createTask('Confirmação de Entrega', Sector.FINANCEIRO, TaskStage.SALE_COMPLETED, financeiroRole, serviceOrder),
+      this.createTask('Emissão de NF/BOLETO', Sector.FINANCEIRO, TaskStage.SALE_COMPLETED, financeiroRole, serviceOrder),
+      this.createTask('Confirmação de Recebimento', Sector.FINANCEIRO, TaskStage.SALE_COMPLETED, financeiroRole, serviceOrder),
     ];
   
     for(let t of tasks){
@@ -85,12 +86,14 @@ export class ServiceOrderService {
   private createTask(
     title: string,
     sector: Sector,
+    stage: TaskStage,
     role: RoleEntity,
     serviceOrder: ServiceOrder
   ): Task {
     const task = new Task();
     task.title = title;
     task.sector = sector;
+    task.stage = stage;
     task.role = role;
     task.serviceOrder = serviceOrder;
     return task;
@@ -134,7 +137,7 @@ export class ServiceOrderService {
 
     if (!orders || orders.length === 0) {
       throw new InternalServerErrorException(
-        'Nenhuma ordem de serviço encontrada',
+        'Nenhuma ordem de serviço encontrada.',
       );
     }
 
@@ -177,7 +180,7 @@ export class ServiceOrderService {
 
     if (!orderFound) {
       throw new NotFoundException(
-        `Ordem de serviço com id: ${id}, não encontrada`,
+        `Ordem de serviço com id: ${id} não encontrada.`,
       );
     }
 
@@ -194,7 +197,7 @@ export class ServiceOrderService {
 
     if (!orderFound) {
       throw new NotFoundException(
-        `Ordem de serviço com id: ${id}, não encontrada`,
+        `Ordem de serviço com id: ${id} não encontrada.`,
       );
     }
 
@@ -219,7 +222,7 @@ export class ServiceOrderService {
 
     if (!orderFound) {
       throw new NotFoundException(
-        `Ordem de serviço com id: ${id}, não encontrada`,
+        `Ordem de serviço com id: ${id} não encontrada.`,
       );
     }
 

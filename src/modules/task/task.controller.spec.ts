@@ -7,6 +7,7 @@ import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { AddressDto } from '../client/dto/address.dto';
 import { start } from 'repl';
+import { TaskStage } from './enums/task.stage.enum';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -18,7 +19,8 @@ describe('TaskController', () => {
     userId: 'user1',
     completedAt: new Date(),
     sector: Sector.OPERACIONAL,
-    role: 'role1',
+    stage: TaskStage.SALE_COMPLETED,
+    role: 'role1'
   };
 
   const mockedUser = {
@@ -76,8 +78,7 @@ describe('TaskController', () => {
         'task1',
         'Task1',
         Sector.OPERACIONAL,
-        null,
-        null,
+        TaskStage.SALE_COMPLETED,
         {
           id: 'user1',
           name: 'User1',
@@ -93,7 +94,7 @@ describe('TaskController', () => {
       const response = await controller.create(createTaskDto);
 
       expect(response).toEqual({
-        message: 'Tarefa criada com sucesso',
+        message: 'Tarefa criada com sucesso.',
         task: expectedResult,
       });
 
@@ -110,6 +111,7 @@ describe('TaskController', () => {
           startedAt: null,
           completedAt: null,
           sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser,
         },
@@ -118,7 +120,7 @@ describe('TaskController', () => {
 
       const response = await controller.findAll();
 
-      expect(response.message).toEqual('Tarefas obtidas com sucesso');
+      expect(response.message).toEqual('Tarefas obtidas com sucesso.');
       expect(response.tasks).toEqual(expectedResult);
       expect(mockTaskService.findAll).toHaveBeenCalledWith({});
     });
@@ -134,6 +136,7 @@ describe('TaskController', () => {
         startedAt: null,
         completedAt: null,
         sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };
@@ -142,7 +145,7 @@ describe('TaskController', () => {
 
       const response = await controller.findById('task1');
 
-      expect(response.message).toEqual('Tarefa obtida com sucesso');
+      expect(response.message).toEqual('Tarefa obtida com sucesso.');
       expect(response.task).toEqual(expectedResult);
       expect(mockTaskService.findById).toHaveBeenCalledWith('task1');
     });
@@ -156,6 +159,7 @@ describe('TaskController', () => {
         Sector.OPERACIONAL,
         null,
         null,
+        TaskStage.SALE_COMPLETED,
         {
           id: 'user1',
           name: 'User1',
@@ -185,12 +189,13 @@ describe('TaskController', () => {
         userId: mockedUser.id,
         orderId: 'order1',
         sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
         address: new AddressDto(), // address opcional
       };
 
       const response = await controller.update('task1', updateTaskDto);
 
-      expect(response.message).toEqual('Tarefa atualizada com sucesso');
+      expect(response.message).toEqual('Tarefa atualizada com sucesso.');
       expect(response.task).toEqual(expectedResult);
 
       expect(mockTaskService.update).toHaveBeenCalledWith(
@@ -276,6 +281,7 @@ describe('TaskController', () => {
         startedAt: null,
         completedAt: null,
         sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };
@@ -284,7 +290,7 @@ describe('TaskController', () => {
 
       const response = await controller.remove('task1');
 
-      expect(response.message).toEqual('Tarefa excluída com sucesso');
+      expect(response.message).toEqual('Tarefa excluída com sucesso.');
       expect(response.task).toEqual(expectedResult);
       expect(mockTaskService.remove).toHaveBeenCalledWith('task1');
     });

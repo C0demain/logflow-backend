@@ -32,7 +32,7 @@ export class ClientController {
   async create(@Body() createClientDto: CreateClientDto) {
     const clientCreated = await this.clientService.create(createClientDto);
     return {
-      message: 'Cliente cadastrado com sucesso',
+      message: 'Cliente cadastrado com sucesso.',
       client: clientCreated,
     };
   }
@@ -61,12 +61,12 @@ export class ClientController {
       });
 
       return {
-        message: 'Clientes encontrados',
+        message: 'Clientes encontrados.',
         clients: clients,
       };
     } catch (error) {
       return {
-        message: 'nenhum cliente encontrado',
+        message: 'Nenhum cliente encontrado.',
         clients: [],
       };
     }
@@ -81,7 +81,7 @@ export class ClientController {
     const clientUpdated = await this.clientService.update(id, updateClientDto);
 
     return {
-      message: 'Cliente atualizado com sucesso',
+      message: 'Cliente atualizado com sucesso.',
       client: clientUpdated,
     };
   }

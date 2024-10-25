@@ -16,7 +16,7 @@ export class TaskService {
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
     private readonly serviceOrderService: ServiceOrderService,
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
   async create(createTaskDto: CreateTaskDto) {
     const taskDb = new Task();
@@ -35,6 +35,7 @@ export class TaskService {
     taskDb.title = createTaskDto.title;
     taskDb.serviceOrder = serviceOrder;
     taskDb.sector = createTaskDto.sector;
+    taskDb.stage = createTaskDto.stage;
     
     // Opcionais
     taskDb.assignedUser = userId;
@@ -85,7 +86,7 @@ export class TaskService {
     const task = await this.taskRepository.findOneBy({ id })
 
     if (task === null) {
-      throw new NotFoundException(`Tarefa com id ${id} não encontrada`)
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada.`)
     }
 
     const parsedTask = parseToGetTaskDTO(task)
@@ -93,6 +94,7 @@ export class TaskService {
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {
+
     // Verifica se a tarefa existe
     const task = await this.taskRepository.findOneBy({ id });
     if (!task) {
@@ -105,7 +107,13 @@ export class TaskService {
       throw new NotFoundException('Ordem de serviço não encontrada.');
     }
 
-    // Busca o usuário atribuído (opcional)
+    // Atualizando os campos obrigatórios
+    task.title = updateTaskDto.title;
+    task.serviceOrder = serviceOrder;
+    task.sector = updateTaskDto.sector;
+    task.stage = updateTaskDto.stage;
+
+    // Atualizando os campos opcionais
     let user = null;
     if (updateTaskDto.userId) {
       user = await this.userService.findById(updateTaskDto.userId);
@@ -114,10 +122,6 @@ export class TaskService {
       }
     }
 
-    task.title = updateTaskDto.title;
-    task.serviceOrder = serviceOrder;
-
-    // Atualizando os campos opcionais
     if (user) {
       task.assignedUser = user;
     }
@@ -163,7 +167,7 @@ export class TaskService {
     const task = await this.taskRepository.findOneBy({ id })
 
     if (task === null) {
-      throw new NotFoundException(`Tarefa com id ${id} não encontrada`)
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada.`)
     }
 
     await this.taskRepository.delete(id)
