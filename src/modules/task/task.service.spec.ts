@@ -87,7 +87,8 @@ describe('TaskService', () => {
       const expectedResult: GetTaskDto = {
         id: 'task1',
         title: 'task-title',
-        completedAt: undefined,
+        startedAt: null,
+        completedAt: null,
         sector: Sector.OPERACIONAL,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
@@ -113,7 +114,8 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
-          completedAt: undefined,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder,
@@ -136,7 +138,8 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
-          completedAt: undefined,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder,
@@ -159,7 +162,8 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
-          completedAt: undefined,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder,
@@ -182,7 +186,8 @@ describe('TaskService', () => {
         {
           id: 'task1',
           title: 'Task1',
-          completedAt: undefined,
+          startedAt: null,
+          completedAt: null,
           sector: Sector.OPERACIONAL,
           assignedUser: mockedUser,
           serviceOrder: mockedServiceOrder,
@@ -206,7 +211,8 @@ describe('TaskService', () => {
       const expectedResult: GetTaskDto = {
         id: 'task1',
         title: 'Task1',
-        completedAt: undefined,
+        startedAt: null,
+        completedAt: null,
         sector: Sector.OPERACIONAL,
         assignedUser: mockedUser,
         serviceOrder: mockedServiceOrder,
@@ -233,7 +239,7 @@ describe('TaskService', () => {
       const expectedResult = {
         id: 'task1',
         title: 'Task2',
-        completedAt: undefined,
+        completedAt: null,
         sector: Sector.OPERACIONAL,
         assignedUser: mockedUser,
         serviceOrder: mockedServiceOrder,
@@ -247,34 +253,7 @@ describe('TaskService', () => {
 
       const task = await service.update('task1', {
         title: 'Task2',
-        completedAt: new Date(),
-        userId: 'user1',
-        orderId: 'order1',
-        sector: Sector.OPERACIONAL,
-        address: new AddressDto(),
-      });
-
-      expect(task).toEqual(expectedResult);
-    });
-
-    it('should update a task completion date', async () => {
-      const expectedResult = {
-        id: 'task1',
-        title: 'Task1',
-        completedAt: new Date(),
-        sector: Sector.OPERACIONAL,
-        assignedUser: mockedUser,
-        serviceOrder: mockedServiceOrder,
-      };
-
-      mockRepository.findOneBy.mockResolvedValue({
-        ...expectedResult,
-        ...{ completedAt: undefined },
-      });
-      mockRepository.save.mockResolvedValue(expectedResult);
-
-      const task = await service.update('task1', {
-        title: 'Task1',
+        startedAt: new Date(),
         completedAt: new Date(),
         userId: 'user1',
         orderId: 'order1',
@@ -291,6 +270,7 @@ describe('TaskService', () => {
       expect(
         service.update('task1', {
           title: 'Task2',
+          startedAt: new Date(),
           completedAt: new Date(),
           userId: 'user1',
           orderId: 'order2',
@@ -301,12 +281,87 @@ describe('TaskService', () => {
     });
   });
 
+  describe('start', () => {
+    it('should start a task', async () => {
+      const expectedResult = {
+        id: 'task1',
+        title: 'Task1',
+        startedAt: new Date(),
+        completedAt: null,
+        sector: Sector.OPERACIONAL,
+        serviceOrder: mockedServiceOrder,
+        assignedUser: mockedUser,
+      };
+
+      mockRepository.findOneBy.mockResolvedValue({
+        ...expectedResult,
+        ...{ completedAt: null },
+      });
+      mockRepository.save.mockResolvedValue(expectedResult);
+      
+      const task = await service.start('task1');
+
+      expect(task).toEqual(expectedResult);
+    });
+
+    it('should throw NotFoundException when id is invalid', async () => {
+      mockRepository.findOneBy.mockResolvedValue(null);
+
+      expect(service.start('task1')).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
+  describe('complete', () => {
+    it('should mark a task as completed', async () => {
+      const expectedResult = {
+        id: 'task1',
+        title: 'Task1',
+        completedAt: new Date(),
+        sector: Sector.OPERACIONAL,
+        assignedUser: mockedUser,
+        serviceOrder: mockedServiceOrder,
+      };
+
+      mockRepository.findOneBy.mockResolvedValue({
+        ...expectedResult,
+        ...{ completedAt: null },
+      });
+      mockRepository.save.mockResolvedValue(expectedResult);
+
+      const task = await service.complete('task1');
+
+      expect(task).toEqual(expectedResult);
+    });
+
+    it('should mark a task as not completed', async () => {
+      const expectedResult = {
+        id: 'task1',
+        title: 'Task1',
+        completedAt: null,
+        sector: Sector.OPERACIONAL,
+        assignedUser: mockedUser,
+        serviceOrder: mockedServiceOrder,
+      };
+
+      mockRepository.findOneBy.mockResolvedValue({
+        ...expectedResult,
+        ...{ completedAt: new Date() },
+      });
+      mockRepository.save.mockResolvedValue(expectedResult);
+
+      const task = await service.complete('task1');
+
+      expect(task).toEqual(expectedResult);
+    });
+  });
+
   describe('remove', () => {
     it('should remove a task by id', async () => {
       const expectedResult: GetTaskDto = {
         id: 'task1',
         title: 'Task1',
-        completedAt: undefined,
+        startedAt: null,
+        completedAt: null,
         sector: Sector.OPERACIONAL,
         assignedUser: mockedUser,
         serviceOrder: mockedServiceOrder,
