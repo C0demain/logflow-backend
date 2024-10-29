@@ -163,6 +163,37 @@ export class TaskService {
     return parseToGetTaskDTO(completedTask);
   }
 
+  async assign(id: string, body: { userId: string }) {
+    const task = await this.taskRepository.findOneBy({ id });
+
+    if (task === null) {
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
+    }
+
+    const user = await this.userService.findById(body.userId);
+
+    if (user === null) {
+      throw new NotFoundException(`Usuário com id ${body.userId} não encontrado`);
+    }
+
+    task.assignedUser = user;
+    const assignedTask = await this.taskRepository.save(task);
+    return parseToGetTaskDTO(assignedTask);
+  }
+
+  async unassign(id: string) {
+    const task = await this.taskRepository.findOneBy({ id });
+
+    if (task === null) {
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
+    }
+
+    task.assignedUser = null;
+
+    const unassignedTask = await this.taskRepository.save(task);
+    return parseToGetTaskDTO(unassignedTask);
+  }
+
   async remove(id: string) {
     const task = await this.taskRepository.findOneBy({ id })
 

@@ -39,7 +39,7 @@ export class Task {
 
     @ManyToOne(() => UserEntity, user => user.tasks, {eager:true})
     @JoinColumn({ name: 'assignedUserId'})
-    assignedUser: UserEntity;
+    assignedUser: UserEntity | null;
 
     @Column(() => Address)
     address: Address;

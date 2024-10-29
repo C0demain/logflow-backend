@@ -5,6 +5,7 @@ import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskService } from './task.service';
+import { AssignUserDto } from './dto/assign-user.dto';
 
 @Controller('/api/v1/task')
 @ApiBearerAuth()
@@ -88,6 +89,26 @@ export class TaskController {
     const task = await this.taskService.complete(id)
     return {
       message: 'Data de conclusão da tarefa alterada com sucesso',
+      task
+    }
+  }
+
+  @Patch(':id/assign')
+  @ApiOperation({summary: 'Atribuir um usuário a uma tarefa'})
+  async assign(@Param('id') id: string, @Body() userId: AssignUserDto) {
+    const task = await this.taskService.assign(id, userId)
+    return {
+      message: 'Usuário atribuído com sucesso',
+      task
+    }
+  }
+
+  @Patch(':id/unassign')
+  @ApiOperation({summary: 'Desatribuir um usuário de uma tarefa'})
+  async unassign(@Param('id') id: string) {
+    const task = await this.taskService.unassign(id)
+    return {
+      message: 'Usuário desatribuído com sucesso',
       task
     }
   }
