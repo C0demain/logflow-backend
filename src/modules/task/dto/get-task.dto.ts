@@ -79,7 +79,7 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
         email: task.assignedUser.email,
     } : {
         id: "null",
-        name: "nenhum usuário atribuído a esta tarefa",
+        name: "Nenhum usuário atribuído a esta tarefa",
         email: "null",
     };
 

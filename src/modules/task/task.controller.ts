@@ -88,7 +88,17 @@ export class TaskController {
   async complete(@Param('id') id: string) {
     const task = await this.taskService.complete(id)
     return {
-      message: 'Data de conclusão da tarefa alterada com sucesso',
+      message: 'Tarefa concluída com sucesso',
+      task
+    }
+  }
+
+  @Patch(':id/uncomplete')
+  @ApiOperation({summary: 'Desfazer a conclusão de uma tarefa'})
+  async uncomplete(@Param('id') id: string) {
+    const task = await this.taskService.uncomplete(id)
+    return {
+      message: 'Conclusão da tarefa desfeita com sucesso',
       task
     }
   }

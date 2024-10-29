@@ -158,9 +158,21 @@ export class TaskService {
       throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
     }
 
-    task.completedAt = task.completedAt === null ? new Date() : null;
+    task.completedAt = new Date();
     const completedTask = await this.taskRepository.save(task);
     return parseToGetTaskDTO(completedTask);
+  }
+
+  async uncomplete(id: string) {
+    const task = await this.taskRepository.findOneBy({ id });
+
+    if (task === null) {
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
+    }
+
+    task.completedAt = null;
+    const uncompletedTask = await this.taskRepository.save(task);
+    return parseToGetTaskDTO(uncompletedTask);
   }
 
   async assign(id: string, body: { userId: string }) {
