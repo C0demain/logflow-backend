@@ -1,13 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { TaskController } from './task.controller';
-import { TaskService } from './task.service';
 import { JwtService } from '@nestjs/jwt';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { CreateTaskDto } from 'src/modules/task/dto/create-task.dto';
 import { GetTaskDto } from 'src/modules/task/dto/get-task.dto';
-import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { AddressDto } from '../client/dto/address.dto';
-import { start } from 'repl';
 import { TaskStage } from './enums/task.stage.enum';
+import { TaskController } from './task.controller';
+import { TaskService } from './task.service';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -20,7 +19,7 @@ describe('TaskController', () => {
     completedAt: new Date(),
     sector: Sector.OPERACIONAL,
     stage: TaskStage.SALE_COMPLETED,
-    role: 'role1'
+    role: 'role1',
   };
 
   const mockedUser = {
@@ -41,6 +40,9 @@ describe('TaskController', () => {
     update: jest.fn(),
     start: jest.fn(),
     complete: jest.fn(),
+    uncomplete: jest.fn(),
+    assign: jest.fn(),
+    unassign: jest.fn(),
     remove: jest.fn(),
   };
 
@@ -248,7 +250,7 @@ describe('TaskController', () => {
       const response = await controller.complete('task1');
 
       expect(response.message).toEqual(
-        'Data de conclusão da tarefa alterada com sucesso',
+        'Tarefa concluída com sucesso',
       );
       expect(response.task).toEqual(expectedResult);
       expect(mockTaskService.complete).toHaveBeenCalledWith('task1');
@@ -266,15 +268,65 @@ describe('TaskController', () => {
         assignedUser: mockedUser,
       };
 
-      mockTaskService.complete.mockResolvedValue(expectedResult);
+      mockTaskService.uncomplete.mockResolvedValue(expectedResult);
 
-      const response = await controller.complete('task1');
+      const response = await controller.uncomplete('task1');
 
       expect(response.message).toEqual(
-        'Data de conclusão da tarefa alterada com sucesso',
+        'Conclusão da tarefa desfeita com sucesso',
       );
       expect(response.task).toEqual(expectedResult);
       expect(mockTaskService.complete).toHaveBeenCalledWith('task1');
+    });
+  });
+
+  describe('assign', () => {
+    it('should assign a user to a task', async () => {
+      const expectedResult: GetTaskDto = {
+        id: 'task1',
+        title: 'Task1',
+        startedAt: null,
+        completedAt: null,
+        sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
+        serviceOrder: mockedServiceOrder,
+        assignedUser: mockedUser,
+      };
+
+      mockTaskService.assign.mockResolvedValue(expectedResult);
+
+      const assignUserDTO = {
+        userId: 'user1'
+      }
+
+      const response = await controller.assign('task1', assignUserDTO);
+
+      expect(mockTaskService.assign).toHaveBeenCalledWith('task1', assignUserDTO);
+      expect(response.task).toEqual(expectedResult);
+    });
+
+    it('should unassign a user from a task', async () => {
+      const expectedResult: GetTaskDto = {
+        id: 'task1',
+        title: 'Task1',
+        startedAt: null,
+        completedAt: null,
+        sector: Sector.OPERACIONAL,
+        stage: TaskStage.SALE_COMPLETED,
+        serviceOrder: mockedServiceOrder,
+        assignedUser: {
+          id: 'null',
+          name: 'Nenhum usuário atribuído a esta tarefa',
+          email: 'null',
+        },
+      };
+
+      mockTaskService.unassign.mockResolvedValue(expectedResult);
+
+      const response = await controller.unassign('task1');
+
+      expect(response.task).toEqual(expectedResult);
+      expect(mockTaskService.unassign).toHaveBeenCalledWith('task1');
     });
   });
 
