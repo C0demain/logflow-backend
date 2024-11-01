@@ -8,6 +8,7 @@ import { ServiceOrderService } from 'src/modules/service-order/service-order.ser
 import { UserService } from 'src/modules/user/user.service';
 import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { TaskStage } from './enums/task.stage.enum';
 
 @Injectable()
 export class TaskService {
@@ -46,7 +47,7 @@ export class TaskService {
     return parseToGetTaskDTO(createdTask);
   }
 
-  async findAll(filters: { title?: string, assignedUserId?: string, serviceOrderId?: string, completedAt?: Date, sector?: Sector }) {
+  async findAll(filters: { title?: string, assignedUserId?: string, serviceOrderId?: string, completedAt?: Date, sector?: Sector, stage?:TaskStage }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<Task> = {}
 
@@ -68,6 +69,10 @@ export class TaskService {
 
     if (filters.serviceOrderId) {
       where.serviceOrder = { id: filters.serviceOrderId }
+    }
+
+    if(filters.stage){
+      where.stage = filters.stage;
     }
 
 

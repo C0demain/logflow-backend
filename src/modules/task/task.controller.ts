@@ -6,6 +6,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskService } from './task.service';
 import { AssignUserDto } from './dto/assign-user.dto';
+import { TaskStage } from './enums/task.stage.enum';
 
 @Controller('/api/v1/task')
 @ApiBearerAuth()
@@ -43,9 +44,10 @@ export class TaskController {
     @Query('assignedUserId') assignedUserId?: string,
     @Query('serviceOrderId') serviceOrderId?: string,
     @Query('completed') completedAt?: Date,
-    @Query('sector') sector?: Sector
+    @Query('sector') sector?: Sector,
+    @Query('stage') stage?: TaskStage
   ) {
-    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId, completedAt, sector });
+    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId, completedAt, sector, stage });
     return {
       message: 'Tarefas obtidas com sucesso.',
       tasks
