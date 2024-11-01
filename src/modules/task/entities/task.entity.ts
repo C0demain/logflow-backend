@@ -51,7 +51,7 @@ export class Task {
     @JoinColumn({ name: 'role_name', referencedColumnName: 'name' })
     role: RoleEntity;
 
-    @OneToMany(() => FileEntity, (file) => file.task)
+    @OneToMany(() => FileEntity, (file) => file.task, {eager: true, nullable: true})
     files: FileEntity[];
 
     @CreateDateColumn()

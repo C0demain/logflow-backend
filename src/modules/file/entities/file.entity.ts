@@ -23,6 +23,6 @@ export class FileEntity {
   @ManyToOne(() => UserEntity, (user) => user.files, { eager: true , nullable: true})
   user: UserEntity;
 
-  @ManyToOne(() => Task, (task) => task.files, { eager: true, nullable: true})
+  @ManyToOne(() => Task, (task) => task.files)
   task: Task
 }
