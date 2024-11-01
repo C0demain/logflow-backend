@@ -219,6 +219,16 @@ export class TaskService {
 
   }
 
+  async updateDueDate(id: string, dueDate: Date) {
+    const task = await this.taskRepository.findOne({ where: { id } });
+    if (!task) {
+        throw new NotFoundException('Task not found');
+    }
+    task.dueDate = dueDate;
+    return this.taskRepository.save(task);
+}
+
+
   async remove(id: string) {
     const task = await this.taskRepository.findOneBy({ id })
 

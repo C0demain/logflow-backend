@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AuthenticationGuard } from 'src/modules/auth/authentication.guard';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
@@ -133,6 +133,21 @@ export class TaskController {
     }
   }
 
+  @Patch(':id/dueDate')
+  @ApiOperation({summary: 'adicionar data de previsão a uma tarefa ja existente'})
+  async dueDate(@Param('id') id: string, @Body('date') date: string ){
+    const parsedDueDate = this.parseBrazilianDate(date);
+    if (!parsedDueDate) {
+        throw new BadRequestException('Data inválida. Use o formato DD/MM/YYYY.');
+    }
+    const task = await this.taskService.updateDueDate(id, parsedDueDate);
+    return{
+      message: 'valor atribuido a tarefa',
+      task
+    }
+  }
+
+
   @Delete(':id')
   @ApiOperation({summary: 'Deletar uma tarefa'})
   async remove(@Param('id') id: string) {
@@ -142,4 +157,10 @@ export class TaskController {
       task
     }
   }
+
+  private parseBrazilianDate(dateStr: string): Date | null {
+    const [day, month, year] = dateStr.split('/').map(Number);
+    if (!day || !month || !year) return null;
+    return new Date(year, month - 1, day);
+}
 }

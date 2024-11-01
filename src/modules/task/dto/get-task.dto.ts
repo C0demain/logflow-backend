@@ -8,6 +8,7 @@ export class GetTaskDto {
     readonly sector: Sector;
     readonly startedAt: Date | null;
     readonly completedAt: Date | null;
+    readonly dueDate?: Date | null;
     readonly stage: TaskStage;
     readonly taskCost: number | null;
     readonly serviceOrder?: {
@@ -38,6 +39,7 @@ export class GetTaskDto {
         title: string,
         startedAt: Date | null,
         completedAt: Date | null,
+        dueDate: Date | null,
         sector: Sector,
         stage: TaskStage,
         taskCost: number | null,
@@ -69,6 +71,7 @@ export class GetTaskDto {
         this.title = title;
         this.startedAt = startedAt;
         this.completedAt = completedAt;
+        this.dueDate = dueDate;
         this.sector = sector;
         this.stage = stage;
         this.taskCost = taskCost;
@@ -116,7 +119,8 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
         task.id, 
         task.title, 
         task.startedAt, 
-        task.completedAt, 
+        task.completedAt,
+        task.dueDate, 
         task.sector,
         task.stage,
         task.taskCost,

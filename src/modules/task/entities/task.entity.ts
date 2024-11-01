@@ -28,6 +28,10 @@ export class Task {
 
     @Column({name: 'completed_at', type:"timestamptz", nullable: true})
     completedAt: Date | null;
+
+    @Column({name: 'dueDate', type: 'timestamptz', nullable: true})
+    dueDate: Date | null;
+    
     @Column({ name: 'stage', type: 'enum', enum: TaskStage, nullable: false })
     stage: TaskStage;
 

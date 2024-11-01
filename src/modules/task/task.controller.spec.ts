@@ -81,6 +81,7 @@ describe('TaskController', () => {
         'Task1',
         null,
         null,
+        null,
         Sector.OPERACIONAL,
         TaskStage.SALE_COMPLETED,
         null,
@@ -163,6 +164,7 @@ describe('TaskController', () => {
       const expectedResult: GetTaskDto = new GetTaskDto(
         'task1',
         'Task1',
+        null,
         null,
         null,
         Sector.OPERACIONAL,
