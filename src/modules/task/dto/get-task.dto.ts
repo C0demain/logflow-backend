@@ -28,6 +28,10 @@ export class GetTaskDto {
         number: string,
         complement?: string,
     }
+    readonly files?: Array<{
+        id: string,
+        filename: string,
+    }>
 
     constructor(
         id: string,
@@ -54,7 +58,11 @@ export class GetTaskDto {
             street: string,
             number: string,
             complement?: string,
-        }
+        },
+        files?: Array<{
+            id: string,
+            filename: string,
+        }>
         
     ) {
         this.id = id;
@@ -67,6 +75,7 @@ export class GetTaskDto {
         this.assignedUser = assignedUser;
         this.serviceOrder = serviceOrder;
         this.address = address;
+        this.files = files
     };
 }
 
@@ -95,6 +104,13 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
         number: task.address.number,
         complement: task.address.complement,
     } : undefined;
+
+    const files = task.files && task.files.map(f => {
+        return {
+            id: f.id,
+            filename: f.filename,
+        }
+    })
     
     return new GetTaskDto(
         task.id, 
@@ -106,6 +122,7 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
         task.taskCost,
         assignedUser, 
         serviceOrder, 
-        address
+        address,
+        files
     );
 }
