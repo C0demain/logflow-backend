@@ -206,6 +206,19 @@ export class TaskService {
     return parseToGetTaskDTO(unassignedTask);
   }
 
+  async addCost(id:string, cost: number){
+    const task = await this.taskRepository.findOneBy({id});
+
+    if (task === null) {
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
+    }
+
+    task.taskCost = cost;
+    const updatedTask = await this.taskRepository.save(task);
+    return parseToGetTaskDTO(updatedTask);
+
+  }
+
   async remove(id: string) {
     const task = await this.taskRepository.findOneBy({ id })
 

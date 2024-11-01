@@ -83,6 +83,7 @@ describe('TaskController', () => {
         null,
         Sector.OPERACIONAL,
         TaskStage.SALE_COMPLETED,
+        null,
         {
           id: 'user1',
           name: 'User1',
@@ -116,6 +117,7 @@ describe('TaskController', () => {
           completedAt: null,
           sector: Sector.OPERACIONAL,
           stage: TaskStage.SALE_COMPLETED,
+          taskCost: null,
           serviceOrder: mockedServiceOrder,
           assignedUser: mockedUser,
         },
@@ -141,6 +143,7 @@ describe('TaskController', () => {
         completedAt: null,
         sector: Sector.OPERACIONAL,
         stage: TaskStage.SALE_COMPLETED,
+        taskCost: null,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };
@@ -164,6 +167,7 @@ describe('TaskController', () => {
         null,
         Sector.OPERACIONAL,
         TaskStage.SALE_COMPLETED,
+        null,
         {
           id: 'user1',
           name: 'User1',
@@ -218,6 +222,7 @@ describe('TaskController', () => {
         completedAt: null,
         stage: TaskStage.SALE_COMPLETED,
         sector: Sector.OPERACIONAL,
+        taskCost: null,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };
@@ -241,6 +246,7 @@ describe('TaskController', () => {
         completedAt: new Date(),
         sector: Sector.OPERACIONAL,
         stage: TaskStage.SALE_COMPLETED,
+        taskCost: null,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };
@@ -264,6 +270,7 @@ describe('TaskController', () => {
         completedAt: null,
         sector: Sector.OPERACIONAL,
         stage: TaskStage.SALE_COMPLETED,
+        taskCost: null,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };
@@ -289,6 +296,7 @@ describe('TaskController', () => {
         completedAt: null,
         sector: Sector.OPERACIONAL,
         stage: TaskStage.SALE_COMPLETED,
+        taskCost: null,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };
@@ -313,6 +321,7 @@ describe('TaskController', () => {
         completedAt: null,
         sector: Sector.OPERACIONAL,
         stage: TaskStage.SALE_COMPLETED,
+        taskCost: null,
         serviceOrder: mockedServiceOrder,
         assignedUser: {
           id: 'null',
@@ -339,6 +348,7 @@ describe('TaskController', () => {
         completedAt: null,
         sector: Sector.OPERACIONAL,
         stage: TaskStage.SALE_COMPLETED,
+        taskCost: null,
         serviceOrder: mockedServiceOrder,
         assignedUser: mockedUser,
       };

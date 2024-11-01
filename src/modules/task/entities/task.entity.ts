@@ -37,6 +37,9 @@ export class Task {
     @ManyToOne(() => ServiceOrder, serviceOrder => serviceOrder.tasks, {eager:true})
     serviceOrder: ServiceOrder;
 
+    @Column({name: 'taskCost', type: 'numeric', nullable: true})
+    taskCost: number;
+
     @ManyToOne(() => UserEntity, user => user.tasks, {eager:true})
     @JoinColumn({ name: 'assignedUserId'})
     assignedUser: UserEntity | null;

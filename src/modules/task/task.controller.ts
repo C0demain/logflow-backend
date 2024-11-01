@@ -123,6 +123,16 @@ export class TaskController {
     }
   }
 
+  @Patch(':id/cost')
+  @ApiOperation({summary: 'adicionar custo a uma tarefa ja existente'})
+  async addCost(@Param('id') id: string, @Body('value') value: number){
+    const task = await this.taskService.addCost(id, value);
+    return{
+      message: 'valor atribuido a tarefa',
+      task
+    }
+  }
+
   @Delete(':id')
   @ApiOperation({summary: 'Deletar uma tarefa'})
   async remove(@Param('id') id: string) {
