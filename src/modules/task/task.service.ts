@@ -9,6 +9,7 @@ import { UserService } from 'src/modules/user/user.service';
 import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { TaskStage } from './enums/task.stage.enum';
+import { FilterTasksDto } from './dto/filter-tasks.dto';
 
 @Injectable()
 export class TaskService {
@@ -17,7 +18,7 @@ export class TaskService {
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
     private readonly serviceOrderService: ServiceOrderService,
     private readonly userService: UserService,
-  ) {}
+  ) { }
 
   async create(createTaskDto: CreateTaskDto) {
     const taskDb = new Task();
@@ -37,7 +38,7 @@ export class TaskService {
     taskDb.serviceOrder = serviceOrder;
     taskDb.sector = createTaskDto.sector;
     taskDb.stage = createTaskDto.stage;
-    
+
     // Opcionais
     taskDb.assignedUser = userId;
     taskDb.role = userId.role;
@@ -47,7 +48,7 @@ export class TaskService {
     return parseToGetTaskDTO(createdTask);
   }
 
-  async findAll(filters: { title?: string, assignedUserId?: string, serviceOrderId?: string, completedAt?: Date, sector?: Sector, stage?:TaskStage }) {
+  async findAll(filters: { title?: string, assignedUserId?: string, serviceOrderId?: string, completedAt?: Date, sector?: Sector, stage?: TaskStage }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<Task> = {}
 
@@ -71,12 +72,12 @@ export class TaskService {
       where.serviceOrder = { id: filters.serviceOrderId }
     }
 
-    if(filters.stage){
+    if (filters.stage) {
       where.stage = filters.stage;
     }
 
 
-    const tasks = await this.taskRepository.find({ where, order: {createdAt: "asc"} })
+    const tasks = await this.taskRepository.find({ where, order: { createdAt: "asc" } })
 
     const taskList = tasks.map(task => {
       const parsedTask = parseToGetTaskDTO(task)
@@ -96,6 +97,26 @@ export class TaskService {
 
     const parsedTask = parseToGetTaskDTO(task)
     return parsedTask
+  }
+
+  async countOverdueTasks(filters: FilterTasksDto): Promise<number> {
+    const query = this.taskRepository.createQueryBuilder('task');
+
+    if (filters.dueDate) {
+      // Busca tarefas que estão atrasadas filtrando pela data de vencimento
+      query.andWhere('task.completedAt > task.dueDate AND task.dueDate = :dueDate', { dueDate: filters.dueDate });
+    }
+
+    if (filters.sector) {
+      //Busca tarefas que estão atrasadas filtrando pelo setor
+      query.andWhere('task.sector = :sector', { sector: filters.sector });
+    }
+
+    // Busca somente as tarefas atrasadas
+    query.andWhere('task.completedAt > task.dueDate');
+
+    const count = await query.getCount();
+    return count;
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {
@@ -130,13 +151,17 @@ export class TaskService {
     if (user) {
       task.assignedUser = user;
     }
-
     if (updateTaskDto.completedAt !== undefined) {
       task.completedAt = updateTaskDto.completedAt;
     }
-
+    if (updateTaskDto.startedAt !== undefined) {
+      task.startedAt = updateTaskDto.startedAt;
+    }
+    if (updateTaskDto.dueDate !== undefined) {
+      task.dueDate = updateTaskDto.dueDate;
+    }
     if (updateTaskDto.address) {
-      task.address = updateTaskDto.address; 
+      task.address = updateTaskDto.address;
     }
 
     const updatedTask = await this.taskRepository.save(task);
@@ -211,8 +236,8 @@ export class TaskService {
     return parseToGetTaskDTO(unassignedTask);
   }
 
-  async addCost(id:string, cost: number){
-    const task = await this.taskRepository.findOneBy({id});
+  async addCost(id: string, cost: number) {
+    const task = await this.taskRepository.findOneBy({ id });
 
     if (task === null) {
       throw new NotFoundException(`Tarefa com id ${id} não encontrada`);
@@ -227,12 +252,11 @@ export class TaskService {
   async updateDueDate(id: string, dueDate: Date) {
     const task = await this.taskRepository.findOne({ where: { id } });
     if (!task) {
-        throw new NotFoundException('Task not found');
+      throw new NotFoundException('Task not found');
     }
     task.dueDate = dueDate;
     return this.taskRepository.save(task);
-}
-
+  }
 
   async remove(id: string) {
     const task = await this.taskRepository.findOneBy({ id })

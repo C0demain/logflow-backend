@@ -7,6 +7,7 @@ import { AddressDto } from '../client/dto/address.dto';
 import { TaskStage } from './enums/task.stage.enum';
 import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
+import { FilterTasksDto } from './dto/filter-tasks.dto';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -37,6 +38,7 @@ describe('TaskController', () => {
     create: jest.fn(),
     findAll: jest.fn(),
     findById: jest.fn(),
+    countOverdueTasks: jest.fn(),
     update: jest.fn(),
     start: jest.fn(),
     complete: jest.fn(),
@@ -159,6 +161,23 @@ describe('TaskController', () => {
     });
   });
 
+  describe('getOverdueTasksCount', () => {
+    it('should return the number of tasks completed after due date', async () => {
+      const filters: FilterTasksDto = {
+        dueDate: '2024-02-01',
+        sector: Sector.OPERACIONAL,
+      };
+
+      const expectedCount = 5;
+      mockTaskService.countOverdueTasks.mockResolvedValue(expectedCount);
+
+      const response = await controller.getOverdueTasksCount(filters);
+
+      expect(response.count).toEqual(expectedCount);
+      expect(mockTaskService.countOverdueTasks).toHaveBeenCalledWith(filters);
+    });
+  });
+
   describe('update', () => {
     it('should update task by id, with optional address', async () => {
       const expectedResult: GetTaskDto = new GetTaskDto(
@@ -195,6 +214,7 @@ describe('TaskController', () => {
       const updateTaskDto = {
         title: 'Task1',
         startedAt: new Date(),
+        dueDate: new Date(),
         completedAt: new Date(),
         userId: mockedUser.id,
         orderId: 'order1',
