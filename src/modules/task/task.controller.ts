@@ -7,21 +7,22 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskService } from './task.service';
 import { AssignUserDto } from './dto/assign-user.dto';
 import { TaskStage } from './enums/task.stage.enum';
+import { FilterTasksDto } from './dto/filter-tasks.dto';
 
 @Controller('/api/v1/task')
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard)
 @ApiTags('task')
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(private readonly taskService: TaskService) { }
 
   @Post()
-  @ApiOperation({summary: 'Criar tarefa'})
+  @ApiOperation({ summary: 'Criar tarefa' })
   @ApiQuery({ name: 'title', required: true })
   @ApiQuery({ name: 'orderId', required: true })
-  @ApiQuery({ name: 'sector', required: true})
+  @ApiQuery({ name: 'sector', required: true })
   @ApiQuery({ name: 'stage', required: true })
-  @ApiQuery({ name: 'role', required: false})
+  @ApiQuery({ name: 'role', required: false })
   @ApiQuery({ name: 'userId', required: false })
   @ApiQuery({ name: 'completed', required: false })
   async create(@Body() createTaskDto: CreateTaskDto) {
@@ -33,12 +34,12 @@ export class TaskController {
   }
 
   @Get()
-  @ApiOperation({summary: 'Listar todas as tarefas'})
-  @ApiQuery({name: 'title', required: false})
-  @ApiQuery({name: 'completed', required: false})
-  @ApiQuery({name: 'sector', required: false})
-  @ApiQuery({name: 'assignedUserId', required: false})
-  @ApiQuery({name: 'serviceOrderId', required: false})
+  @ApiOperation({ summary: 'Listar todas as tarefas' })
+  @ApiQuery({ name: 'title', required: false })
+  @ApiQuery({ name: 'completed', required: false })
+  @ApiQuery({ name: 'sector', required: false })
+  @ApiQuery({ name: 'assignedUserId', required: false })
+  @ApiQuery({ name: 'serviceOrderId', required: false })
   async findAll(
     @Query('title') title?: string,
     @Query('assignedUserId') assignedUserId?: string,
@@ -55,18 +56,28 @@ export class TaskController {
   }
 
   @Get(':id')
-  @ApiOperation({summary: 'Retornar uma tarefa de acordo com id'})
+  @ApiOperation({ summary: 'Retornar uma tarefa de acordo com id' })
   async findById(@Param('id') id: string) {
     const task = await this.taskService.findById(id)
     return {
       message: 'Tarefa obtida com sucesso.',
       task
     }
-      
+
+  }
+
+  @Get('overdue/count')
+  @ApiOperation({ summary: 'Listar as tarefas com atraso através de filtros de setor e período' })
+  @ApiQuery({ name: 'dueDate', required: false })
+  @ApiQuery({ name: 'sector', required: false })
+  async getOverdueTasksCount(@Query() filters: FilterTasksDto): Promise<{ count: number }> {
+    const count = await this.taskService.countOverdueTasks(filters);
+
+    return { count };
   }
 
   @Put(':id')
-  @ApiOperation({summary: 'Atualizar uma tarefa'})
+  @ApiOperation({ summary: 'Atualizar uma tarefa' })
   async update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
     const task = await this.taskService.update(id, updateTaskDto)
     return {
@@ -76,7 +87,7 @@ export class TaskController {
   }
 
   @Patch(':id/start')
-  @ApiOperation({summary: 'Iniciar uma tarefa'})
+  @ApiOperation({ summary: 'Iniciar uma tarefa' })
   async start(@Param('id') id: string) {
     const task = await this.taskService.start(id)
     return {
@@ -86,7 +97,7 @@ export class TaskController {
   }
 
   @Patch(':id/complete')
-  @ApiOperation({summary: 'Concluir uma tarefa'})
+  @ApiOperation({ summary: 'Concluir uma tarefa' })
   async complete(@Param('id') id: string) {
     const task = await this.taskService.complete(id)
     return {
@@ -96,7 +107,7 @@ export class TaskController {
   }
 
   @Patch(':id/uncomplete')
-  @ApiOperation({summary: 'Desfazer a conclusão de uma tarefa'})
+  @ApiOperation({ summary: 'Desfazer a conclusão de uma tarefa' })
   async uncomplete(@Param('id') id: string) {
     const task = await this.taskService.uncomplete(id)
     return {
@@ -106,7 +117,7 @@ export class TaskController {
   }
 
   @Patch(':id/assign')
-  @ApiOperation({summary: 'Atribuir um usuário a uma tarefa'})
+  @ApiOperation({ summary: 'Atribuir um usuário a uma tarefa' })
   async assign(@Param('id') id: string, @Body() userId: AssignUserDto) {
     const task = await this.taskService.assign(id, userId)
     return {
@@ -116,7 +127,7 @@ export class TaskController {
   }
 
   @Patch(':id/unassign')
-  @ApiOperation({summary: 'Desatribuir um usuário de uma tarefa'})
+  @ApiOperation({ summary: 'Desatribuir um usuário de uma tarefa' })
   async unassign(@Param('id') id: string) {
     const task = await this.taskService.unassign(id)
     return {
@@ -126,24 +137,24 @@ export class TaskController {
   }
 
   @Patch(':id/cost')
-  @ApiOperation({summary: 'adicionar custo a uma tarefa ja existente'})
-  async addCost(@Param('id') id: string, @Body('value') value: number){
+  @ApiOperation({ summary: 'adicionar custo a uma tarefa ja existente' })
+  async addCost(@Param('id') id: string, @Body('value') value: number) {
     const task = await this.taskService.addCost(id, value);
-    return{
+    return {
       message: 'valor atribuido a tarefa',
       task
     }
   }
 
   @Patch(':id/dueDate')
-  @ApiOperation({summary: 'adicionar data de previsão a uma tarefa ja existente'})
-  async dueDate(@Param('id') id: string, @Body('date') date: string ){
+  @ApiOperation({ summary: 'adicionar data de previsão a uma tarefa ja existente' })
+  async dueDate(@Param('id') id: string, @Body('date') date: string) {
     const parsedDueDate = this.parseBrazilianDate(date);
     if (!parsedDueDate) {
-        throw new BadRequestException('Data inválida. Use o formato DD/MM/YYYY.');
+      throw new BadRequestException('Data inválida. Use o formato DD/MM/YYYY.');
     }
     const task = await this.taskService.updateDueDate(id, parsedDueDate);
-    return{
+    return {
       message: 'valor atribuido a tarefa',
       task
     }
@@ -151,7 +162,7 @@ export class TaskController {
 
 
   @Delete(':id')
-  @ApiOperation({summary: 'Deletar uma tarefa'})
+  @ApiOperation({ summary: 'Deletar uma tarefa' })
   async remove(@Param('id') id: string) {
     const task = await this.taskService.remove(id)
     return {
@@ -164,5 +175,5 @@ export class TaskController {
     const [day, month, year] = dateStr.split('/').map(Number);
     if (!day || !month || !year) return null;
     return new Date(year, month - 1, day);
-}
+  }
 }

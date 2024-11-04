@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { AddressDto } from '../client/dto/address.dto';
 import { TaskStage } from './enums/task.stage.enum';
 import { TaskService } from './task.service';
+import { FilterTasksDto } from './dto/filter-tasks.dto';
 
 describe('TaskService', () => {
   let service: TaskService;
@@ -23,6 +24,9 @@ describe('TaskService', () => {
     find: jest.fn(),
     findOneBy: jest.fn(),
     delete: jest.fn(),
+    createQueryBuilder: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    getCount: jest.fn(),
   };
 
   const mockedUser = {
@@ -247,6 +251,26 @@ describe('TaskService', () => {
     });
   });
 
+  describe('countOverdueTasks', () => {
+    it('should return the count of overdue tasks', async () => {
+      const filters = { 
+        dueDate: '2024-02-01', 
+        sector: Sector.OPERACIONAL 
+      };
+      
+      const expectedCount = 5; 
+  
+      mockRepository.getCount.mockResolvedValue(expectedCount);
+  
+      const count = await service.countOverdueTasks(filters);
+  
+      expect(count).toBe(expectedCount);
+      expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('task');
+      expect(mockRepository.andWhere).toHaveBeenCalledTimes(3);
+      expect(mockRepository.getCount).toHaveBeenCalled();
+    });
+  });
+
   describe('update', () => {
     it('should update a task by id', async () => {
       const expectedResult = {
@@ -268,6 +292,7 @@ describe('TaskService', () => {
       const task = await service.update('task1', {
         title: 'Task2',
         startedAt: new Date(),
+        dueDate: new Date(),
         completedAt: new Date(),
         userId: 'user1',
         orderId: 'order1',
@@ -295,6 +320,7 @@ describe('TaskService', () => {
         service.update('task1', {
           title: 'Task2',
           startedAt: new Date(),
+          dueDate: new Date(),
           completedAt: new Date(),
           userId: 'user1',
           orderId: 'order2',
