@@ -16,6 +16,7 @@ describe('ServiceOrderController', () => {
     findAll: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
+    getLogs: jest.fn()
   };
 
   beforeEach(async () => {
@@ -246,6 +247,55 @@ describe('ServiceOrderController', () => {
       expect(mockServiceOrderService.update).toHaveBeenCalledWith('uuid', updateServiceOrderDto);
     });
   });
+
+  describe('findAllLogs', () => {
+    it('should return all logs of service orders', async () => {
+      const logs = [
+        {
+          id: 'log-1',
+          changedTo: Sector.OPERACIONAL,
+          creationDate: new Date(),
+        },
+      ];
+
+      mockServiceOrderService.getLogs.mockResolvedValue(logs);
+
+      const response = await controller.findAllLogs();
+
+      expect(response.message).toEqual('Logs de ordens de serviço encontrados.');
+      expect(response.logs).toEqual(logs);
+    });
+
+    it('should return a message when no logs are found', async () => {
+      mockServiceOrderService.getLogs.mockResolvedValue([]);
+
+      const response = await controller.findAllLogs();
+
+      expect(response.message).toEqual('Nenhum log de ordem de serviço encontrado.');
+      expect(response.logs).toEqual([]);
+    });
+
+    it('should apply filters and return filtered logs', async () => {
+      const logs = [
+        {
+          id: 'log-1',
+          changedTo: Sector.OPERACIONAL,
+          creationDate: new Date(),
+        },
+      ];
+
+      mockServiceOrderService.getLogs.mockResolvedValue(logs);
+
+      const response = await controller.findAllLogs('log-1', 'order-123', Sector.OPERACIONAL);
+
+      expect(response.logs).toEqual(logs);
+      expect(mockServiceOrderService.getLogs).toHaveBeenCalledWith({
+        id: 'log-1',
+        serviceOrderId: 'order-123',
+        changedTo: Sector.OPERACIONAL,
+      });
+    });
+  })
 
   describe('remove', () => {
     it('should delete the service order and return it', async () => {

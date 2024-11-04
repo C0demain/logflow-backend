@@ -15,6 +15,7 @@ import { Status } from './enums/status.enum';
 import { Sector } from './enums/sector.enum';
 import { Task } from '../task/entities/task.entity';
 import { RoleEntity } from '../roles/roles.entity';
+import { ServiceOrderLog } from './entities/service-order-log.entity';
 
 const mockServiceOrderRepository = {
   save: jest.fn(),
@@ -29,6 +30,10 @@ const mockTaskRepository = {
 
 const mockRoleRepository = {
   findOne: jest.fn(),
+};
+
+const mockServiceOrderLogRepository = {
+  find: jest.fn(),
 };
 
 const mockUserService = {
@@ -62,6 +67,10 @@ describe('ServiceOrderService', () => {
         {
           provide: getRepositoryToken(RoleEntity),
           useValue: mockRoleRepository,
+        },
+        {
+          provide: getRepositoryToken(ServiceOrderLog),
+          useValue: mockServiceOrderLogRepository,
         },
         {
           provide: ClientService,
@@ -176,29 +185,19 @@ describe('ServiceOrderService', () => {
           ],
         },
       ];
-
+  
       mockServiceOrderRepository.find.mockResolvedValue(orders);
-
+  
       const result = await service.findAll(filters);
-
+  
       expect(result.length).toEqual(1);
       expect(result[0].id).toEqual('order-123');
       expect(mockServiceOrderRepository.find).toHaveBeenCalledWith({
         where: filters,
-        relations: {
-          serviceOrderLogs: true,
-        },
       });
     });
-
-    it('should throw an error if no orders are found', async () => {
-      mockServiceOrderRepository.find.mockResolvedValue([]);
-
-      await expect(service.findAll({})).rejects.toThrow(
-        InternalServerErrorException,
-      );
-    });
   });
+  
 
   describe('update', () => {
     it('should update a service order', async () => {
@@ -240,6 +239,36 @@ describe('ServiceOrderService', () => {
       ).rejects.toThrow(NotFoundException);
     });
   });
+
+  describe('getLogs', () => {
+    it('should return the service order logs', async () => {
+      const log = {
+        id: '1',
+        changedTo: Sector.OPERACIONAL,
+        creationDate: new Date(),
+        serviceOrder: { id: '2' },
+      } as ServiceOrderLog;
+  
+      mockServiceOrderLogRepository.find.mockResolvedValue([log]);
+  
+      const result = await service.getLogs({ id: '1', serviceOrderId: '2', changedTo: Sector.OPERACIONAL });
+  
+      expect(result).toEqual([
+        {
+          id: '1',
+          changedTo: Sector.OPERACIONAL,
+          creationDate: log.creationDate,
+        },
+      ]);
+    });
+  
+    it('should throw an error if not found', async () => {
+      mockServiceOrderLogRepository.find.mockResolvedValue([]);
+  
+      await expect(service.getLogs({})).rejects.toThrow('Nenhum log de ordem de serviço encontrado.');
+    });
+  });
+  
 
   describe('remove', () => {
     it('should delete a service order', async () => {

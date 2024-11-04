@@ -234,13 +234,16 @@ export class ServiceOrderService {
       relations: ['serviceOrder'],
     });
   
+    if (logs.length === 0) {
+      throw new NotFoundException('Nenhum log de ordem de serviço encontrado.');
+    }
+  
     return logs.map(log => ({
       id: log.id,
       changedTo: log.changedTo,
       creationDate: log.creationDate,
     }));
   }
-  
   
   async remove(id: string) {
     const orderFound = await this.serviceOrderRepository.findOne({
