@@ -17,6 +17,7 @@ import { ClientModule } from './modules/client/client.module';
 import { TaskModule } from './modules/task/task.module';
 import { RolesModule } from './modules/roles/roles.module'; 
 import { FileModule } from './modules/file/file.module';
+import { ProcessModule } from './modules/process/process.module';
 
 
 @Module({
@@ -36,6 +37,7 @@ import { FileModule } from './modules/file/file.module';
     TaskModule,
     RolesModule,
     FileModule,
+    ProcessModule,
   ],
   controllers: [RedirectController],
   providers: [

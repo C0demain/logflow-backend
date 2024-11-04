@@ -14,6 +14,7 @@ import {
     OneToMany,
 } from "typeorm";
 import { TaskStage } from "../enums/task.stage.enum";
+import { Process } from "src/modules/process/entities/process.entity";
 
 @Entity({name: 'task'})
 export class Task {
@@ -39,7 +40,7 @@ export class Task {
     sector: Sector;
 
     @ManyToOne(() => ServiceOrder, serviceOrder => serviceOrder.tasks, {eager:true})
-    serviceOrder: ServiceOrder;
+    serviceOrder?: ServiceOrder;
 
     @Column({name: 'taskCost', type: 'numeric', nullable: true})
     taskCost: number;
@@ -54,6 +55,9 @@ export class Task {
     @ManyToOne(() => RoleEntity, { eager: true , nullable:true})
     @JoinColumn({ name: 'role_name', referencedColumnName: 'name' })
     role: RoleEntity;
+
+    @ManyToOne(() => Process, process => process.tasks)
+    process: Process
 
     @OneToMany(() => FileEntity, (file) => file.task, {eager: true, nullable: true})
     files: FileEntity[];
