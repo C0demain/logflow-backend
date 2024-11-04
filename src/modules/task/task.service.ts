@@ -9,6 +9,7 @@ import {
   MoreThan,
   MoreThanOrEqual,
   Between,
+  LessThanOrEqual,
 } from 'typeorm';
 import { ServiceOrderService } from 'src/modules/service-order/service-order.service';
 import { UserService } from 'src/modules/user/user.service';
@@ -75,10 +76,18 @@ export class TaskService {
 
     if (filters.completedFrom && filters.completedTo) {
       where.completedAt = Between(filters.completedFrom, filters.completedTo);
+    } else if (filters.completedFrom) {
+      where.completedAt = MoreThanOrEqual(filters.completedFrom);
+    } else if (filters.completedTo) {
+      where.completedAt = LessThanOrEqual(filters.completedTo);
     }
 
     if (filters.startedFrom && filters.startedTo) {
       where.startedAt = Between(filters.startedFrom, filters.startedTo);
+    } else if (filters.startedFrom) {
+      where.startedAt = MoreThanOrEqual(filters.startedFrom);
+    } else if (filters.startedTo) {
+      where.startedAt = LessThanOrEqual(filters.startedTo);
     }
 
     if (filters.sector) {
