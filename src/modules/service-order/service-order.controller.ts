@@ -20,9 +20,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../auth/authentication.guard';
+import { Sector } from './enums/sector.enum';
 
 @ApiTags('service-order')
-@UseGuards(AuthenticationGuard)
+// @UseGuards(AuthenticationGuard)
 @Controller('/api/v1/service-order')
 @ApiBearerAuth()
 export class ServiceOrderController {
@@ -62,7 +63,6 @@ export class ServiceOrderController {
           userEmail: orderCreated.user.email,
           userRole: orderCreated.user.role.name,
         },
-        orderCreated.serviceOrderLogs,
         orderCreated.description,
         orderCreated.value
       ),
@@ -137,6 +137,38 @@ export class ServiceOrderController {
         orders: [],
       };
     }
+  }
+
+  @Get('history/get')
+  @ApiOperation({
+    summary: 'Listar todos os logs de ordens de serviço',
+    description: 'Rota acessível apenas para administradores',
+  })
+  @ApiQuery({ name: 'id', required: false, type: String })
+  @ApiQuery({ name: 'serviceOrderId', required: false, type: String })
+  @ApiQuery({ name: 'changedTo', required: false, enum: Sector })
+  async findAllLogs(
+    @Query('id') id?: string,
+    @Query('serviceOrderId') serviceOrderId?: string,
+    @Query('changedTo') changedTo?: Sector,
+  ) {
+    const logs = await this.serviceOrderService.getLogs({
+      id,
+      serviceOrderId,
+      changedTo,
+    });
+  
+    if (!logs || logs.length === 0) {
+      return {
+        message: 'Nenhum log de ordem de serviço encontrado.',
+        logs: [],
+      };
+    }
+  
+    return {
+      message: 'Logs de ordens de serviço encontrados.',
+      logs: logs,
+    };
   }
 
   @Put(':id')

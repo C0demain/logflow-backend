@@ -8,10 +8,11 @@ import { ClientModule } from '../client/client.module';
 import { TaskModule } from '../task/task.module';
 import { Task } from '../task/entities/task.entity';
 import { RoleEntity } from '../roles/roles.entity';
+import { ServiceOrderLog } from './entities/service-order-log.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ServiceOrder,Task,RoleEntity]),
+    TypeOrmModule.forFeature([ServiceOrder,Task,RoleEntity, ServiceOrderLog]),
     UserModule,
     ClientModule,
     forwardRef(() => TaskModule)

@@ -19,10 +19,6 @@ export class ListServiceOrderDto {
       userEmail: string;
       userRole?: string;
     },
-    readonly logs?: {
-      changedTo?: Sector;
-      atDate?: Date;
-    }[],
     readonly description?: string,
     readonly value?: Number,
   ) {}

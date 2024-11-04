@@ -25,6 +25,8 @@ export class ServiceOrderService {
     private readonly serviceOrderRepository: Repository<ServiceOrder>,
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
+    @InjectRepository(ServiceOrderLog)
+    private readonly logsRepository: Repository<ServiceOrderLog>,
     @InjectRepository(RoleEntity)
     private roleRepository: Repository<RoleEntity>,
     private readonly userService: UserService,
@@ -130,9 +132,6 @@ export class ServiceOrderService {
 
     const orders = await this.serviceOrderRepository.find({
       where,
-      relations: {
-        serviceOrderLogs: true,
-      },
     });
 
     if (!orders || orders.length === 0) {
@@ -161,10 +160,6 @@ export class ServiceOrderService {
           userEmail: user.email,
           userRole: user.role.name,
         },
-        serviceOrder.serviceOrderLogs.map((log) => ({
-          changedTo: log.changedTo,
-          atDate: log.creationDate,
-        })),
         serviceOrder.description,
         serviceOrder.value
       );
@@ -215,6 +210,38 @@ export class ServiceOrderService {
     return await this.serviceOrderRepository.save(orderFound);
   }
 
+  async getLogs(filters: {
+    id?: string;
+    serviceOrderId?: string;
+    changedTo?: Sector;
+  }) {
+    const where: FindOptionsWhere<ServiceOrderLog> = {};
+  
+    if (filters.id) {
+      where.id = filters.id;
+    }
+  
+    if (filters.serviceOrderId) {
+      where.serviceOrder = { id: filters.serviceOrderId };
+    }
+  
+    if (filters.changedTo) {
+      where.changedTo = filters.changedTo;
+    }
+  
+    const logs = await this.logsRepository.find({
+      where,
+      relations: ['serviceOrder'],
+    });
+  
+    return logs.map(log => ({
+      id: log.id,
+      changedTo: log.changedTo,
+      creationDate: log.creationDate,
+    }));
+  }
+  
+  
   async remove(id: string) {
     const orderFound = await this.serviceOrderRepository.findOne({
       where: { id },
