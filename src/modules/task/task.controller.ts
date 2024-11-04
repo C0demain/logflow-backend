@@ -36,19 +36,26 @@ export class TaskController {
   @Get()
   @ApiOperation({ summary: 'Listar todas as tarefas' })
   @ApiQuery({ name: 'title', required: false })
-  @ApiQuery({ name: 'completed', required: false })
-  @ApiQuery({ name: 'sector', required: false })
   @ApiQuery({ name: 'assignedUserId', required: false })
   @ApiQuery({ name: 'serviceOrderId', required: false })
+  @ApiQuery({ name: 'sector', required: false })
+  @ApiQuery({ name: 'stage', required: false })
+  @ApiQuery({ name: 'completedFrom', required: false })
+  @ApiQuery({ name: 'completedTo', required: false })
+  @ApiQuery({ name: 'startedFrom', required: false })
+  @ApiQuery({ name: 'startedTo', required: false })
   async findAll(
     @Query('title') title?: string,
     @Query('assignedUserId') assignedUserId?: string,
     @Query('serviceOrderId') serviceOrderId?: string,
-    @Query('completed') completedAt?: Date,
     @Query('sector') sector?: Sector,
-    @Query('stage') stage?: TaskStage
+    @Query('stage') stage?: TaskStage,
+    @Query('completedFrom') completedFrom?: Date,
+    @Query('completedTo') completedTo?: Date,
+    @Query('startedFrom') startedFrom?: Date,
+    @Query('startedTo') startedTo?: Date,
   ) {
-    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId, completedAt, sector, stage });
+    const tasks = await this.taskService.findAll({ title, assignedUserId, serviceOrderId, sector, stage, completedFrom, completedTo, startedFrom, startedTo });
     return {
       message: 'Tarefas obtidas com sucesso.',
       tasks

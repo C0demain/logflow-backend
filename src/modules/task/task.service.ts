@@ -3,7 +3,13 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from 'src/modules/task/entities/task.entity';
-import { Repository, FindOptionsWhere } from 'typeorm'
+import {
+  Repository,
+  FindOptionsWhere,
+  MoreThan,
+  MoreThanOrEqual,
+  Between,
+} from 'typeorm';
 import { ServiceOrderService } from 'src/modules/service-order/service-order.service';
 import { UserService } from 'src/modules/user/user.service';
 import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
@@ -13,17 +19,18 @@ import { FilterTasksDto } from './dto/filter-tasks.dto';
 
 @Injectable()
 export class TaskService {
-
   constructor(
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
     private readonly serviceOrderService: ServiceOrderService,
     private readonly userService: UserService,
-  ) { }
+  ) {}
 
   async create(createTaskDto: CreateTaskDto) {
     const taskDb = new Task();
 
-    const serviceOrder = await this.serviceOrderService.findById(createTaskDto.orderId);
+    const serviceOrder = await this.serviceOrderService.findById(
+      createTaskDto.orderId,
+    );
     if (serviceOrder === null) {
       throw new NotFoundException('Ordem de serviço não encontrada.');
     }
@@ -48,55 +55,70 @@ export class TaskService {
     return parseToGetTaskDTO(createdTask);
   }
 
-  async findAll(filters: { title?: string, assignedUserId?: string, serviceOrderId?: string, completedAt?: Date, sector?: Sector, stage?: TaskStage }) {
+  async findAll(filters: {
+    title?: string;
+    assignedUserId?: string;
+    serviceOrderId?: string;
+    sector?: Sector;
+    stage?: TaskStage;
+    completedFrom?: Date;
+    completedTo?: Date;
+    startedFrom?: Date;
+    startedTo?: Date;
+  }) {
     // Construir a consulta dinamicamente
-    const where: FindOptionsWhere<Task> = {}
+    const where: FindOptionsWhere<Task> = {};
 
     if (filters.title) {
-      where.title = filters.title
+      where.title = filters.title;
     }
 
-    if (filters.completedAt) {
-      where.completedAt = filters.completedAt
+    if (filters.completedFrom && filters.completedTo) {
+      where.completedAt = Between(filters.completedFrom, filters.completedTo);
+    }
+
+    if (filters.startedFrom && filters.startedTo) {
+      where.startedAt = Between(filters.startedFrom, filters.startedTo);
     }
 
     if (filters.sector) {
-      where.sector = filters.sector
+      where.sector = filters.sector;
     }
 
     if (filters.assignedUserId) {
-      where.assignedUser = { id: filters.assignedUserId }
+      where.assignedUser = { id: filters.assignedUserId };
     }
 
     if (filters.serviceOrderId) {
-      where.serviceOrder = { id: filters.serviceOrderId }
+      where.serviceOrder = { id: filters.serviceOrderId };
     }
 
     if (filters.stage) {
       where.stage = filters.stage;
     }
 
+    const tasks = await this.taskRepository.find({
+      where,
+      order: { createdAt: 'asc' },
+    });
 
-    const tasks = await this.taskRepository.find({ where, order: { createdAt: "asc" } })
+    const taskList = tasks.map((task) => {
+      const parsedTask = parseToGetTaskDTO(task);
+      return parsedTask;
+    });
 
-    const taskList = tasks.map(task => {
-      const parsedTask = parseToGetTaskDTO(task)
-      return parsedTask
-    })
-
-    return taskList
-
+    return taskList;
   }
 
   async findById(id: string) {
-    const task = await this.taskRepository.findOneBy({ id })
+    const task = await this.taskRepository.findOneBy({ id });
 
     if (task === null) {
-      throw new NotFoundException(`Tarefa com id ${id} não encontrada.`)
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada.`);
     }
 
-    const parsedTask = parseToGetTaskDTO(task)
-    return parsedTask
+    const parsedTask = parseToGetTaskDTO(task);
+    return parsedTask;
   }
 
   async countOverdueTasks(filters: FilterTasksDto): Promise<number> {
@@ -104,12 +126,18 @@ export class TaskService {
 
     if (filters.startedAt) {
       //Busca tarefas que estão atrasadas filtrando pela data de início
-      query.andWhere('task.completedAt > task.dueDate AND task.startedAt >= :startedAt', { startedAt: filters.startedAt });
+      query.andWhere(
+        'task.completedAt > task.dueDate AND task.startedAt >= :startedAt',
+        { startedAt: filters.startedAt },
+      );
     }
 
     if (filters.dueDate) {
       // Busca tarefas que estão atrasadas filtrando pela data de vencimento
-      query.andWhere('task.completedAt > task.dueDate AND task.dueDate <= :dueDate', { dueDate: filters.dueDate });
+      query.andWhere(
+        'task.completedAt > task.dueDate AND task.dueDate <= :dueDate',
+        { dueDate: filters.dueDate },
+      );
     }
 
     if (filters.sector) {
@@ -122,7 +150,6 @@ export class TaskService {
   }
 
   async update(id: string, updateTaskDto: UpdateTaskDto) {
-
     // Verifica se a tarefa existe
     const task = await this.taskRepository.findOneBy({ id });
     if (!task) {
@@ -130,7 +157,9 @@ export class TaskService {
     }
 
     // Busca a ordem de serviço (obrigatório)
-    const serviceOrder = await this.serviceOrderService.findById(updateTaskDto.orderId);
+    const serviceOrder = await this.serviceOrderService.findById(
+      updateTaskDto.orderId,
+    );
     if (!serviceOrder) {
       throw new NotFoundException('Ordem de serviço não encontrada.');
     }
@@ -217,7 +246,9 @@ export class TaskService {
     const user = await this.userService.findById(body.userId);
 
     if (user === null) {
-      throw new NotFoundException(`Usuário com id ${body.userId} não encontrado`);
+      throw new NotFoundException(
+        `Usuário com id ${body.userId} não encontrado`,
+      );
     }
 
     task.assignedUser = user;
@@ -248,7 +279,6 @@ export class TaskService {
     task.taskCost = cost;
     const updatedTask = await this.taskRepository.save(task);
     return parseToGetTaskDTO(updatedTask);
-
   }
 
   async updateDueDate(id: string, dueDate: Date) {
@@ -261,14 +291,14 @@ export class TaskService {
   }
 
   async remove(id: string) {
-    const task = await this.taskRepository.findOneBy({ id })
+    const task = await this.taskRepository.findOneBy({ id });
 
     if (task === null) {
-      throw new NotFoundException(`Tarefa com id ${id} não encontrada.`)
+      throw new NotFoundException(`Tarefa com id ${id} não encontrada.`);
     }
 
-    await this.taskRepository.delete(id)
-    const parsedTask = parseToGetTaskDTO(task)
-    return parsedTask
+    await this.taskRepository.delete(id);
+    const parsedTask = parseToGetTaskDTO(task);
+    return parsedTask;
   }
 }
