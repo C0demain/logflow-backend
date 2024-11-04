@@ -68,6 +68,7 @@ export class TaskController {
 
   @Get('overdue/count')
   @ApiOperation({ summary: 'Listar as tarefas com atraso através de filtros de setor e período' })
+  @ApiQuery({ name: 'startedAt', required: false })
   @ApiQuery({ name: 'dueDate', required: false })
   @ApiQuery({ name: 'sector', required: false })
   async getOverdueTasksCount(@Query() filters: FilterTasksDto): Promise<{ count: number }> {

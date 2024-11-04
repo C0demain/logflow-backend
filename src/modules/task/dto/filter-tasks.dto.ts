@@ -5,6 +5,10 @@ export class FilterTasksDto {
 
     @IsOptional()
     @IsDateString()
+    startedAt?: string;
+
+    @IsOptional()
+    @IsDateString()
     dueDate?: string;
 
     @IsOptional()
