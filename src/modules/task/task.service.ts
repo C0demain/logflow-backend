@@ -102,18 +102,20 @@ export class TaskService {
   async countOverdueTasks(filters: FilterTasksDto): Promise<number> {
     const query = this.taskRepository.createQueryBuilder('task');
 
+    if (filters.startedAt) {
+      //Busca tarefas que estão atrasadas filtrando pela data de início
+      query.andWhere('task.completedAt > task.dueDate AND task.startedAt >= :startedAt', { startedAt: filters.startedAt });
+    }
+
     if (filters.dueDate) {
       // Busca tarefas que estão atrasadas filtrando pela data de vencimento
-      query.andWhere('task.completedAt > task.dueDate AND task.dueDate = :dueDate', { dueDate: filters.dueDate });
+      query.andWhere('task.completedAt > task.dueDate AND task.dueDate <= :dueDate', { dueDate: filters.dueDate });
     }
 
     if (filters.sector) {
       //Busca tarefas que estão atrasadas filtrando pelo setor
       query.andWhere('task.sector = :sector', { sector: filters.sector });
     }
-
-    // Busca somente as tarefas atrasadas
-    query.andWhere('task.completedAt > task.dueDate');
 
     const count = await query.getCount();
     return count;

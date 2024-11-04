@@ -254,6 +254,7 @@ describe('TaskService', () => {
   describe('countOverdueTasks', () => {
     it('should return the count of overdue tasks', async () => {
       const filters = { 
+        startedAt: '2024-01-01',
         dueDate: '2024-02-01', 
         sector: Sector.OPERACIONAL 
       };
