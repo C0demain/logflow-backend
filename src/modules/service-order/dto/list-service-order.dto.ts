@@ -21,5 +21,6 @@ export class ListServiceOrderDto {
     },
     readonly description?: string,
     readonly value?: Number,
+    readonly creationDate?: Date,
   ) {}
 }

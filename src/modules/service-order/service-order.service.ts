@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { Between, FindOptionsWhere, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceOrder } from './entities/service-order.entity';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
@@ -17,6 +17,7 @@ import { ServiceOrderLog } from './entities/service-order-log.entity';
 import { Task } from '../task/entities/task.entity';
 import { RoleEntity } from '../roles/roles.entity';
 import { TaskStage } from '../task/enums/task.stage.enum';
+import { async } from 'rxjs';
 
 @Injectable()
 export class ServiceOrderService {
@@ -108,6 +109,8 @@ export class ServiceOrderService {
     status?: string;
     sector?: string;
     active?: boolean;
+    createdFrom?: Date;
+    createdTo?: Date;
   }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<ServiceOrder> = {};
@@ -126,6 +129,14 @@ export class ServiceOrderService {
 
     if (filters.sector) {
       where.sector = filters.sector as Sector;
+    }
+
+    if (filters.createdFrom && filters.createdTo) {
+      where.creationDate = Between(filters.createdFrom, filters.createdTo);
+    } else if (filters.createdFrom) {
+      where.creationDate = MoreThanOrEqual(filters.createdFrom);
+    } else if (filters.createdTo) {
+      where.creationDate = LessThanOrEqual(filters.createdTo);
     }
 
     where.isActive = filters.active === undefined ? true : filters.active;
@@ -161,7 +172,8 @@ export class ServiceOrderService {
           userRole: user.role.name,
         },
         serviceOrder.description,
-        serviceOrder.value
+        serviceOrder.value,
+        serviceOrder.creationDate,
       );
     });
 

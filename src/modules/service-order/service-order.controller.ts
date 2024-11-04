@@ -79,11 +79,15 @@ export class ServiceOrderController {
   @ApiQuery({ name: 'clientRelated', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, type: String })
   @ApiQuery({ name: 'active', required: false, type: Boolean })
+  @ApiQuery({name: 'createdFrom', required: false, type: Date})
+  @ApiQuery({name: 'createdTo', required: false, type: Date})
   async findAllOrders(
     @Query('id') id?: string,
     @Query('title') title?: string,
     @Query('status') status?: string,
     @Query('active') active?: boolean,
+    @Query('createdFrom') createdFrom?: Date,
+    @Query('createdTo') createdTo?: Date,
   ) {
     try {
       const orders = await this.serviceOrderService.findAll({
@@ -91,6 +95,8 @@ export class ServiceOrderController {
         title,
         status,
         active,
+        createdFrom,
+        createdTo,
       });
 
       if (!orders || orders.length === 0) {
