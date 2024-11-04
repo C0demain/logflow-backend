@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ProcessService } from './process.service';
 import { CreateProcessDto } from './dto/create-process.dto';
 import { UpdateProcessDto } from './dto/update-process.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('api/v1/process')
+@ApiTags('process')
 export class ProcessController {
   constructor(private readonly processService: ProcessService) {}
 

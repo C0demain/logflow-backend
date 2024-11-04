@@ -56,7 +56,7 @@ export class Task {
     @JoinColumn({ name: 'role_name', referencedColumnName: 'name' })
     role: RoleEntity;
 
-    @ManyToOne(() => Process, process => process.tasks)
+    @ManyToOne(() => Process, process => process.tasks, {nullable: true})
     process: Process
 
     @OneToMany(() => FileEntity, (file) => file.task, {eager: true, nullable: true})

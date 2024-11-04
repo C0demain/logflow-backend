@@ -8,6 +8,7 @@ import { TaskService } from './task.service';
 import { AssignUserDto } from './dto/assign-user.dto';
 import { TaskStage } from './enums/task.stage.enum';
 import { FilterTasksDto } from './dto/filter-tasks.dto';
+import { CreateTemplateTaskDto } from 'src/modules/task/dto/create-template-task.dto';
 
 @Controller('/api/v1/task')
 @ApiBearerAuth()
@@ -29,6 +30,16 @@ export class TaskController {
     const task = await this.taskService.create(createTaskDto)
     return {
       message: 'Tarefa criada com sucesso.',
+      task
+    }
+  }
+
+  @ApiOperation({ summary: 'Criar tarefa relacionada a processo' })
+  @Post('template')
+  async createTemplate(@Body() createTemplateDto: CreateTemplateTaskDto){
+    const task = await this.taskService.createTemplateTask(createTemplateDto)
+    return {
+      message: 'Tarefa template criada com sucesso',
       task
     }
   }

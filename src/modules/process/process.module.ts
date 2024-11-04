@@ -10,5 +10,6 @@ import { Process } from 'src/modules/process/entities/process.entity';
   ],
   controllers: [ProcessController],
   providers: [ProcessService],
+  exports: [ProcessService]
 })
 export class ProcessModule {}

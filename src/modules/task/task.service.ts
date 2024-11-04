@@ -10,6 +10,9 @@ import { parseToGetTaskDTO } from 'src/modules/task/dto/get-task.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
 import { TaskStage } from './enums/task.stage.enum';
 import { FilterTasksDto } from './dto/filter-tasks.dto';
+import { CreateTemplateTaskDto } from 'src/modules/task/dto/create-template-task.dto';
+import { ProcessService } from 'src/modules/process/process.service';
+import { Address } from 'src/modules/client/entities/address.entity';
 
 @Injectable()
 export class TaskService {
@@ -18,6 +21,7 @@ export class TaskService {
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
     private readonly serviceOrderService: ServiceOrderService,
     private readonly userService: UserService,
+    private readonly processService: ProcessService
   ) { }
 
   async create(createTaskDto: CreateTaskDto) {
@@ -46,6 +50,29 @@ export class TaskService {
 
     const createdTask = await this.taskRepository.save(taskDb);
     return parseToGetTaskDTO(createdTask);
+  }
+
+  async createTemplateTask(createTemplateTaskDto: CreateTemplateTaskDto){
+    const process = await this.processService.findById(createTemplateTaskDto.processId)
+    if(!process){
+      throw new NotFoundException(`Process with id ${createTemplateTaskDto.processId} not found`)
+    }
+
+    const templateTask = new Task()
+    console.log(createTemplateTaskDto)
+
+    // Obrigatórios
+    templateTask.title = createTemplateTaskDto.title
+    templateTask.process = process
+    templateTask.sector = createTemplateTaskDto.sector
+    templateTask.stage = createTemplateTaskDto.stage
+
+    // Opcionais
+    templateTask.taskCost = createTemplateTaskDto.taskCost || 0
+    templateTask.address = createTemplateTaskDto.address || new Address()
+
+    await this.taskRepository.save(templateTask)
+    return templateTask
   }
 
   async findAll(filters: { title?: string, assignedUserId?: string, serviceOrderId?: string, completedAt?: Date, sector?: Sector, stage?: TaskStage }) {
@@ -77,7 +104,7 @@ export class TaskService {
     }
 
 
-    const tasks = await this.taskRepository.find({ where, order: { createdAt: "asc" } })
+    const tasks = await this.taskRepository.find({ where, order: { createdAt: "asc", process: undefined }, loadEagerRelations: true })
 
     const taskList = tasks.map(task => {
       const parsedTask = parseToGetTaskDTO(task)
@@ -101,6 +128,7 @@ export class TaskService {
 
   async countOverdueTasks(filters: FilterTasksDto): Promise<number> {
     const query = this.taskRepository.createQueryBuilder('task');
+    query.leftJoinAndSelect('task.process', 'process').andWhere('process.id IS NULL') // Ignora tarefas template
 
     if (filters.startedAt) {
       //Busca tarefas que estão atrasadas filtrando pela data de início

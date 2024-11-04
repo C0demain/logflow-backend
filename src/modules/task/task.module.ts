@@ -6,13 +6,15 @@ import { Task } from 'src/modules/task/entities/task.entity';
 import { ServiceOrderModule } from 'src/modules/service-order/service-order.module';
 import { UserModule } from 'src/modules/user/user.module';
 import { ClientModule } from '../client/client.module';
+import { ProcessModule } from 'src/modules/process/process.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Task]),
     forwardRef(() => ServiceOrderModule),
     UserModule,
-    ClientModule
+    ClientModule,
+    ProcessModule
   ],
   controllers: [TaskController],
   providers: [TaskService],
