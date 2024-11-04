@@ -9,6 +9,6 @@ export class Process {
     @Column()
     title: string
 
-    @OneToMany(() => Task, (task) => task.process)
+    @OneToMany(() => Task, (task) => task.process, {eager: true})
     tasks: Task[]
 }
