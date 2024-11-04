@@ -1,21 +1,18 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ServiceOrderService } from './service-order.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ServiceOrder } from './entities/service-order.entity';
-import { UserService } from '../user/user.service';
-import { ClientService } from '../client/client.service';
 import { Repository } from 'typeorm';
-import {
-  NotFoundException,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { ClientService } from '../client/client.service';
+import { RoleEntity } from '../roles/roles.entity';
+import { Task } from '../task/entities/task.entity';
+import { UserService } from '../user/user.service';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
-import { Status } from './enums/status.enum';
-import { Sector } from './enums/sector.enum';
-import { Task } from '../task/entities/task.entity';
-import { RoleEntity } from '../roles/roles.entity';
 import { ServiceOrderLog } from './entities/service-order-log.entity';
+import { ServiceOrder } from './entities/service-order.entity';
+import { Sector } from './enums/sector.enum';
+import { Status } from './enums/status.enum';
+import { ServiceOrderService } from './service-order.service';
 
 const mockServiceOrderRepository = {
   save: jest.fn(),
@@ -43,6 +40,57 @@ const mockUserService = {
 const mockClientService = {
   findById: jest.fn(),
 };
+
+const orders = [
+  {
+    id: 'order-1',
+    title: 'Test Order 1',
+    status: Status.PENDENTE,
+    sector: Sector.OPERACIONAL,
+    client: {
+      name: 'Client X',
+      email: 'clientX@gmail.com',
+      cnpj: '12345',
+    },
+    user: {
+      id: 'user-id-123',
+      name: 'User Test',
+      email: 'user@test.com',
+      role: 'EMPLOYEE',
+    },
+    serviceOrderLogs: [
+      {
+        changedTo: Sector.OPERACIONAL,
+        atDate: new Date(),
+      },
+    ],
+    creationDate: new Date(2024, 9, 10),
+  },
+  {
+    id: 'order-2',
+    title: 'Test Order 2',
+    status: Status.PENDENTE,
+    sector: Sector.FINANCEIRO,
+    client: {
+      name: 'Client Y',
+      email: 'clientY@gmail.com',
+      cnpj: '54321',
+    },
+    user: {
+      id: 'user-id-123',
+      name: 'User Test',
+      email: 'user@test.com',
+      role: 'EMPLOYEE',
+    },
+    serviceOrderLogs: [
+      {
+        changedTo: Sector.OPERACIONAL,
+        atDate: new Date(),
+      },
+    ],
+    creationDate: new Date(2024, 10, 11),
+  },
+];
 
 describe('ServiceOrderService', () => {
   let service: ServiceOrderService;
@@ -98,7 +146,7 @@ describe('ServiceOrderService', () => {
         sector: Sector.OPERACIONAL,
         userId: 'user-id-123',
         description: 'anything',
-        value: 100
+        value: 100,
       };
 
       const userMock = {
@@ -115,7 +163,10 @@ describe('ServiceOrderService', () => {
       };
 
       const motoristaRoleMock = { id: 'role-1', name: 'Motorista' };
-      const financeiroRoleMock = { id: 'role-2', name: 'Analista Administrativo "Financeiro"' };
+      const financeiroRoleMock = {
+        id: 'role-2',
+        name: 'Analista Administrativo "Financeiro"',
+      };
       const operacionalRoleMock = { id: 'role-3', name: 'Gerente Operacional' };
 
       mockUserService.findById.mockResolvedValue(userMock);
@@ -147,7 +198,7 @@ describe('ServiceOrderService', () => {
           user: userMock,
         }),
       );
-      
+
       expect(mockTaskRepository.save).toHaveBeenCalled();
       expect(mockRoleRepository.findOne).toHaveBeenCalledTimes(3);
     });
@@ -160,44 +211,53 @@ describe('ServiceOrderService', () => {
         status: Status.PENDENTE,
         sector: Sector.OPERACIONAL,
       };
-      const orders = [
-        {
-          id: 'order-123',
-          title: 'Test Order',
-          status: Status.PENDENTE,
-          sector: Sector.OPERACIONAL,
-          client: {
-            name: 'Client X',
-            email: 'client@gmail.com',
-            cnpj: '12345',
-          },
-          user: {
-            id: 'user-id-123',
-            name: 'User Test',
-            email: 'user@test.com',
-            role: 'EMPLOYEE',
-          },
-          serviceOrderLogs: [
-            {
-              changedTo: Sector.OPERACIONAL,
-              atDate: new Date(),
-            },
-          ],
-        },
-      ];
-  
-      mockServiceOrderRepository.find.mockResolvedValue(orders);
-  
+
+      mockServiceOrderRepository.find.mockResolvedValue(
+        orders.filter(
+          (order) =>
+            order.status === filters.status && order.sector === filters.sector,
+        ),
+      );
+
       const result = await service.findAll(filters);
-  
+
       expect(result.length).toEqual(1);
-      expect(result[0].id).toEqual('order-123');
+      expect(result[0].id).toEqual('order-1');
       expect(mockServiceOrderRepository.find).toHaveBeenCalledWith({
         where: filters,
       });
     });
+
+    it('should return service orders based on date filters', async () => {
+      const filters = {
+        createdFrom: new Date(2024, 9, 9),
+        createdTo: new Date(2024, 9, 11),
+      };
+
+      mockServiceOrderRepository.find.mockResolvedValue(
+        orders.filter(
+          (order) =>
+            order.creationDate >= filters.createdFrom &&
+            order.creationDate <= filters.createdTo,
+        ),
+      );
+
+      const result = await service.findAll(filters);
+
+      expect(result.length).toEqual(1);
+      expect(result[0].creationDate!.getTime()).toBeGreaterThanOrEqual(
+        filters.createdFrom.getTime(),
+      );
+      expect(mockServiceOrderRepository.find).toHaveBeenCalledWith({
+        where: expect.objectContaining({
+          creationDate: expect.objectContaining({
+            _type: 'between',
+            _value: [filters.createdFrom, filters.createdTo],
+          }),
+        }),
+      });
+    });
   });
-  
 
   describe('update', () => {
     it('should update a service order', async () => {
@@ -248,11 +308,15 @@ describe('ServiceOrderService', () => {
         creationDate: new Date(),
         serviceOrder: { id: '2' },
       } as ServiceOrderLog;
-  
+
       mockServiceOrderLogRepository.find.mockResolvedValue([log]);
-  
-      const result = await service.getLogs({ id: '1', serviceOrderId: '2', changedTo: Sector.OPERACIONAL });
-  
+
+      const result = await service.getLogs({
+        id: '1',
+        serviceOrderId: '2',
+        changedTo: Sector.OPERACIONAL,
+      });
+
       expect(result).toEqual([
         {
           id: '1',
@@ -261,14 +325,15 @@ describe('ServiceOrderService', () => {
         },
       ]);
     });
-  
+
     it('should throw an error if not found', async () => {
       mockServiceOrderLogRepository.find.mockResolvedValue([]);
-  
-      await expect(service.getLogs({})).rejects.toThrow('Nenhum log de ordem de serviço encontrado.');
+
+      await expect(service.getLogs({})).rejects.toThrow(
+        'Nenhum log de ordem de serviço encontrado.',
+      );
     });
   });
-  
 
   describe('remove', () => {
     it('should delete a service order', async () => {

@@ -220,6 +220,42 @@ describe('TaskService', () => {
         order: { createdAt: 'asc' },
       });
     });
+    
+    it('should return tasks filtered by date range', async () => {
+      const expectedResult: GetTaskDto[] = [
+        {
+          id: 'task1',
+          title: 'Task1',
+          startedAt: null,
+          completedAt: null,
+          sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
+          taskCost: null,
+          assignedUser: mockedUser,
+          serviceOrder: mockedServiceOrder,
+        },
+      ];
+
+      const filters = {
+        completedFrom: new Date('2024-01-01'),
+        completedTo: new Date('2024-02-01'),
+      };
+
+      mockRepository.find.mockResolvedValue(expectedResult);
+
+      const tasks = await service.findAll(filters);
+
+      expect(tasks).toEqual(expectedResult);
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: expect.objectContaining({
+          completedAt: expect.objectContaining({
+            _type: 'between',
+            _value: [filters.completedFrom, filters.completedTo],
+          }),
+        }),
+        order: { createdAt: 'asc' },
+      });
+    });
   });
 
   describe('findById', () => {
