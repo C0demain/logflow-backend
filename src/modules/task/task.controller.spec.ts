@@ -8,6 +8,7 @@ import { TaskStage } from './enums/task.stage.enum';
 import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
 import { FilterTasksDto } from './dto/filter-tasks.dto';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -45,6 +46,8 @@ describe('TaskController', () => {
     uncomplete: jest.fn(),
     assign: jest.fn(),
     unassign: jest.fn(),
+    addCost: jest.fn(),
+    updateDueDate: jest.fn(),
     remove: jest.fn(),
   };
 
@@ -360,6 +363,108 @@ describe('TaskController', () => {
       expect(mockTaskService.unassign).toHaveBeenCalledWith('task1');
     });
   });
+
+  describe('addCost', () => {
+    it('should add a cost to a task', async () => {
+      const taskId = 'task1';
+      const cost = 500;
+      const expectedTask = {
+        id: taskId,
+        title: 'Task1',
+        taskCost: cost,
+        dueDate: null,
+        sector: 'OPERACIONAL',
+        startedAt: undefined,
+        completedAt: undefined,
+        stage: undefined,
+        assignedUser: {
+          id: "null",
+          name: "Nenhum usuário atribuído a esta tarefa",
+          email: "null",
+        },
+        serviceOrder: undefined,
+        address: undefined,
+        files: undefined,
+      };
+  
+      mockTaskService.addCost.mockResolvedValue(expectedTask);
+  
+      const response = await controller.addCost(taskId, cost);
+  
+      expect(mockTaskService.addCost).toHaveBeenCalledWith(taskId, cost);
+      expect(response.task).toEqual(expectedTask);
+      expect(response.message).toBe('valor atribuido a tarefa');
+    });
+  
+    it('should throw NotFoundException when task ID is invalid', async () => {
+      const taskId = 'invalidTaskId';
+      const cost = 500;
+  
+      mockTaskService.addCost.mockRejectedValue(new NotFoundException('Task not found'));
+  
+      await expect(controller.addCost(taskId, cost)).rejects.toBeInstanceOf(NotFoundException);
+      expect(mockTaskService.addCost).toHaveBeenCalledWith(taskId, cost);
+    });
+  });
+  
+  describe('dueDate', () => {
+    it('should update the due date of a task', async () => {
+      const taskId = 'task1';
+      const date = '31/12/2024';
+      const parsedDueDate = new Date('2024-12-31');
+      const expectedTask = {
+        id: taskId,
+        title: 'Task1',
+        taskCost: null,
+        dueDate: parsedDueDate,
+        sector: 'OPERACIONAL',
+        startedAt: undefined,
+        completedAt: undefined,
+        stage: undefined,
+        assignedUser: {
+          id: "null",
+          name: "Nenhum usuário atribuído a esta tarefa",
+          email: "null",
+        },
+        serviceOrder: undefined,
+        address: undefined,
+        files: undefined,
+      };
+  
+      jest.spyOn(controller, 'parseBrazilianDate').mockReturnValue(parsedDueDate);
+      mockTaskService.updateDueDate.mockResolvedValue(expectedTask);
+  
+      const response = await controller.dueDate(taskId, date);
+  
+      expect(controller.parseBrazilianDate).toHaveBeenCalledWith(date);
+      expect(mockTaskService.updateDueDate).toHaveBeenCalledWith(taskId, parsedDueDate);
+      expect(response.task).toEqual(expectedTask);
+      expect(response.message).toBe('valor atribuido a tarefa');
+    });
+  
+    it('should throw BadRequestException for invalid date format', async () => {
+      const taskId = 'task1';
+      const invalidDate = 'invalid-date';
+  
+      jest.spyOn(controller, 'parseBrazilianDate').mockReturnValue(null);
+  
+      await expect(controller.dueDate(taskId, invalidDate)).rejects.toBeInstanceOf(BadRequestException);
+      expect(controller.parseBrazilianDate).toHaveBeenCalledWith(invalidDate);
+    });
+  
+    it('should throw NotFoundException when task ID is invalid', async () => {
+      const taskId = 'invalidTaskId';
+      const date = '31/12/2024';
+      const parsedDueDate = new Date('2024-12-31');
+  
+      jest.spyOn(controller, 'parseBrazilianDate').mockReturnValue(parsedDueDate);
+      mockTaskService.updateDueDate.mockRejectedValue(new NotFoundException('Task not found'));
+  
+      await expect(controller.dueDate(taskId, date)).rejects.toBeInstanceOf(NotFoundException);
+      expect(mockTaskService.updateDueDate).toHaveBeenCalledWith(taskId, parsedDueDate);
+    });
+  });
+  
 
   describe('remove', () => {
     it('should remove task by id', async () => {

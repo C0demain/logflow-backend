@@ -22,6 +22,7 @@ describe('TaskService', () => {
   const mockRepository = {
     save: jest.fn(),
     find: jest.fn(),
+    findOne: jest.fn(),
     findOneBy: jest.fn(),
     delete: jest.fn(),
     createQueryBuilder: jest.fn().mockReturnThis(),
@@ -484,6 +485,94 @@ describe('TaskService', () => {
       expect(service.unassign('task1')).rejects.toBeInstanceOf(NotFoundException);
     });
   });
+
+  describe('addCost', () => {
+    it('should add a cost to a task', async () => {
+      const taskId = 'task1';
+      const cost = 500;
+      const expectedTask = {
+        id: taskId,
+        title: 'Task1',
+        taskCost: cost,
+        dueDate: null,
+        sector: 'OPERACIONAL',
+        startedAt: undefined,
+        completedAt: undefined,
+        stage: undefined,
+        assignedUser: {
+          id: "null",
+          name: "Nenhum usuário atribuído a esta tarefa",
+          email: "null",
+        },
+        serviceOrder: undefined,
+        address: undefined,
+        files: undefined, 
+      };
+  
+      mockRepository.findOneBy.mockResolvedValue({ id: taskId, title: 'Task1', taskCost: null });
+      mockRepository.save.mockResolvedValue(expectedTask);
+  
+      const result = await service.addCost(taskId, cost);
+  
+      expect(result).toEqual(expectedTask);
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: taskId });
+      expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({ taskCost: cost }));
+    });
+  
+    it('should throw NotFoundException when task ID is invalid', async () => {
+      const taskId = 'invalidTaskId';
+  
+      mockRepository.findOneBy.mockResolvedValue(null);
+  
+      await expect(service.addCost(taskId, 500)).rejects.toBeInstanceOf(NotFoundException);
+      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: taskId });
+    });
+  });
+
+  describe('updateDueDate', () => {
+    it('should update the due date of a task', async () => {
+      const taskId = 'task1';
+      const dueDate = new Date('2024-12-31');
+      const expectedTask = {
+        id: taskId,
+        title: 'Task1',
+        taskCost: null,
+        dueDate: dueDate,
+        sector: 'OPERACIONAL',
+        startedAt: undefined,
+        completedAt: undefined,
+        stage: undefined,
+        assignedUser: {
+          id: "null",
+          name: "Nenhum usuário atribuído a esta tarefa",
+          email: "null",
+        },
+        serviceOrder: undefined,
+        address: undefined,
+        files: undefined,
+      };
+  
+      mockRepository.findOne.mockResolvedValue({ id: taskId, title: 'Task1', taskCost: null, dueDate: null });
+      mockRepository.save.mockResolvedValue(expectedTask);
+  
+      const result = await service.updateDueDate(taskId, dueDate);
+  
+      expect(result).toEqual(expectedTask);
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: taskId } });
+      expect(mockRepository.save).toHaveBeenCalledWith(expect.objectContaining({ dueDate: dueDate }));
+    });
+  
+    it('should throw NotFoundException when task ID is invalid', async () => {
+      const taskId = 'invalidTaskId';
+      const dueDate = new Date('2024-12-31');
+  
+      mockRepository.findOne.mockResolvedValue(null);
+  
+      await expect(service.updateDueDate(taskId, dueDate)).rejects.toBeInstanceOf(NotFoundException);
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: taskId } });
+    });
+  });
+  
 
   describe('remove', () => {
     it('should remove a task by id', async () => {
