@@ -6,7 +6,7 @@ import { AuthenticationGuard } from '../auth/authentication.guard';
 @ApiTags('roles')
 @ApiBearerAuth()
 @UseGuards(AuthenticationGuard)
-@Controller('api/vi/roles')
+@Controller('api/v1/roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
