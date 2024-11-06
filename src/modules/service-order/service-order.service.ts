@@ -19,6 +19,7 @@ import { RoleEntity } from '../roles/roles.entity';
 import { TaskStage } from '../task/enums/task.stage.enum';
 import { Process } from 'src/modules/process/entities/process.entity';
 import { TaskService } from 'src/modules/task/task.service';
+import { ProcessService } from 'src/modules/process/process.service';
 
 @Injectable()
 export class ServiceOrderService {
@@ -29,8 +30,7 @@ export class ServiceOrderService {
     private taskRepository: Repository<Task>,
     @InjectRepository(RoleEntity)
     private roleRepository: Repository<RoleEntity>,
-    @InjectRepository(Process)
-    private readonly processRepository: Repository<Process>,
+    private readonly processService: ProcessService,
     private readonly userService: UserService,
     private readonly clientService: ClientService,
   ) {}
@@ -40,6 +40,7 @@ export class ServiceOrderService {
   
     const user = await this.userService.findById(createServiceOrderDto.userId);
     const client = await this.clientService.findById(createServiceOrderDto.clientId);
+    const process = await this.processService.findById(createServiceOrderDto.processId)
   
     serviceDb.title = createServiceOrderDto.title;
     serviceDb.client = client;
@@ -53,17 +54,12 @@ export class ServiceOrderService {
   
     const savedServiceOrder = await this.serviceOrderRepository.save(serviceDb);
   
-    await this.createTasksForServiceOrder(savedServiceOrder);
+    await this.createTasksForServiceOrder(savedServiceOrder, process);
   
     return savedServiceOrder;
   }
   
-  private async createTasksForServiceOrder(serviceOrder: ServiceOrder) {
-    const process = await this.processRepository.findOne({where: {title: 'Pedido c/ entrega'} })
-    if(!process){
-      throw new NotFoundException('Processo padrão não encontrado')
-    }
-
+  private async createTasksForServiceOrder(serviceOrder: ServiceOrder, process: Process) {
     process.tasks.forEach(async (t) => {
       const newTask = this.taskRepository.create({
         title: t.title,
