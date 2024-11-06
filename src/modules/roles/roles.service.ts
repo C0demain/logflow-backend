@@ -18,4 +18,14 @@ export class RolesService {
 
     return roles;
   }
+
+  async findById(id: string){
+    const role = await this.repository.findOneBy({ id })
+
+    if(!role){
+      throw new NotFoundException(`Função com id ${id} não encontrada.`);
+    }
+
+    return role;
+  }
 }

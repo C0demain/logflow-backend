@@ -22,9 +22,8 @@ export class CreateTemplateTaskDto {
     @IsNotEmpty()
     stage: TaskStage;
 
-    @IsString()
-    @IsOptional()
-    role: string;
+    @IsUUID()
+    roleId: string;
 
     @IsOptional()
     @IsNumber()

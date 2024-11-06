@@ -13,6 +13,7 @@ import { FilterTasksDto } from './dto/filter-tasks.dto';
 import { CreateTemplateTaskDto } from 'src/modules/task/dto/create-template-task.dto';
 import { ProcessService } from 'src/modules/process/process.service';
 import { Address } from 'src/modules/client/entities/address.entity';
+import { RolesService } from 'src/modules/roles/roles.service';
 
 @Injectable()
 export class TaskService {
@@ -21,7 +22,8 @@ export class TaskService {
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
     private readonly serviceOrderService: ServiceOrderService,
     private readonly userService: UserService,
-    private readonly processService: ProcessService
+    private readonly processService: ProcessService,
+    private readonly roleService: RolesService
   ) { }
 
   async create(createTaskDto: CreateTaskDto) {
@@ -55,7 +57,12 @@ export class TaskService {
   async createTemplateTask(createTemplateTaskDto: CreateTemplateTaskDto){
     const process = await this.processService.findById(createTemplateTaskDto.processId)
     if(!process){
-      throw new NotFoundException(`Process with id ${createTemplateTaskDto.processId} not found`)
+      throw new NotFoundException(`Processo com id ${createTemplateTaskDto.processId} não encontrado`)
+    }
+
+    const role = await this.roleService.findById(createTemplateTaskDto.roleId)
+    if(!role){
+      throw new NotFoundException(`Função com id ${createTemplateTaskDto.processId} não encontrada`)
     }
 
     const templateTask = new Task()
