@@ -5,23 +5,10 @@ import { ProcessService } from './process.service';
 describe('ProcessController', () => {
   let controller: ProcessController;
 
-  const mockService = {
-    create: jest.fn(),
-    findAll: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ProcessController],
-      providers: [
-        {
-          provide: ProcessService,
-          useValue: mockService
-        }
-        
-      ],
+      providers: [ProcessService],
     }).compile();
 
     controller = module.get<ProcessController>(ProcessController);

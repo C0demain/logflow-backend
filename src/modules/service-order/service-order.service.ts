@@ -56,7 +56,7 @@ export class ServiceOrderService {
   }
   
   private async createTasksForServiceOrder(serviceOrder: ServiceOrder, processId: string) {
-    const process = await this.processRepository.findOneBy({id: processId})
+    const process = await this.processRepository.findOne({where: {id: processId} })
     if(!process){
       throw new NotFoundException('Processo não encontrado')
     }
