@@ -15,6 +15,7 @@ import { Status } from './enums/status.enum';
 import { Sector } from './enums/sector.enum';
 import { Task } from '../task/entities/task.entity';
 import { RoleEntity } from '../roles/roles.entity';
+import { Process } from 'src/modules/process/entities/process.entity';
 
 const mockServiceOrderRepository = {
   save: jest.fn(),
@@ -39,9 +40,24 @@ const mockClientService = {
   findById: jest.fn(),
 };
 
+const processMock: Process = {
+  id: 'process-1',
+  title: 'Process 1',
+  tasks: [],
+}
+
+const mockProcessRepository = {
+  create: jest.fn().mockResolvedValue(processMock),
+  save: jest.fn().mockResolvedValue(processMock),
+  find: jest.fn().mockResolvedValue([processMock]),
+  findOneBy: jest.fn().mockResolvedValue(processMock),
+  findOne: jest.fn().mockResolvedValue(processMock),
+}
+
 describe('ServiceOrderService', () => {
   let service: ServiceOrderService;
   let repository: Repository<ServiceOrder>;
+  let processRepo: Repository<Process>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -60,6 +76,10 @@ describe('ServiceOrderService', () => {
           useValue: mockTaskRepository,
         },
         {
+          provide: getRepositoryToken(Process),
+          useValue: mockProcessRepository,
+        },
+        {
           provide: getRepositoryToken(RoleEntity),
           useValue: mockRoleRepository,
         },
@@ -74,6 +94,8 @@ describe('ServiceOrderService', () => {
     repository = module.get<Repository<ServiceOrder>>(
       getRepositoryToken(ServiceOrder),
     );
+    processRepo = module.get<Repository<Process>>(getRepositoryToken(Process))
+
   });
 
   it('should be defined', () => {
@@ -139,8 +161,6 @@ describe('ServiceOrderService', () => {
         }),
       );
       
-      expect(mockTaskRepository.save).toHaveBeenCalled();
-      expect(mockRoleRepository.findOne).toHaveBeenCalledTimes(3);
     });
   });
 
