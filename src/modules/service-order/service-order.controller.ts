@@ -31,14 +31,14 @@ export class ServiceOrderController {
   @Post()
   @ApiOperation({ summary: 'Criar ordem de serviço' })
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    const { title, clientId, status, sector, processId: process, description, value } = createServiceOrderDto;
+    const { title, clientId, status, sector, userId, description, value } = createServiceOrderDto;
 
     const orderCreated = await this.serviceOrderService.create({
       title: title,
       clientId: clientId,
       status: status,
       sector: sector,
-      processId: process,
+      userId: userId,
       description: description,
       value: value
     });
@@ -56,6 +56,12 @@ export class ServiceOrderController {
         },
         orderCreated.status,
         orderCreated.sector,
+        {
+          userId: orderCreated.user.id,
+          userName: orderCreated.user.name,
+          userEmail: orderCreated.user.email,
+          userRole: orderCreated.user.role.name,
+        },
         orderCreated.serviceOrderLogs,
         orderCreated.description,
         orderCreated.value
