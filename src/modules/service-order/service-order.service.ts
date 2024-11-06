@@ -17,6 +17,8 @@ import { ServiceOrderLog } from './entities/service-order-log.entity';
 import { Task } from '../task/entities/task.entity';
 import { RoleEntity } from '../roles/roles.entity';
 import { TaskStage } from '../task/enums/task.stage.enum';
+import { Process } from 'src/modules/process/entities/process.entity';
+import { TaskService } from 'src/modules/task/task.service';
 
 @Injectable()
 export class ServiceOrderService {
@@ -27,6 +29,8 @@ export class ServiceOrderService {
     private taskRepository: Repository<Task>,
     @InjectRepository(RoleEntity)
     private roleRepository: Repository<RoleEntity>,
+    @InjectRepository(Process)
+    private readonly processRepository: Repository<Process>,
     private readonly userService: UserService,
     private readonly clientService: ClientService,
   ) {}
@@ -55,48 +59,25 @@ export class ServiceOrderService {
   }
   
   private async createTasksForServiceOrder(serviceOrder: ServiceOrder) {
-    const motoristaRole = await this.roleRepository.findOne({ where: { name: 'Motorista' } });
-    const financeiroRole = await this.roleRepository.findOne({ where: { name: 'Analista Administrativo "Financeiro"' } });
-    const operacionalRole = await this.roleRepository.findOne({ where: { name: 'Gerente Operacional' } });
-  
-    if(!motoristaRole || !financeiroRole || !operacionalRole){
-      throw new NotFoundException("Funções não encontradas.")
+    const process = await this.processRepository.findOne({where: {title: 'Pedido c/ entrega'} })
+    if(!process){
+      throw new NotFoundException('Processo padrão não encontrado')
     }
-    const tasks = [
-      this.createTask('Documentos de Coleta', Sector.OPERACIONAL, TaskStage.DOCUMENTS_ISSUANCE, motoristaRole, serviceOrder),
-      this.createTask('Endereço de Coleta', Sector.OPERACIONAL, TaskStage.DOCUMENTS_ISSUANCE, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Assinatura de Coleta', Sector.OPERACIONAL, TaskStage.COLLECTION, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Trazer p/ Galpão', Sector.OPERACIONAL, TaskStage.COLLECTION, operacionalRole, serviceOrder),
-  
-      this.createTask('Documentos de Entrega', Sector.OPERACIONAL, TaskStage.DELIVERY_DOCUMENTS_ISSUANCE, motoristaRole, serviceOrder),
-      this.createTask('Endereço de Entrega', Sector.OPERACIONAL, TaskStage.DELIVERY_DOCUMENTS_ISSUANCE, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Assinatura de Entrega', Sector.OPERACIONAL, TaskStage.DELIVERY, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Devolução de Documentos', Sector.OPERACIONAL, TaskStage.DELIVERY, operacionalRole, serviceOrder),
-  
-      this.createTask('Confirmação de Entrega', Sector.FINANCEIRO, TaskStage.DELIVERY_CONFIRMATION, financeiroRole, serviceOrder),
-      this.createTask('Emissão de NF/BOLETO', Sector.FINANCEIRO, TaskStage.BUDGET_CHECK, financeiroRole, serviceOrder),
-      this.createTask('Confirmação de Recebimento', Sector.FINANCEIRO, TaskStage.SALE_COMPLETED, financeiroRole, serviceOrder),
-    ];
-  
-    for(let t of tasks){
-      await this.taskRepository.save(t)
-    }
-  }
-  
-  private createTask(
-    title: string,
-    sector: Sector,
-    stage: TaskStage,
-    role: RoleEntity,
-    serviceOrder: ServiceOrder
-  ): Task {
-    const task = new Task();
-    task.title = title;
-    task.sector = sector;
-    task.stage = stage;
-    task.role = role;
-    task.serviceOrder = serviceOrder;
-    return task;
+
+    process.tasks.forEach(async (t) => {
+      const newTask = this.taskRepository.create({
+        title: t.title,
+        sector: t.sector,
+        role: t.role,
+        serviceOrder,
+        stage: t.stage,
+        files: t.files,
+        address: t.address
+      })
+
+      await this.taskRepository.save(newTask)
+    })
+    
   }
   
 
