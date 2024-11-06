@@ -20,11 +20,24 @@ export class ProcessService {
   }
 
   async findAll() {
-    return await this.processRepository.find()
+    return await this.processRepository.find({
+      order: {
+        tasks : {
+          createdAt: 'asc'
+        }
+      }
+    })
   }
 
   async findById(id: string) {
-    const process = await this.processRepository.findOneBy({ id })
+    const process = await this.processRepository.findOne({
+      where: { id },
+      order: {
+        tasks: {
+          createdAt: 'asc'
+        }
+      }
+    })
     if(!process){
       throw new NotFoundException(`Process with id ${id} not found`)
     }
