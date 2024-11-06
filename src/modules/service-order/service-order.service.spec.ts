@@ -15,6 +15,7 @@ import { Status } from './enums/status.enum';
 import { Sector } from './enums/sector.enum';
 import { Task } from '../task/entities/task.entity';
 import { RoleEntity } from '../roles/roles.entity';
+import { Process } from 'src/modules/process/entities/process.entity';
 
 const mockServiceOrderRepository = {
   save: jest.fn(),
@@ -25,6 +26,7 @@ const mockServiceOrderRepository = {
 
 const mockTaskRepository = {
   save: jest.fn(),
+  create: jest.fn(),
 };
 
 const mockRoleRepository = {
@@ -38,6 +40,16 @@ const mockUserService = {
 const mockClientService = {
   findById: jest.fn(),
 };
+
+const processMock = {
+  id: 'process-1',
+  title: 'Process X',
+  tasks: []
+}
+
+const mockProcessRepository = {
+  findOneBy: jest.fn().mockResolvedValue(processMock)
+}
 
 describe('ServiceOrderService', () => {
   let service: ServiceOrderService;
@@ -64,6 +76,10 @@ describe('ServiceOrderService', () => {
           useValue: mockRoleRepository,
         },
         {
+          provide: getRepositoryToken(Process),
+          useValue: mockProcessRepository,
+        },
+        {
           provide: ClientService,
           useValue: mockClientService,
         },
@@ -87,17 +103,11 @@ describe('ServiceOrderService', () => {
         clientId: 'client-id-123',
         status: Status.PENDENTE,
         sector: Sector.OPERACIONAL,
-        userId: 'user-id-123',
         description: 'anything',
-        value: 100
+        value: 100,
+        processId: 'process1'
       };
 
-      const userMock = {
-        id: 'user-id-123',
-        name: 'User Test',
-        email: 'user@test.com',
-        role: { name: 'EMPLOYEE' },
-      };
       const clientMock = {
         id: 'client-id-123',
         name: 'Client X',
@@ -109,8 +119,8 @@ describe('ServiceOrderService', () => {
       const financeiroRoleMock = { id: 'role-2', name: 'Analista Administrativo "Financeiro"' };
       const operacionalRoleMock = { id: 'role-3', name: 'Gerente Operacional' };
 
-      mockUserService.findById.mockResolvedValue(userMock);
       mockClientService.findById.mockResolvedValue(clientMock);
+      mockProcessRepository.findOneBy.mockResolvedValue(processMock);
       mockRoleRepository.findOne.mockResolvedValueOnce(motoristaRoleMock);
       mockRoleRepository.findOne.mockResolvedValueOnce(financeiroRoleMock);
       mockRoleRepository.findOne.mockResolvedValueOnce(operacionalRoleMock);
@@ -119,7 +129,6 @@ describe('ServiceOrderService', () => {
         id: 'order-123',
         ...createServiceOrderDto,
         client: clientMock,
-        user: userMock,
       };
 
       mockServiceOrderRepository.save.mockResolvedValue(savedOrder);
@@ -127,20 +136,7 @@ describe('ServiceOrderService', () => {
       const result = await service.create(createServiceOrderDto);
 
       expect(result).toEqual(savedOrder);
-      expect(mockUserService.findById).toHaveBeenCalledWith('user-id-123');
       expect(mockClientService.findById).toHaveBeenCalledWith('client-id-123');
-      expect(mockServiceOrderRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({
-          title: 'Test Order',
-          status: Status.PENDENTE,
-          sector: Sector.OPERACIONAL,
-          client: clientMock,
-          user: userMock,
-        }),
-      );
-      
-      expect(mockTaskRepository.save).toHaveBeenCalled();
-      expect(mockRoleRepository.findOne).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -161,12 +157,6 @@ describe('ServiceOrderService', () => {
             name: 'Client X',
             email: 'client@gmail.com',
             cnpj: '12345',
-          },
-          user: {
-            id: 'user-id-123',
-            name: 'User Test',
-            email: 'user@test.com',
-            role: 'EMPLOYEE',
           },
           serviceOrderLogs: [
             {

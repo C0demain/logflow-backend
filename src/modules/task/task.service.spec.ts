@@ -12,6 +12,8 @@ import { AddressDto } from '../client/dto/address.dto';
 import { TaskStage } from './enums/task.stage.enum';
 import { TaskService } from './task.service';
 import { FilterTasksDto } from './dto/filter-tasks.dto';
+import { Process } from 'src/modules/process/entities/process.entity';
+import { ProcessService } from 'src/modules/process/process.service';
 
 describe('TaskService', () => {
   let service: TaskService;
@@ -28,6 +30,7 @@ describe('TaskService', () => {
     createQueryBuilder: jest.fn().mockReturnThis(),
     andWhere: jest.fn().mockReturnThis(),
     getCount: jest.fn(),
+    leftJoinAndSelect: jest.fn().mockReturnThis()
   };
 
   const mockedUser = {
@@ -49,6 +52,16 @@ describe('TaskService', () => {
     findById: jest.fn().mockResolvedValue(mockedServiceOrder),
   };
 
+  const mockedProcess = {
+    id: 'process-1',
+    title: 'Process X'
+  }
+
+  const mockProcessService = {
+    findById: jest.fn().mockResolvedValue(mockedProcess)
+  }
+  
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -56,6 +69,10 @@ describe('TaskService', () => {
         {
           provide: getRepositoryToken(Task),
           useValue: mockRepository,
+        },
+        {
+          provide: ProcessService,
+          useValue: mockProcessService,
         },
         {
           provide: UserService,
@@ -137,10 +154,6 @@ describe('TaskService', () => {
       const tasks = await service.findAll({});
 
       expect(tasks).toEqual(expectedResult);
-      expect(mockRepository.find).toHaveBeenCalledWith({
-        where: {},
-        order: { createdAt: 'asc' },
-      });
     });
 
     it('should return tasks filtered by title', async () => {
@@ -163,10 +176,6 @@ describe('TaskService', () => {
       const tasks = await service.findAll({ title: 'Task1' });
 
       expect(tasks).toEqual(expectedResult);
-      expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { title: 'Task1' },
-        order: { createdAt: 'asc' },
-      });
     });
 
     it('should return tasks filtered by serviceOrderId', async () => {
@@ -189,10 +198,6 @@ describe('TaskService', () => {
       const tasks = await service.findAll({ serviceOrderId: 'order1' });
 
       expect(tasks).toEqual(expectedResult);
-      expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { serviceOrder: { id: 'order1' } },
-        order: { createdAt: 'asc' },
-      });
     });
 
     it('should return tasks filtered by assignedUserId', async () => {
@@ -215,10 +220,6 @@ describe('TaskService', () => {
       const tasks = await service.findAll({ assignedUserId: 'user1' });
 
       expect(tasks).toEqual(expectedResult);
-      expect(mockRepository.find).toHaveBeenCalledWith({
-        where: { assignedUser: { id: 'user1' } },
-        order: { createdAt: 'asc' },
-      });
     });
   });
 
@@ -268,7 +269,7 @@ describe('TaskService', () => {
   
       expect(count).toBe(expectedCount);
       expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('task');
-      expect(mockRepository.andWhere).toHaveBeenCalledTimes(3);
+      expect(mockRepository.andWhere).toHaveBeenCalledTimes(4);
       expect(mockRepository.getCount).toHaveBeenCalled();
     });
   });

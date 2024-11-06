@@ -46,9 +46,9 @@ describe('ServiceOrderController', () => {
         clientId: 'Client X',
         status: Status.PENDENTE,
         sector: Sector.OPERACIONAL,
-        userId: 'user-123',
         description: 'anything',
-        value: 100
+        value: 100,
+        processId: 'process1'
       };
 
       const result = {
@@ -62,12 +62,6 @@ describe('ServiceOrderController', () => {
         },
         status: Status.PENDENTE,
         sector: Sector.OPERACIONAL,
-        user: {
-          id: 'user-123',
-          name: 'User Test',
-          email: 'user@test.com',
-          role: 'EMPLOYEE',
-        },
       };
 
       mockServiceOrderService.create.mockResolvedValue(result);
@@ -87,11 +81,6 @@ describe('ServiceOrderController', () => {
           },
           result.status,
           result.sector,
-          {
-            userId: result.user.id,
-            userName: result.user.name,
-            userEmail: result.user.email,
-          }
         ),
       );
     });
@@ -111,12 +100,6 @@ describe('ServiceOrderController', () => {
           },
           Status.PENDENTE,
           Sector.OPERACIONAL,
-          {
-            userId: 'user-123', 
-            userName: 'User Test',
-            userEmail: 'user@test.com',
-            userRole: '',
-          },
         ),
       ];
 
@@ -141,12 +124,6 @@ describe('ServiceOrderController', () => {
           },
           Status.PENDENTE,
           Sector.OPERACIONAL,
-          {
-            userId: 'user-123', 
-            userName: 'User Test',
-            userEmail: 'user@test.com',
-            userRole: '',
-          },
         ),
       ];
 
@@ -182,12 +159,6 @@ describe('ServiceOrderController', () => {
           },
           Status.PENDENTE,
           Sector.OPERACIONAL,
-          {
-            userId: 'user-123', 
-            userName: 'User Test',
-            userEmail: 'user@test.com',
-            userRole: '',
-          },
         ),
       ];
 
@@ -228,11 +199,6 @@ describe('ServiceOrderController', () => {
           clientCnpj: '12345',
         },
         status: Status.FINALIZADO,
-        user: {
-          id: 'user-123',
-          name: 'User Test',
-          email: 'user@test.com',
-        },
       };
 
       mockServiceOrderService.update.mockResolvedValue(updatedOrder);
@@ -258,11 +224,6 @@ describe('ServiceOrderController', () => {
           clientCnpj: '12345',
         },
         status: Status.PENDENTE,
-        user: {
-          id: 'user-123',
-          name: 'User Test',
-          email: 'user@test.com',
-        },
       };
 
       mockServiceOrderService.remove.mockResolvedValue(orderToRemove);
