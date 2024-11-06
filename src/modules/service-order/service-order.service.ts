@@ -37,15 +37,12 @@ export class ServiceOrderService {
 
   async create(createServiceOrderDto: CreateServiceOrderDto): Promise<ServiceOrder> {
     const serviceDb = new ServiceOrder();
-  
-    const user = await this.userService.findById(createServiceOrderDto.userId);
     const client = await this.clientService.findById(createServiceOrderDto.clientId);
   
     serviceDb.title = createServiceOrderDto.title;
     serviceDb.client = client;
     serviceDb.status = createServiceOrderDto.status;
     serviceDb.sector = createServiceOrderDto.sector;
-    serviceDb.user = user;
 
     // Opcionais
     serviceDb.description = createServiceOrderDto.description;
@@ -53,15 +50,15 @@ export class ServiceOrderService {
   
     const savedServiceOrder = await this.serviceOrderRepository.save(serviceDb);
   
-    await this.createTasksForServiceOrder(savedServiceOrder);
+    await this.createTasksForServiceOrder(savedServiceOrder, createServiceOrderDto.processId);
   
     return savedServiceOrder;
   }
   
-  private async createTasksForServiceOrder(serviceOrder: ServiceOrder) {
-    const process = await this.processRepository.findOne({where: {title: 'Pedido c/ entrega'} })
+  private async createTasksForServiceOrder(serviceOrder: ServiceOrder, processId: string) {
+    const process = await this.processRepository.findOne({where: {id: processId} })
     if(!process){
-      throw new NotFoundException('Processo padrão não encontrado')
+      throw new NotFoundException('Processo não encontrado')
     }
 
     process.tasks.forEach(async (t) => {
@@ -116,6 +113,8 @@ export class ServiceOrderService {
       },
     });
 
+    console.log(orders)
+
     if (!orders || orders.length === 0) {
       throw new InternalServerErrorException(
         'Nenhuma ordem de serviço encontrada.',
@@ -123,7 +122,6 @@ export class ServiceOrderService {
     }
 
     const ordersList = orders.map((serviceOrder) => {
-      const user = serviceOrder.user;
       const client = serviceOrder.client;
       return new ListServiceOrderDto(
         serviceOrder.id,
@@ -136,12 +134,6 @@ export class ServiceOrderService {
         },
         serviceOrder.status,
         serviceOrder.sector,
-        {
-          userId: user.id,
-          userName: user.name,
-          userEmail: user.email,
-          userRole: user.role.name,
-        },
         serviceOrder.serviceOrderLogs.map((log) => ({
           changedTo: log.changedTo,
           atDate: log.creationDate,

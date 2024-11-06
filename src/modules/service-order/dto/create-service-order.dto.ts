@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsNumber,
   Length,
+  ValidateIf,
 } from 'class-validator';
 import { Status } from '../enums/status.enum';
 import { Sector } from '../enums/sector.enum';
@@ -23,12 +24,13 @@ export class CreateServiceOrderDto {
   @IsEnum(Status, { message: "O campo 'Status' precisa estar dentro dos padrões pré-definidos."})
   status: Status;
 
+  @IsUUID()
+  @IsNotEmpty({ message: "O campo com o ID do Processo é obrigatório." })
+  processId: string
+
   @IsEnum(Sector, { message: "O campo 'Setor' precisa estar dentro dos padrões pré-definidos."})
   sector: Sector;
 
-  @IsUUID()
-  @IsNotEmpty({ message: "O campo com o ID do Usuário é obrigatório." })
-  userId: string;
 
   @IsOptional()
   @IsString()

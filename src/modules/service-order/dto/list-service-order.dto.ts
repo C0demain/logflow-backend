@@ -13,12 +13,6 @@ export class ListServiceOrderDto {
     },
     readonly status: Status,
     readonly sector: Sector,
-    readonly user: {
-      userId: string;
-      userName: string;
-      userEmail: string;
-      userRole?: string;
-    },
     readonly logs?: {
       changedTo?: Sector;
       atDate?: Date;
