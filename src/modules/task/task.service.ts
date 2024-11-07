@@ -73,6 +73,7 @@ export class TaskService {
     templateTask.process = process
     templateTask.sector = createTemplateTaskDto.sector
     templateTask.stage = createTemplateTaskDto.stage
+    templateTask.role = role
 
     // Opcionais
     templateTask.taskCost = createTemplateTaskDto.taskCost || 0
