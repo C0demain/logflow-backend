@@ -134,7 +134,9 @@ export class TaskService {
     }
 
     if (filters.serviceOrderId) {
-      where.serviceOrder = { id: filters.serviceOrderId };
+      where.serviceOrder = { id: filters.serviceOrderId, isActive: true };
+    } else {
+      where.serviceOrder = { isActive: true };
     }
 
     if (filters.stage) {
