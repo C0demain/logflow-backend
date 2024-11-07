@@ -32,16 +32,17 @@ export class ServiceOrderController {
   @Post()
   @ApiOperation({ summary: 'Criar ordem de serviço' })
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    const { title, clientId, status, sector, userId, description, value } = createServiceOrderDto;
+    const { title, clientId, status, processId, sector, userId, description, value } = createServiceOrderDto;
 
     const orderCreated = await this.serviceOrderService.create({
-      title: title,
-      clientId: clientId,
-      status: status,
-      sector: sector,
-      userId: userId,
-      description: description,
-      value: value
+      title,
+      clientId,
+      processId,
+      status,
+      sector,
+      userId,
+      description,
+      value
     });
 
     return {

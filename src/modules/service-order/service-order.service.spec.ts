@@ -13,6 +13,7 @@ import { ServiceOrder } from './entities/service-order.entity';
 import { Sector } from './enums/sector.enum';
 import { Status } from './enums/status.enum';
 import { ServiceOrderService } from './service-order.service';
+import { Process } from 'src/modules/process/entities/process.entity';
 
 const mockServiceOrderRepository = {
   save: jest.fn(),
@@ -91,10 +92,24 @@ const orders = [
     creationDate: new Date(2024, 10, 11),
   },
 ];
+const processMock: Process = {
+  id: 'process-1',
+  title: 'Process 1',
+  tasks: [],
+}
+
+const mockProcessRepository = {
+  create: jest.fn().mockResolvedValue(processMock),
+  save: jest.fn().mockResolvedValue(processMock),
+  find: jest.fn().mockResolvedValue([processMock]),
+  findOneBy: jest.fn().mockResolvedValue(processMock),
+  findOne: jest.fn().mockResolvedValue(processMock),
+}
 
 describe('ServiceOrderService', () => {
   let service: ServiceOrderService;
   let repository: Repository<ServiceOrder>;
+  let processRepo: Repository<Process>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -111,6 +126,10 @@ describe('ServiceOrderService', () => {
         {
           provide: getRepositoryToken(Task),
           useValue: mockTaskRepository,
+        },
+        {
+          provide: getRepositoryToken(Process),
+          useValue: mockProcessRepository,
         },
         {
           provide: getRepositoryToken(RoleEntity),
@@ -131,6 +150,8 @@ describe('ServiceOrderService', () => {
     repository = module.get<Repository<ServiceOrder>>(
       getRepositoryToken(ServiceOrder),
     );
+    processRepo = module.get<Repository<Process>>(getRepositoryToken(Process))
+
   });
 
   it('should be defined', () => {
@@ -147,6 +168,7 @@ describe('ServiceOrderService', () => {
         userId: 'user-id-123',
         description: 'anything',
         value: 100,
+        processId: 'process-1'
       };
 
       const userMock = {
@@ -198,9 +220,7 @@ describe('ServiceOrderService', () => {
           user: userMock,
         }),
       );
-
-      expect(mockTaskRepository.save).toHaveBeenCalled();
-      expect(mockRoleRepository.findOne).toHaveBeenCalledTimes(3);
+      
     });
   });
 

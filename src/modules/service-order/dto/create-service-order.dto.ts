@@ -19,6 +19,10 @@ export class CreateServiceOrderDto {
   @IsNotEmpty({ message: "O campo com o ID do Cliente é obrigatório." })
   clientId: string;
 
+  @IsUUID()
+  @IsNotEmpty({ message: "O campo com o ID do Processo é obrigatório." })
+  processId: string;
+
   @IsOptional()
   @IsEnum(Status, { message: "O campo 'Status' precisa estar dentro dos padrões pré-definidos."})
   status: Status;
