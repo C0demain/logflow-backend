@@ -249,4 +249,49 @@ export class ServiceOrderService {
 
     return orderFound;
   }
+
+  async calculateValues(filters: {
+    id?: string;
+    title?: string;
+    status?: string;
+    sector?: string;
+    active?: boolean;
+    dateFrom?: Date;
+    dateTo?: Date;
+  }) {
+    const where: FindOptionsWhere<ServiceOrder> = {};
+
+    if (filters.id) where.id = filters.id;
+    if (filters.title) where.title = filters.title;
+    if (filters.status) where.status = filters.status as Status;
+    if (filters.sector) where.sector = filters.sector as Sector;
+    if (filters.dateFrom && filters.dateTo) {
+      where.creationDate = Between(filters.dateFrom, filters.dateTo);
+    } else if (filters.dateFrom) {
+      where.creationDate = MoreThanOrEqual(filters.dateFrom);
+    } else if (filters.dateTo) {
+      where.creationDate = LessThanOrEqual(filters.dateTo);
+    }
+    where.isActive = filters.active === undefined ? true : filters.active;
+
+    const orders = await this.serviceOrderRepository.find({ where, relations: ['tasks'] });
+
+    if (!orders || orders.length === 0) {
+      throw new InternalServerErrorException('Nenhuma ordem de serviço encontrada.');
+    }
+
+    const totalValue = orders.reduce((sum, order) => sum + Number(order.value || 0), 0);
+    const averageValue = orders.length > 0 ? totalValue / orders.length : 0;
+    const totalTaskCost = orders.reduce((sum, order) => {
+      return sum + order.tasks.reduce((taskSum, task) => taskSum + Number(task.taskCost || 0), 0);
+    }, 0);
+    const profit = totalValue - totalTaskCost;
+
+    return {
+      totalValue: totalValue.toFixed(2),
+      averageValue: averageValue.toFixed(2),
+      totalTaskCost: totalTaskCost.toFixed(2),
+      profit: profit.toFixed(2),
+    };
+    }
 }
