@@ -23,7 +23,7 @@ import { AuthenticationGuard } from '../auth/authentication.guard';
 import { Sector } from './enums/sector.enum';
 
 @ApiTags('service-order')
-// @UseGuards(AuthenticationGuard)
+@UseGuards(AuthenticationGuard)
 @Controller('/api/v1/service-order')
 @ApiBearerAuth()
 export class ServiceOrderController {
@@ -119,34 +119,8 @@ export class ServiceOrderController {
     }
   }
 
-  @Get('/:sector')
-  @ApiOperation({ summary: 'Listar ordens de serviço por setor' })
-  async findOrdersBySector(@Param('sector') sector: string) {
-    try {
-      const ordersBySector = await this.serviceOrderService.findAll({
-        sector: sector,
-      });
 
-      if (!ordersBySector || ordersBySector.length === 0) {
-        return {
-          message: `Nenhuma ordem de serviço encontrada para o setor: ${sector}.`,
-          orders: ordersBySector,
-        };
-      }
-
-      return {
-        message: `Ordens de serviço do setor ${sector} encontradas.`,
-        orders: ordersBySector,
-      };
-    } catch (error) {
-      return {
-        message: 'Nenhuma ordem de serviço encontrada.',
-        orders: [],
-      };
-    }
-  }
-
-  @Get('history/get')
+  @Get('history')
   @ApiOperation({
     summary: 'Listar todos os logs de ordens de serviço',
     description: 'Rota acessível apenas para administradores',
@@ -178,7 +152,7 @@ export class ServiceOrderController {
     };
   }
 
-  @Get('dashboard/get')
+  @Get('dashboard')
   @ApiOperation({
     summary: 'Calcular totais das ordens de serviço e tarefas',
     description: 'Rota acessível apenas para administradores',

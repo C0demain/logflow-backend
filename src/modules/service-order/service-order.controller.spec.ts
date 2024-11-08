@@ -168,50 +168,6 @@ describe('ServiceOrderController', () => {
     });
   });
 
-  describe('findOrdersBySector', () => {
-    it('should return orders by sector', async () => {
-      const sector = Sector.OPERACIONAL;
-      const result = [
-        new ListServiceOrderDto(
-          'order-123',
-          'Filtered Order',
-          {
-            clientId: "client-123",
-            clientName: 'Client X',
-            clientEmail: 'client@gmail.com',
-            clientCnpj: '12345',
-          },
-          Status.PENDENTE,
-          Sector.OPERACIONAL,
-          {
-            userId: 'user-123', 
-            userName: 'User Test',
-            userEmail: 'user@test.com',
-            userRole: '',
-          },
-        ),
-      ];
-
-      mockServiceOrderService.findAll.mockResolvedValue(result);
-
-      const response = await controller.findOrdersBySector(sector);
-
-      expect(response.message).toEqual(`Ordens de serviço do setor ${sector} encontradas.`);
-      expect(response.orders).toEqual(result);
-    });
-
-    it('should return a message when no orders are found for the sector', async () => {
-      const sector = 'INEXISTENTE';
-
-      mockServiceOrderService.findAll.mockResolvedValue([]);
-
-      const response = await controller.findOrdersBySector(sector);
-
-      expect(response.message).toEqual(`Nenhuma ordem de serviço encontrada para o setor: ${sector}.`);
-      expect(response.orders).toEqual([]);
-    });
-  });
-
   describe('update', () => {
     it('should update the service order and return it', async () => {
       const updateServiceOrderDto: UpdateServiceOrderDto = {
