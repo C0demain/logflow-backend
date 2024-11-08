@@ -169,6 +169,8 @@ export class TaskService {
     const query = this.taskRepository.createQueryBuilder('task');
     query.leftJoinAndSelect('task.process', 'process').andWhere('process.id IS NULL') // Ignora tarefas template
 
+    query.andWhere('task.dueDate IS NOT NULL')
+    query.leftJoinAndSelect('task.serviceOrder', 'serviceOrder').andWhere('serviceOrder.isActive IS true')
     if (filters.startedAt) {
       //Busca tarefas que estão atrasadas filtrando pela data de início
       query.andWhere(
@@ -188,6 +190,10 @@ export class TaskService {
     if (filters.sector) {
       //Busca tarefas que estão atrasadas filtrando pelo setor
       query.andWhere('task.sector = :sector', { sector: filters.sector });
+    }
+
+    if(Object.values(filters).every(el => el === undefined)){
+      query.andWhere('task.completedAt > task.dueDate')
     }
 
     const count = await query.getCount();
