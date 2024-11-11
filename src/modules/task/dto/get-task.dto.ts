@@ -1,11 +1,16 @@
 import { Sector } from "src/modules/service-order/enums/sector.enum"
 import { Task } from "src/modules/task/entities/task.entity"
+import { TaskStage } from "../enums/task.stage.enum";
 
 export class GetTaskDto {
     readonly id: string;
     readonly title: string;
     readonly sector: Sector;
-    readonly completed: boolean;
+    readonly startedAt: Date | null;
+    readonly completedAt: Date | null;
+    readonly dueDate?: Date | null;
+    readonly stage: TaskStage;
+    readonly taskCost: number | null;
     readonly serviceOrder?: {
         id: string,
         title: string
@@ -24,12 +29,20 @@ export class GetTaskDto {
         number: string,
         complement?: string,
     }
+    readonly files?: Array<{
+        id: string,
+        filename: string,
+    }>
 
     constructor(
         id: string,
         title: string,
+        startedAt: Date | null,
+        completedAt: Date | null,
+        dueDate: Date | null,
         sector: Sector,
-        completed: boolean,
+        stage: TaskStage,
+        taskCost: number | null,
         assignedUser?: {
             id: string,
             name: string,
@@ -47,16 +60,25 @@ export class GetTaskDto {
             street: string,
             number: string,
             complement?: string,
-        }
+        },
+        files?: Array<{
+            id: string,
+            filename: string,
+        }>
         
     ) {
         this.id = id;
         this.title = title;
-        this.completed = completed;
+        this.startedAt = startedAt;
+        this.completedAt = completedAt;
+        this.dueDate = dueDate;
         this.sector = sector;
+        this.stage = stage;
+        this.taskCost = taskCost;
         this.assignedUser = assignedUser;
         this.serviceOrder = serviceOrder;
         this.address = address;
+        this.files = files
     };
 }
 
@@ -72,7 +94,7 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
         email: task.assignedUser.email,
     } : {
         id: "null",
-        name: "nenhum usuário atribuído a esta tarefa",
+        name: "Nenhum usuário atribuído a esta tarefa",
         email: "null",
     };
 
@@ -85,14 +107,26 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
         number: task.address.number,
         complement: task.address.complement,
     } : undefined;
+
+    const files = task.files && task.files.map(f => {
+        return {
+            id: f.id,
+            filename: f.filename,
+        }
+    })
     
     return new GetTaskDto(
         task.id, 
         task.title, 
-        task.sector, 
-        task.completed, 
+        task.startedAt, 
+        task.completedAt,
+        task.dueDate, 
+        task.sector,
+        task.stage,
+        task.taskCost,
         assignedUser, 
         serviceOrder, 
-        address
+        address,
+        files
     );
 }

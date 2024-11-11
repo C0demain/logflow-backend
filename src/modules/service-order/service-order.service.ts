@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { Between, FindOptionsWhere, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceOrder } from './entities/service-order.entity';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
@@ -16,6 +16,10 @@ import { ClientService } from '../client/client.service';
 import { ServiceOrderLog } from './entities/service-order-log.entity';
 import { Task } from '../task/entities/task.entity';
 import { RoleEntity } from '../roles/roles.entity';
+import { TaskStage } from '../task/enums/task.stage.enum';
+import { Process } from 'src/modules/process/entities/process.entity';
+import { TaskService } from 'src/modules/task/task.service';
+import { ProcessService } from 'src/modules/process/process.service';
 
 @Injectable()
 export class ServiceOrderService {
@@ -24,8 +28,11 @@ export class ServiceOrderService {
     private readonly serviceOrderRepository: Repository<ServiceOrder>,
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
+    @InjectRepository(ServiceOrderLog)
+    private readonly logsRepository: Repository<ServiceOrderLog>,
     @InjectRepository(RoleEntity)
     private roleRepository: Repository<RoleEntity>,
+    private readonly processService: ProcessService,
     private readonly userService: UserService,
     private readonly clientService: ClientService,
   ) {}
@@ -35,6 +42,7 @@ export class ServiceOrderService {
   
     const user = await this.userService.findById(createServiceOrderDto.userId);
     const client = await this.clientService.findById(createServiceOrderDto.clientId);
+    const process = await this.processService.findById(createServiceOrderDto.processId)
   
     serviceDb.title = createServiceOrderDto.title;
     serviceDb.client = client;
@@ -48,52 +56,26 @@ export class ServiceOrderService {
   
     const savedServiceOrder = await this.serviceOrderRepository.save(serviceDb);
   
-    await this.createTasksForServiceOrder(savedServiceOrder);
+    await this.createTasksForServiceOrder(savedServiceOrder, process);
   
     return savedServiceOrder;
   }
   
-  private async createTasksForServiceOrder(serviceOrder: ServiceOrder) {
-    const motoristaRole = await this.roleRepository.findOne({ where: { name: 'Motorista' } });
-    const financeiroRole = await this.roleRepository.findOne({ where: { name: 'Analista Administrativo "Financeiro"' } });
-    const operacionalRole = await this.roleRepository.findOne({ where: { name: 'Gerente Operacional' } });
-  
-    if(!motoristaRole || !financeiroRole || !operacionalRole){
-      throw new NotFoundException("roles nao encontradas")
-    }
-    const tasks = [
-      this.createTask('Documentos de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Endereço de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Assinatura de Coleta', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Trazer p/ Galpão', Sector.OPERACIONAL, operacionalRole, serviceOrder),
-  
-      this.createTask('Documentos de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Endereço de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Assinatura de Entrega', Sector.OPERACIONAL, motoristaRole, serviceOrder),
-      this.createTask('Motorista: Devolução de Documentos', Sector.OPERACIONAL, operacionalRole, serviceOrder),
-  
-      this.createTask('Confirmação de Entrega', Sector.FINANCEIRO, financeiroRole, serviceOrder),
-      this.createTask('Emissão de NF/BOLETO', Sector.FINANCEIRO, financeiroRole, serviceOrder),
-      this.createTask('Confirmação de Recebimento', Sector.FINANCEIRO, financeiroRole, serviceOrder),
-    ];
-  
-    for(let t of tasks){
-      await this.taskRepository.save(t)
-    }
-  }
-  
-  private createTask(
-    title: string,
-    sector: Sector,
-    role: RoleEntity,
-    serviceOrder: ServiceOrder
-  ): Task {
-    const task = new Task();
-    task.title = title;
-    task.sector = sector;
-    task.role = role;
-    task.serviceOrder = serviceOrder;
-    return task;
+  private async createTasksForServiceOrder(serviceOrder: ServiceOrder, process: Process) {
+    process.tasks.forEach(async (t) => {
+      const newTask = this.taskRepository.create({
+        title: t.title,
+        sector: t.sector,
+        role: t.role,
+        serviceOrder,
+        stage: t.stage,
+        files: t.files,
+        address: t.address
+      })
+
+      await this.taskRepository.save(newTask)
+    })
+    
   }
   
 
@@ -103,6 +85,8 @@ export class ServiceOrderService {
     status?: string;
     sector?: string;
     active?: boolean;
+    createdFrom?: Date;
+    createdTo?: Date;
   }) {
     // Construir a consulta dinamicamente
     const where: FindOptionsWhere<ServiceOrder> = {};
@@ -123,25 +107,29 @@ export class ServiceOrderService {
       where.sector = filters.sector as Sector;
     }
 
+    if (filters.createdFrom && filters.createdTo) {
+      where.creationDate = Between(filters.createdFrom, filters.createdTo);
+    } else if (filters.createdFrom) {
+      where.creationDate = MoreThanOrEqual(filters.createdFrom);
+    } else if (filters.createdTo) {
+      where.creationDate = LessThanOrEqual(filters.createdTo);
+    }
+
     where.isActive = filters.active === undefined ? true : filters.active;
 
     const orders = await this.serviceOrderRepository.find({
       where,
-      relations: {
-        serviceOrderLogs: true,
-      },
     });
 
     if (!orders || orders.length === 0) {
       throw new InternalServerErrorException(
-        'Nenhuma ordem de serviço encontrada',
+        'Nenhuma ordem de serviço encontrada.',
       );
     }
 
     const ordersList = orders.map((serviceOrder) => {
       const user = serviceOrder.user;
       const client = serviceOrder.client;
-
       return new ListServiceOrderDto(
         serviceOrder.id,
         serviceOrder.title,
@@ -159,10 +147,9 @@ export class ServiceOrderService {
           userEmail: user.email,
           userRole: user.role.name,
         },
-        serviceOrder.serviceOrderLogs.map((log) => ({
-          changedTo: log.changedTo,
-          atDate: log.creationDate,
-        })),
+        serviceOrder.description,
+        serviceOrder.value,
+        serviceOrder.creationDate,
       );
     });
 
@@ -176,7 +163,7 @@ export class ServiceOrderService {
 
     if (!orderFound) {
       throw new NotFoundException(
-        `Ordem de serviço com id: ${id}, não encontrada`,
+        `Ordem de serviço com id: ${id} não encontrada.`,
       );
     }
 
@@ -193,7 +180,7 @@ export class ServiceOrderService {
 
     if (!orderFound) {
       throw new NotFoundException(
-        `Ordem de serviço com id: ${id}, não encontrada`,
+        `Ordem de serviço com id: ${id} não encontrada.`,
       );
     }
 
@@ -211,6 +198,41 @@ export class ServiceOrderService {
     return await this.serviceOrderRepository.save(orderFound);
   }
 
+  async getLogs(filters: {
+    id?: string;
+    serviceOrderId?: string;
+    changedTo?: Sector;
+  }) {
+    const where: FindOptionsWhere<ServiceOrderLog> = {};
+  
+    if (filters.id) {
+      where.id = filters.id;
+    }
+  
+    if (filters.serviceOrderId) {
+      where.serviceOrder = { id: filters.serviceOrderId };
+    }
+  
+    if (filters.changedTo) {
+      where.changedTo = filters.changedTo;
+    }
+  
+    const logs = await this.logsRepository.find({
+      where,
+      relations: ['serviceOrder'],
+    });
+  
+    if (logs.length === 0) {
+      throw new NotFoundException('Nenhum log de ordem de serviço encontrado.');
+    }
+  
+    return logs.map(log => ({
+      id: log.id,
+      changedTo: log.changedTo,
+      creationDate: log.creationDate,
+    }));
+  }
+  
   async remove(id: string) {
     const orderFound = await this.serviceOrderRepository.findOne({
       where: { id },
@@ -218,7 +240,7 @@ export class ServiceOrderService {
 
     if (!orderFound) {
       throw new NotFoundException(
-        `Ordem de serviço com id: ${id}, não encontrada`,
+        `Ordem de serviço com id: ${id} não encontrada.`,
       );
     }
 
@@ -227,4 +249,49 @@ export class ServiceOrderService {
 
     return orderFound;
   }
+
+  async calculateValues(filters: {
+    id?: string;
+    title?: string;
+    status?: string;
+    sector?: string;
+    active?: boolean;
+    dateFrom?: Date;
+    dateTo?: Date;
+  }) {
+    const where: FindOptionsWhere<ServiceOrder> = {};
+
+    if (filters.id) where.id = filters.id;
+    if (filters.title) where.title = filters.title;
+    if (filters.status) where.status = filters.status as Status;
+    if (filters.sector) where.sector = filters.sector as Sector;
+    if (filters.dateFrom && filters.dateTo) {
+      where.creationDate = Between(filters.dateFrom, filters.dateTo);
+    } else if (filters.dateFrom) {
+      where.creationDate = MoreThanOrEqual(filters.dateFrom);
+    } else if (filters.dateTo) {
+      where.creationDate = LessThanOrEqual(filters.dateTo);
+    }
+    where.isActive = filters.active === undefined ? true : filters.active;
+
+    const orders = await this.serviceOrderRepository.find({ where, relations: ['tasks'] });
+
+    if (!orders || orders.length === 0) {
+      throw new InternalServerErrorException('Nenhuma ordem de serviço encontrada.');
+    }
+
+    const totalValue = orders.reduce((sum, order) => sum + Number(order.value || 0), 0);
+    const averageValue = orders.length > 0 ? totalValue / orders.length : 0;
+    const totalTaskCost = orders.reduce((sum, order) => {
+      return sum + order.tasks.reduce((taskSum, task) => taskSum + Number(task.taskCost || 0), 0);
+    }, 0);
+    const profit = totalValue - totalTaskCost;
+
+    return {
+      totalValue: totalValue.toFixed(2),
+      averageValue: averageValue.toFixed(2),
+      totalTaskCost: totalTaskCost.toFixed(2),
+      profit: profit.toFixed(2),
+    };
+    }
 }

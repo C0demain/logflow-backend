@@ -12,22 +12,26 @@ import { Sector } from '../enums/sector.enum';
 
 export class CreateServiceOrderDto {
   @IsString()
-  @IsNotEmpty({ message: 'o campo `title` não pode estar vazio' })
+  @IsNotEmpty({ message: "O campo 'Título' não pode estar vazio." })
   title: string;
 
   @IsUUID()
-  @IsNotEmpty({ message: 'o campo `clientId`é obrigatorio' })
+  @IsNotEmpty({ message: "O campo com o ID do Cliente é obrigatório." })
   clientId: string;
 
+  @IsUUID()
+  @IsNotEmpty({ message: "O campo com o ID do Processo é obrigatório." })
+  processId: string;
+
   @IsOptional()
-  @IsEnum(Status, { message: 'o campo `status` precisa estar dentro dos padrões pré-definidos'})
+  @IsEnum(Status, { message: "O campo 'Status' precisa estar dentro dos padrões pré-definidos."})
   status: Status;
 
-  @IsEnum(Sector, { message: 'o campo `sector` precisa estar dentro dos padrões pré-definidos'})
+  @IsEnum(Sector, { message: "O campo 'Setor' precisa estar dentro dos padrões pré-definidos."})
   sector: Sector;
 
   @IsUUID()
-  @IsNotEmpty({ message: 'O campo `userId` é obrigatório' })
+  @IsNotEmpty({ message: "O campo com o ID do Usuário é obrigatório." })
   userId: string;
 
   @IsOptional()

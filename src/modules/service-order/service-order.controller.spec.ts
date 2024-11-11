@@ -16,6 +16,7 @@ describe('ServiceOrderController', () => {
     findAll: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
+    getLogs: jest.fn()
   };
 
   beforeEach(async () => {
@@ -124,7 +125,7 @@ describe('ServiceOrderController', () => {
 
       const response = await controller.findAllOrders();
 
-      expect(response.message).toEqual('Ordens de serviço encontradas');
+      expect(response.message).toEqual('Ordens de serviço encontradas.');
       expect(response.orders).toEqual(result);
     });
 
@@ -162,51 +163,7 @@ describe('ServiceOrderController', () => {
 
       const response = await controller.findAllOrders();
 
-      expect(response.message).toEqual('Nenhuma ordem de serviço encontrada');
-      expect(response.orders).toEqual([]);
-    });
-  });
-
-  describe('findOrdersBySector', () => {
-    it('should return orders by sector', async () => {
-      const sector = Sector.OPERACIONAL;
-      const result = [
-        new ListServiceOrderDto(
-          'order-123',
-          'Filtered Order',
-          {
-            clientId: "client-123",
-            clientName: 'Client X',
-            clientEmail: 'client@gmail.com',
-            clientCnpj: '12345',
-          },
-          Status.PENDENTE,
-          Sector.OPERACIONAL,
-          {
-            userId: 'user-123', 
-            userName: 'User Test',
-            userEmail: 'user@test.com',
-            userRole: '',
-          },
-        ),
-      ];
-
-      mockServiceOrderService.findAll.mockResolvedValue(result);
-
-      const response = await controller.findOrdersBySector(sector);
-
-      expect(response.message).toEqual(`Ordens de serviço do setor ${sector} encontradas`);
-      expect(response.orders).toEqual(result);
-    });
-
-    it('should return a message when no orders are found for the sector', async () => {
-      const sector = 'INEXISTENTE';
-
-      mockServiceOrderService.findAll.mockResolvedValue([]);
-
-      const response = await controller.findOrdersBySector(sector);
-
-      expect(response.message).toEqual(`Nenhuma ordem de serviço encontrada para o setor: ${sector}`);
+      expect(response.message).toEqual('Nenhuma ordem de serviço encontrada.');
       expect(response.orders).toEqual([]);
     });
   });
@@ -240,12 +197,61 @@ describe('ServiceOrderController', () => {
       const result = await controller.update('uuid', updateServiceOrderDto);
 
       expect(result).toEqual({
-        message: 'ordem de serviço atualizada',
+        message: 'Ordem de serviço atualizada.',
         serviceOrder: updatedOrder,
       });
       expect(mockServiceOrderService.update).toHaveBeenCalledWith('uuid', updateServiceOrderDto);
     });
   });
+
+  describe('findAllLogs', () => {
+    it('should return all logs of service orders', async () => {
+      const logs = [
+        {
+          id: 'log-1',
+          changedTo: Sector.OPERACIONAL,
+          creationDate: new Date(),
+        },
+      ];
+
+      mockServiceOrderService.getLogs.mockResolvedValue(logs);
+
+      const response = await controller.findAllLogs();
+
+      expect(response.message).toEqual('Logs de ordens de serviço encontrados.');
+      expect(response.logs).toEqual(logs);
+    });
+
+    it('should return a message when no logs are found', async () => {
+      mockServiceOrderService.getLogs.mockResolvedValue([]);
+
+      const response = await controller.findAllLogs();
+
+      expect(response.message).toEqual('Nenhum log de ordem de serviço encontrado.');
+      expect(response.logs).toEqual([]);
+    });
+
+    it('should apply filters and return filtered logs', async () => {
+      const logs = [
+        {
+          id: 'log-1',
+          changedTo: Sector.OPERACIONAL,
+          creationDate: new Date(),
+        },
+      ];
+
+      mockServiceOrderService.getLogs.mockResolvedValue(logs);
+
+      const response = await controller.findAllLogs('log-1', 'order-123', Sector.OPERACIONAL);
+
+      expect(response.logs).toEqual(logs);
+      expect(mockServiceOrderService.getLogs).toHaveBeenCalledWith({
+        id: 'log-1',
+        serviceOrderId: 'order-123',
+        changedTo: Sector.OPERACIONAL,
+      });
+    });
+  })
 
   describe('remove', () => {
     it('should delete the service order and return it', async () => {
@@ -270,7 +276,7 @@ describe('ServiceOrderController', () => {
       const result = await controller.remove('uuid');
 
       expect(result).toEqual({
-        message: 'ordem de serviço deletada',
+        message: 'Ordem de serviço deletada.',
         serviceOrder: orderToRemove,
       });
       expect(mockServiceOrderService.remove).toHaveBeenCalledWith('uuid');

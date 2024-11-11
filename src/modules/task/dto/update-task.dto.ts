@@ -1,7 +1,8 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { IsDate, IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, ValidateIf, ValidateNested } from 'class-validator';
 import { AddressDto } from 'src/modules/client/dto/address.dto';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
+import { TaskStage } from '../enums/task.stage.enum';
 
 export class UpdateTaskDto {
     @IsString()
@@ -13,15 +14,32 @@ export class UpdateTaskDto {
     orderId: string;
 
     @IsEnum(Sector)
+    @IsNotEmpty()
     sector: Sector;
+
+    @IsEnum(TaskStage)
+    @IsNotEmpty()
+    stage: TaskStage;
 
     @IsOptional()
     @IsNotEmpty()
     @IsUUID()
     userId: string;
+  
+    @IsOptional()
+    @IsDateString()
+    @ValidateIf((object, value) => value !== null)
+    startedAt: Date | null;
 
-    @IsBoolean()
-    completed: boolean;
+    @IsOptional()
+    @IsDateString()
+    @ValidateIf((object, value) => value !== null)
+    dueDate: Date | null;
+
+    @IsOptional()
+    @IsDateString()
+    @ValidateIf((object, value) => value !== null)
+    completedAt: Date | null;
 
     @IsOptional()
     @ValidateNested()

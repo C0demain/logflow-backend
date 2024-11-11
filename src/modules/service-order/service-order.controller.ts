@@ -20,6 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthenticationGuard } from '../auth/authentication.guard';
+import { Sector } from './enums/sector.enum';
 
 @ApiTags('service-order')
 @UseGuards(AuthenticationGuard)
@@ -31,16 +32,17 @@ export class ServiceOrderController {
   @Post()
   @ApiOperation({ summary: 'Criar ordem de serviço' })
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    const { title, clientId, status, sector, userId, description, value } = createServiceOrderDto;
+    const { title, clientId, status, processId, sector, userId, description, value } = createServiceOrderDto;
 
     const orderCreated = await this.serviceOrderService.create({
-      title: title,
-      clientId: clientId,
-      status: status,
-      sector: sector,
-      userId: userId,
-      description: description,
-      value: value
+      title,
+      clientId,
+      processId,
+      status,
+      sector,
+      userId,
+      description,
+      value
     });
 
     return {
@@ -62,14 +64,13 @@ export class ServiceOrderController {
           userEmail: orderCreated.user.email,
           userRole: orderCreated.user.role.name,
         },
-        orderCreated.serviceOrderLogs,
         orderCreated.description,
         orderCreated.value
       ),
     };
   }
 
-  @Get()
+  @Get("/")
   @ApiOperation({
     summary: 'Listar todos as ordens de serviço',
     description: 'Rota acessível apenas para administradores',
@@ -79,11 +80,15 @@ export class ServiceOrderController {
   @ApiQuery({ name: 'clientRelated', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, type: String })
   @ApiQuery({ name: 'active', required: false, type: Boolean })
+  @ApiQuery({name: 'createdFrom', required: false, type: Date})
+  @ApiQuery({name: 'createdTo', required: false, type: Date})
   async findAllOrders(
     @Query('id') id?: string,
     @Query('title') title?: string,
     @Query('status') status?: string,
     @Query('active') active?: boolean,
+    @Query('createdFrom') createdFrom?: Date,
+    @Query('createdTo') createdTo?: Date,
   ) {
     try {
       const orders = await this.serviceOrderService.findAll({
@@ -91,52 +96,94 @@ export class ServiceOrderController {
         title,
         status,
         active,
+        createdFrom,
+        createdTo,
       });
 
       if (!orders || orders.length === 0) {
         return {
-          message: 'Nenhuma ordem de serviço encontrada',
+          message: 'Nenhuma ordem de serviço encontrada.',
           orders: orders,
         };
       }
 
       return {
-        message: 'Ordens de serviço encontradas',
+        message: 'Ordens de serviço encontradas.',
         orders: orders,
       };
     } catch (error) {
       return {
-        message: 'Nenhuma ordem de serviço encontrada',
+        message: 'Nenhuma ordem de serviço encontrada.',
         orders: [],
       };
     }
   }
 
-  @Get('/:sector')
-  @ApiOperation({ summary: 'Listar ordens de serviço por setor' })
-  async findOrdersBySector(@Param('sector') sector: string) {
-    try {
-      const ordersBySector = await this.serviceOrderService.findAll({
-        sector: sector,
-      });
 
-      if (!ordersBySector || ordersBySector.length === 0) {
-        return {
-          message: `Nenhuma ordem de serviço encontrada para o setor: ${sector}`,
-          orders: ordersBySector,
-        };
-      }
-
+  @Get('history')
+  @ApiOperation({
+    summary: 'Listar todos os logs de ordens de serviço',
+    description: 'Rota acessível apenas para administradores',
+  })
+  @ApiQuery({ name: 'id', required: false, type: String })
+  @ApiQuery({ name: 'serviceOrderId', required: false, type: String })
+  @ApiQuery({ name: 'changedTo', required: false, enum: Sector })
+  async findAllLogs(
+    @Query('id') id?: string,
+    @Query('serviceOrderId') serviceOrderId?: string,
+    @Query('changedTo') changedTo?: Sector,
+  ) {
+    const logs = await this.serviceOrderService.getLogs({
+      id,
+      serviceOrderId,
+      changedTo,
+    });
+  
+    if (!logs || logs.length === 0) {
       return {
-        message: `Ordens de serviço do setor ${sector} encontradas`,
-        orders: ordersBySector,
-      };
-    } catch (error) {
-      return {
-        message: 'Nenhuma ordem de serviço encontrada',
-        orders: [],
+        message: 'Nenhum log de ordem de serviço encontrado.',
+        logs: [],
       };
     }
+  
+    return {
+      message: 'Logs de ordens de serviço encontrados.',
+      logs: logs,
+    };
+  }
+
+  @Get('dashboard')
+  @ApiOperation({
+    summary: 'Calcular totais das ordens de serviço e tarefas',
+    description: 'Rota acessível apenas para administradores',
+  })
+  @ApiQuery({ name: 'id', required: false, type: String })
+  @ApiQuery({ name: 'title', required: false, type: String })
+  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'sector', required: false, type: String })
+  @ApiQuery({ name: 'active', required: false, type: Boolean })
+  @ApiQuery({ name: 'dateFrom', required: false, type: Date })
+  @ApiQuery({ name: 'dateTo', required: false, type: Date })
+  async calculateTotals(
+    @Query('id') id?: string,
+    @Query('title') title?: string,
+    @Query('status') status?: string,
+    @Query('sector') sector?: string,
+    @Query('active') active?: boolean,
+    @Query('dateFrom') dateFrom?: string,
+    @Query('dateTo') dateTo?: string,
+  ) {
+    const filters = {
+      id,
+      title,
+      status,
+      sector,
+      active,
+      dateFrom: dateFrom ? new Date(dateFrom) : undefined,
+      dateTo: dateTo ? new Date(dateTo) : undefined,
+    };
+
+    return this.serviceOrderService.calculateValues(filters);
   }
 
   @Put(':id')
@@ -148,7 +195,7 @@ export class ServiceOrderController {
     const orderUpdated = await this.serviceOrderService.update(id, newData);
 
     return {
-      message: `ordem de serviço atualizada`,
+      message: `Ordem de serviço atualizada.`,
       serviceOrder: orderUpdated,
     };
   }
@@ -162,7 +209,7 @@ export class ServiceOrderController {
     const orderRemoved = await this.serviceOrderService.remove(id);
 
     return {
-      message: `ordem de serviço deletada`,
+      message: `Ordem de serviço deletada.`,
       serviceOrder: orderRemoved,
     };
   }

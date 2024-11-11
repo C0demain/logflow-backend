@@ -68,7 +68,7 @@ export class ClientService {
     const clientsFound = await this.clientRepository.find({ where });
 
     if (!clientsFound || clientsFound.length === 0) {
-      throw new InternalServerErrorException('nenhum cliente encontrado');
+      throw new InternalServerErrorException('Nenhum cliente encontrado.');
     }
 
     const clients = clientsFound.map((client) => {
@@ -97,7 +97,7 @@ export class ClientService {
     const clientFound = await this.clientRepository.findOne({ where: { id } });
 
     if (!clientFound) {
-      throw new NotFoundException(`cliente com id ${id} não encotrado`);
+      throw new NotFoundException(`Cliente com id ${id} não encotrado.`);
     }
 
     return clientFound;
@@ -154,7 +154,7 @@ export class ClientService {
     let message = "";
 
     if (!clientFound) {
-      throw new NotFoundException(`Cliente com id: ${id}, não encontrado`);
+      throw new NotFoundException(`Cliente com id: ${id}, não encontrado.`);
     }
 
     if (clientFound.serviceOrder && clientFound.serviceOrder.length === 0) {

@@ -32,6 +32,7 @@ describe('UserService', () => {
     isActive: true,
     orders: [],
     tasks: [],
+    files: [],
   };
 
   const createUserMock: CreateUserDTO = {
