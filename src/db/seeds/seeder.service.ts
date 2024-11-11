@@ -127,9 +127,9 @@ export class SeederService {
       this.createTask('Motorista: Assinatura de Entrega', Sector.OPERACIONAL, TaskStage.DELIVERY, motoristaRole, baseProcess),
       this.createTask('Motorista: Devolução de Documentos', Sector.OPERACIONAL, TaskStage.DELIVERY, operacionalRole, baseProcess),
   
-      this.createTask('Confirmação de Entrega', Sector.FINANCEIRO, TaskStage.DELIVERY_CONFIRMATION, financeiroRole, baseProcess),
+      this.createTask('Confirmação de Entrega', Sector.FINANCEIRO, TaskStage.DELIVERY, financeiroRole, baseProcess),
       this.createTask('Emissão de NF/BOLETO', Sector.FINANCEIRO, TaskStage.BUDGET_CHECK, financeiroRole, baseProcess),
-      this.createTask('Confirmação de Recebimento', Sector.FINANCEIRO, TaskStage.SALE_COMPLETED, financeiroRole, baseProcess)
+      this.createTask('Pagamento', Sector.FINANCEIRO, TaskStage.BUDGET_CHECK, financeiroRole, baseProcess)
     ]
 
     for(let t of tasks){
