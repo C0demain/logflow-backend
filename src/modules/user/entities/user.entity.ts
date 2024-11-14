@@ -50,7 +50,7 @@ export class UserEntity {
   files: FileEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: string;
+  createdAt: Date;
 
   @Column({ name: 'deactivated_at', type: 'timestamptz', nullable: true, default: null })
   deactivatedAt: Date | null;
