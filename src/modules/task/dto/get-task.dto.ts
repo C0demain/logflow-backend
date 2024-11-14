@@ -33,6 +33,11 @@ export class GetTaskDto {
         id: string,
         filename: string,
     }>
+    readonly vehicle?:{
+        plate: string,
+        brand: string,
+        model: string
+    }
 
     constructor(
         id: string,
@@ -64,7 +69,12 @@ export class GetTaskDto {
         files?: Array<{
             id: string,
             filename: string,
-        }>
+        }>,
+        vehicle?:{
+            plate: string,
+            brand: string,
+            model: string
+        }
         
     ) {
         this.id = id;
@@ -79,6 +89,7 @@ export class GetTaskDto {
         this.serviceOrder = serviceOrder;
         this.address = address;
         this.files = files
+        this.vehicle = vehicle;
     };
 }
 
@@ -114,6 +125,13 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
             filename: f.filename,
         }
     })
+
+    const vehicle = task.vehicle?{
+        plate: task.vehicle.plate,
+        brand: task.vehicle.brand,
+        model: task.vehicle.model
+
+    }: undefined
     
     return new GetTaskDto(
         task.id, 
@@ -127,6 +145,8 @@ export function parseToGetTaskDTO(task: Task): GetTaskDto {
         assignedUser, 
         serviceOrder, 
         address,
-        files
+        files,
+        vehicle
+
     );
 }

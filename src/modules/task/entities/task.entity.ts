@@ -15,6 +15,7 @@ import {
 } from "typeorm";
 import { TaskStage } from "../enums/task.stage.enum";
 import { Process } from "src/modules/process/entities/process.entity";
+import { Vehicle } from "src/modules/vehicles/entities/vehicle.entity";
 
 @Entity({name: 'task'})
 export class Task {
@@ -61,6 +62,10 @@ export class Task {
 
     @OneToMany(() => FileEntity, (file) => file.task, {eager: true, nullable: true})
     files: FileEntity[];
+
+    @ManyToOne(() => Vehicle, { nullable: true, eager: true })
+    @JoinColumn({ name: 'vehicle_id' })
+    vehicle: Vehicle
 
     @CreateDateColumn()
     createdAt: Date

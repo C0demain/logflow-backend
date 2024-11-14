@@ -179,6 +179,19 @@ export class TaskController {
     }
   }
 
+  @Patch(':id/assign-vehicle')
+  @ApiOperation({ summary: 'Associar veículo a uma tarefa e atualizar status do veículo para "em uso"' })
+  async assignVehicleToTask(
+    @Param('id') taskId: string,
+    @Body('vehicleId') vehicleId: string,
+  ) {
+    const task = await this.taskService.assignVehicleToTask(taskId, vehicleId);
+    return {
+      message: 'Veículo associado à tarefa com sucesso.',
+      task,
+    };
+  }
+
 
   @Delete(':id')
   @ApiOperation({ summary: 'Deletar uma tarefa' })

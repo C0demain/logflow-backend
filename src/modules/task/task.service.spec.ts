@@ -14,10 +14,12 @@ import { TaskService } from './task.service';
 import { FilterTasksDto } from './dto/filter-tasks.dto';
 import { Process } from 'src/modules/process/entities/process.entity';
 import { ProcessService } from 'src/modules/process/process.service';
+import { Vehicle } from '../vehicles/entities/vehicle.entity';
 
 describe('TaskService', () => {
   let service: TaskService;
   let repo: Repository<Task>;
+  let vehicleRepository: Repository<Vehicle>;
   let processService: ProcessService;
   let userService: UserService;
   let serviceOrderService: ServiceOrderService;
@@ -73,6 +75,10 @@ describe('TaskService', () => {
           provide: getRepositoryToken(Task),
           useValue: mockRepository,
         },
+        { 
+          provide: getRepositoryToken(Vehicle),
+          useClass: Repository 
+        },
         {
           provide: ProcessService,
           useValue: mockProcessService,
@@ -90,6 +96,7 @@ describe('TaskService', () => {
 
     service = module.get<TaskService>(TaskService);
     repo = module.get<Repository<Task>>(getRepositoryToken(Task));
+    vehicleRepository = module.get<Repository<Vehicle>>(getRepositoryToken(Vehicle));
     processService = module.get<ProcessService>(ProcessService);
     userService = module.get<UserService>(UserService);
     serviceOrderService = module.get<ServiceOrderService>(ServiceOrderService);
@@ -636,6 +643,8 @@ describe('TaskService', () => {
       expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: taskId } });
     });
   });
+
+  
   
 
   describe('remove', () => {
