@@ -1,12 +1,12 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateUserDTO } from 'src/modules/user/dto/CreateUser.dto';
 import { UpdateUserDTO } from 'src/modules/user/dto/UpdateUser.dto';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { UserService } from 'src/modules/user/user.service';
-import { Repository } from 'typeorm';
-import { RoleEntity } from '../roles/roles.entity'; 
+import { Between, IsNull, Not, Repository } from 'typeorm';
+import { RoleEntity } from '../roles/roles.entity';
 import { Sector } from '../service-order/enums/sector.enum';
 
 describe('UserService', () => {
@@ -26,10 +26,10 @@ describe('UserService', () => {
     name: 'test-username',
     email: 'testuser@gmail.com',
     password: '123456',
-    createdAt: '2024-01-01',
+    createdAt: new Date('2024-01-01'),
     role: roleMock,
     sector: Sector.OPERACIONAL,
-    isActive: true,
+    deactivatedAt: null,
     orders: [],
     tasks: [],
     files: [],
@@ -41,14 +41,13 @@ describe('UserService', () => {
     password: '123456',
     role: 'Gerente Operacional',
     sector: Sector.OPERACIONAL,
-    isActive: true,
   };
 
   const updateUserMock: UpdateUserDTO = {
     name: 'test-username-updated',
     email: 'testuser@gmail.com',
     password: '123456',
-    role: "Gerente Operacional",
+    role: 'Gerente Operacional',
     sector: Sector.OPERACIONAL,
     isActive: true,
   };
@@ -103,12 +102,13 @@ describe('UserService', () => {
 
     const userList = await service.listUsers();
 
-    expect(userList).toEqual([{
+    expect(userList).toEqual([
+      {
         id: 'uuid-uuid',
         name: 'test-username',
         role: 'Gerente Operacional',
-        isActive: true,
-        email: "testuser@gmail.com",
+        deactivatedAt: null,
+        email: 'testuser@gmail.com',
         sector: Sector.OPERACIONAL,
       },
     ]);
@@ -149,27 +149,75 @@ describe('UserService', () => {
     expect(userRepository.save).toHaveBeenCalledWith(userMock);
   });
 
-  it('should throw NotFoundException when user is not found in findByEmail', async () => {
-    userRepository.findOne = jest.fn().mockResolvedValue(null);
+  it('should return the turnover information', async () => {
+    const filters = {
+      startDate: new Date('2024-01-01'),
+      endDate: new Date('2024-12-31'),
+    };
+    const [newUsers, deactivatedUsers, totalUsers] = [10, 5, 20];
 
-    await expect(
-      service.findByEmail('notvalidemail@gmail.com'),
-    ).rejects.toThrow(NotFoundException);
+    userRepository.count = jest
+      .fn()
+      .mockResolvedValueOnce(newUsers)
+      .mockResolvedValueOnce(deactivatedUsers)
+      .mockResolvedValueOnce(totalUsers);
+
+    const turnover = await service.getTurnover(filters);
+
+    expect(turnover).toEqual({
+      ratio: ((newUsers + deactivatedUsers) / (2 * totalUsers)) * 100,
+      difference: newUsers - deactivatedUsers,
+      newUsers,
+      deactivatedUsers,
+    });
+    expect(userRepository.count).toHaveBeenCalledWith({
+      where: {
+        createdAt: Between(filters.startDate, filters.endDate),
+        deactivatedAt: IsNull(),
+      },
+    });
+    expect(userRepository.count).toHaveBeenCalledWith({
+      where: {
+        createdAt: Between(filters.startDate, filters.endDate),
+        deactivatedAt: Not(IsNull()),
+      },
+    });
   });
 
-  it('should throw NotFoundException when user is not found in update', async () => {
-    userRepository.findOneBy = jest.fn().mockResolvedValue(null);
+  describe('Error cases', () => {
+    it('should throw NotFoundException when user is not found in findByEmail', async () => {
+      userRepository.findOne = jest.fn().mockResolvedValue(null);
 
-    await expect(service.updateUser('uu1d-uu1d', updateUserMock)).rejects.toThrow(
-      NotFoundException,
-    );
-  });
+      await expect(
+        service.findByEmail('notvalidemail@gmail.com'),
+      ).rejects.toThrow(NotFoundException);
+    });
 
-  it('should throw NotFoundException when user is not found in delete', async () => {
-    userRepository.findOneBy = jest.fn().mockResolvedValue(null);
+    it('should throw NotFoundException when user is not found in update', async () => {
+      userRepository.findOneBy = jest.fn().mockResolvedValue(null);
 
-    await expect(service.deleteUser('uu1d-uu1d')).rejects.toThrow(
-      NotFoundException,
-    );
+      await expect(
+        service.updateUser('uu1d-uu1d', updateUserMock),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw NotFoundException when user is not found in delete', async () => {
+      userRepository.findOneBy = jest.fn().mockResolvedValue(null);
+
+      await expect(service.deleteUser('uu1d-uu1d')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should throw BadRequestException when startDate is after endDate', async () => {
+      const filters = {
+        startDate: new Date('2024-12-31'),
+        endDate: new Date('2024-01-01'),
+      };
+
+      await expect(service.getTurnover(filters)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
   });
 });
