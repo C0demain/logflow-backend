@@ -15,8 +15,9 @@ import { UserService } from './user.service';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { AuthenticationGuard } from '../auth/authentication.guard';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UserQueryFilters } from 'src/modules/user/dto/user-query-filters';
+import { start } from 'repl';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -67,6 +68,25 @@ export class UserController {
       message: 'Usuários obtidos com sucesso.',
       users: usersSaved,
     };
+  }
+
+  @Get('/turnover')
+  @ApiOperation({
+    summary: 'Obter taxa de turnover',
+    description: 'Rota acessível apenas para administradores',
+  })
+  @ApiQuery({ name: 'startDate', required: true })
+  @ApiQuery({ name: 'endDate', required: true })
+  async getTurnover(
+    @Query('startDate') startDate?: Date,
+    @Query('endDate') endDate?: Date,
+  ) {
+    const turnover = await this.userService.getTurnover({startDate, endDate});
+
+    return {
+      message: 'Taxa de turnover obtida com sucesso.',
+      turnover
+    }
   }
 
   @Put('/:id')
