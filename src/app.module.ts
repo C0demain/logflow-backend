@@ -18,6 +18,7 @@ import { TaskModule } from './modules/task/task.module';
 import { RolesModule } from './modules/roles/roles.module'; 
 import { FileModule } from './modules/file/file.module';
 import { ProcessModule } from './modules/process/process.module';
+import { VehiclesModule } from './modules/vehicles/vehicles.module';
 
 
 @Module({
@@ -38,6 +39,7 @@ import { ProcessModule } from './modules/process/process.module';
     RolesModule,
     FileModule,
     ProcessModule,
+    VehiclesModule,
   ],
   controllers: [RedirectController],
   providers: [
