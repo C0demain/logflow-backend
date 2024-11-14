@@ -1,13 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { UserEntity } from './entities/user.entity';
+import { UserQueryFilters } from 'src/modules/user/dto/user-query-filters';
+import { FindOptionsWhere, IsNull, Not, Repository } from 'typeorm';
+import { RoleEntity } from '../roles/roles.entity';
 import { CreateUserDTO } from './dto/CreateUser.dto';
 import { ListUsersDTO } from './dto/ListUser.dto';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
-import { FindOptionsWhere } from 'typeorm'
-import { RoleEntity } from '../roles/roles.entity';
-import { UserQueryFilters } from 'src/modules/user/dto/user-query-filters';
+import { UserEntity } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -31,14 +30,18 @@ export class UserService {
     userEntity.role = role;
     userEntity.sector = createUserDTO.sector;
     userEntity.password = createUserDTO.password;
-    userEntity.isActive = createUserDTO.isActive;
 
     return this.userRepository.save(userEntity);
   }
 
   async listUsers(filters?: UserQueryFilters) {
     const where: FindOptionsWhere<UserEntity> = {}
-    where.isActive = filters?.activeUsers !== undefined ? filters?.activeUsers : true
+
+    if (filters?.activeUsers === undefined) {
+      where.deactivatedAt = IsNull()
+    } else{
+      where.deactivatedAt = filters?.activeUsers ? IsNull() : Not(IsNull())
+    }
 
     if(filters?.sector){
       where.sector = filters.sector
@@ -46,7 +49,7 @@ export class UserService {
 
     const usersSaved = await this.userRepository.find({where})
     const usersList = usersSaved.map(
-      (user) => new ListUsersDTO(user.id, user.name, user.role.name, user.isActive, user.email, user.sector),
+      (user) => new ListUsersDTO(user.id, user.name, user.role.name, user.deactivatedAt, user.email, user.sector),
     );
     return usersList;
   }
@@ -107,7 +110,7 @@ export class UserService {
       throw new NotFoundException('O usuário não foi encontrado.');
     }
 
-    user.isActive = false;
+    user.deactivatedAt = new Date();
 
     return await this.userRepository.save(user);
   }

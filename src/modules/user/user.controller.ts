@@ -31,7 +31,7 @@ export class UserController {
     description: 'Rota acessível apenas para administradores',
   })
   async createUser(
-    @Body() { name, email, role, sector, isActive }: CreateUserDTO,
+    @Body() { name, email, role, sector }: CreateUserDTO,
     @Body('password', HashPasswordPipe) hashedPassword: string,
   ) {
     const userCreated = await this.userService.createUser({
@@ -40,7 +40,6 @@ export class UserController {
       password: hashedPassword,
       role: role,
       sector: sector,
-      isActive: isActive,
     });
 
     return {
@@ -49,7 +48,7 @@ export class UserController {
         userCreated.id,
         userCreated.name,
         userCreated.role.name,
-        userCreated.isActive,
+        userCreated.deactivatedAt,
         userCreated.email,
         userCreated.sector
       ),

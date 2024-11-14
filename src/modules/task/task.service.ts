@@ -10,6 +10,8 @@ import {
   MoreThanOrEqual,
   Between,
   LessThanOrEqual,
+  IsNull,
+  Not,
 } from 'typeorm';
 import { ServiceOrderService } from 'src/modules/service-order/service-order.service';
 import { UserService } from 'src/modules/user/user.service';
@@ -136,9 +138,9 @@ export class TaskService {
     }
 
     if (filters.serviceOrderId) {
-      where.serviceOrder = { id: filters.serviceOrderId, isActive: true };
+      where.serviceOrder = { id: filters.serviceOrderId, deactivatedAt: IsNull() };
     } else {
-      where.serviceOrder = { isActive: true };
+      where.serviceOrder = { deactivatedAt: IsNull() };
     }
 
     if (filters.stage) {

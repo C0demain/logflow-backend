@@ -28,7 +28,7 @@ export class AuthenticationService {
       throw new UnauthorizedException('O email ou a senha estão incorretos.');
     }
 
-    if (user.isActive === false) {
+    if (user.deactivatedAt !== null) {
       throw new UnauthorizedException('O usuário deve ser ativo no sistema.');
     }
 

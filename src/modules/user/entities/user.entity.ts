@@ -1,20 +1,19 @@
-import {
-  Entity,
-  Column,
-  CreateDateColumn,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  ManyToOne,
-  OneToOne,
-  JoinColumn,
-} from 'typeorm';
-import { Exclude } from 'class-transformer';
 import { ApiTags } from '@nestjs/swagger';
-import { Task } from 'src/modules/task/entities/task.entity';
+import { Exclude } from 'class-transformer';
+import { FileEntity } from 'src/modules/file/entities/file.entity';
+import { RoleEntity } from 'src/modules/roles/roles.entity';
 import { ServiceOrder } from 'src/modules/service-order/entities/service-order.entity';
 import { Sector } from 'src/modules/service-order/enums/sector.enum';
-import { RoleEntity } from 'src/modules/roles/roles.entity';
-import { FileEntity } from 'src/modules/file/entities/file.entity';
+import { Task } from 'src/modules/task/entities/task.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn
+} from 'typeorm';
 
 @ApiTags('users')
 @Entity({ name: 'users' })
@@ -33,13 +32,15 @@ export class UserEntity {
   password: string;
 
   @ManyToOne(() => RoleEntity, { eager: true, nullable: false })
-  @JoinColumn({ name: 'role_id' })  
+  @JoinColumn({ name: 'role_id' })
   role: RoleEntity;
 
-  @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {eager: false})
+  @OneToMany(() => ServiceOrder, (serviceOrder) => serviceOrder.user, {
+    eager: false,
+  })
   orders: ServiceOrder[];
 
-  @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false})
+  @Column({ name: 'sector', type: 'enum', enum: Sector, nullable: false })
   sector: Sector;
 
   @OneToMany(() => Task, (task) => task.assignedUser)
@@ -48,10 +49,9 @@ export class UserEntity {
   @OneToMany(() => FileEntity, (file) => file.user)
   files: FileEntity[];
 
-  @Column({ name: 'isActive', default: true, nullable: false })
-  isActive: boolean;
-
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
 
+  @Column({ name: 'deactivated_at', type: 'timestamptz', nullable: true, default: null })
+  deactivatedAt: Date | null;
 }

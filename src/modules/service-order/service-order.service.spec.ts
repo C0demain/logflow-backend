@@ -366,12 +366,12 @@ describe('ServiceOrderService', () => {
       mockServiceOrderRepository.findOne.mockResolvedValue(orderToDelete);
       mockServiceOrderRepository.delete.mockResolvedValue({
         ...orderToDelete,
-        isActive: false,
+        deactivatedAt: null,
       });
 
       const result = await service.remove('order-123');
 
-      expect(result.isActive).toBeFalsy();
+      expect(result.deactivatedAt).toBeFalsy();
       expect(mockServiceOrderRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'order-123' },
       });

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { CreateServiceOrderDto } from './dto/create-service-order.dto';
 import { UpdateServiceOrderDto } from './dto/update-service-order.dto';
-import { Between, FindOptionsWhere, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { Between, FindOptionsWhere, IsNull, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceOrder } from './entities/service-order.entity';
 import { ListServiceOrderDto } from './dto/list-service-order.dto';
@@ -115,7 +115,11 @@ export class ServiceOrderService {
       where.creationDate = LessThanOrEqual(filters.createdTo);
     }
 
-    where.isActive = filters.active === undefined ? true : filters.active;
+    if (filters.active === undefined) {
+      where.deactivatedAt = IsNull();
+    } else {
+      where.deactivatedAt = filters.active ? IsNull() : Not(IsNull());
+    }
 
     const orders = await this.serviceOrderRepository.find({
       where,
@@ -244,7 +248,7 @@ export class ServiceOrderService {
       );
     }
 
-    orderFound.isActive = false;
+    orderFound.deactivatedAt = new Date();
     await this.serviceOrderRepository.save(orderFound);
 
     return orderFound;
@@ -272,7 +276,12 @@ export class ServiceOrderService {
     } else if (filters.dateTo) {
       where.creationDate = LessThanOrEqual(filters.dateTo);
     }
-    where.isActive = filters.active === undefined ? true : filters.active;
+
+    if (filters.active === undefined) {
+      where.deactivatedAt = IsNull();
+    } else {
+      where.deactivatedAt = filters.active ? IsNull() : Not(IsNull());
+    }
 
     const orders = await this.serviceOrderRepository.find({ where, relations: ['tasks'] });
 
