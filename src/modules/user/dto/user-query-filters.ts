@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform, Type } from "class-transformer";
-import { IsBoolean, IsEnum, IsOptional } from "class-validator";
+import { IsBoolean, IsEnum, IsOptional, IsUUID } from "class-validator";
 import { Sector } from "src/modules/service-order/enums/sector.enum";
 
 export class UserQueryFilters{
@@ -9,6 +9,11 @@ export class UserQueryFilters{
     @IsOptional()
     @IsEnum(Sector)
     sector?: Sector
+
+    @ApiProperty({name: 'roleId', required: false})
+    @IsOptional()
+    @IsUUID()
+    roleId?: string
 
     @ApiProperty({name: 'activeUsers', type: 'boolean', required: false})
     @IsOptional()
