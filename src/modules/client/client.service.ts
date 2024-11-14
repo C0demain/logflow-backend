@@ -10,9 +10,8 @@ import { FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client } from './entities/client.entity';
 import { ListClientDto } from './dto/list-client.dto';
-import axios from "axios";
 import { isValidUUID } from '../../resources/validations/isValidUUID';
-
+import fetchAddressByCep from './validations/viaCepValidator';
 @Injectable()
 export class ClientService {
   constructor(
@@ -20,28 +19,10 @@ export class ClientService {
     private readonly clientRepository: Repository<Client>,
   ) { }
 
-  async fetchAddressByCep(cep: string) {
-    try {
-      const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-      if (response.data.erro) {
-        throw new Error("CEP não encontrado.");
-      }
-      return {
-        zipCode: cep,
-        state: response.data.uf,
-        city: response.data.localidade,
-        neighborhood: response.data.bairro,
-        street: response.data.logradouro,
-      }
-    } catch (error) {
-      throw new Error(`Erro ao buscar endereço: ${error.message}`);
-    }
-  }
-
   async create(createClientDto: CreateClientDto) {
     const clientCreated = new Client();
 
-    const address = await this.fetchAddressByCep(createClientDto.address.zipCode);
+    const address = await fetchAddressByCep(createClientDto.address.zipCode);
 
     clientCreated.address = {
       ...address,
@@ -142,7 +123,7 @@ export class ClientService {
 
     // Verifica se o CEP foi atualizado
     if (updateClientDto.address?.zipCode && updateClientDto.address.zipCode !== clientFound.address.zipCode) {
-      const newAddress = await this.fetchAddressByCep(updateClientDto.address.zipCode);
+      const newAddress = await fetchAddressByCep(updateClientDto.address.zipCode);
       updatedClient.address = {
         ...newAddress,
         number: updateClientDto.address.number || clientFound.address.number,
