@@ -1,10 +1,11 @@
+import { BadRequestException } from "@nestjs/common";
 import axios from "axios";
 
 async function fetchAddressByCep(cep: string) {
     try {
         const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
         if (response.data.erro) {
-            throw new Error("CEP não encontrado.");
+            throw new BadRequestException("CEP não encontrado.");
         }
         return {
             zipCode: cep,
@@ -14,7 +15,7 @@ async function fetchAddressByCep(cep: string) {
             street: response.data.logradouro,
         }
     } catch (error) {
-        throw new Error(`Erro ao buscar endereço: ${error.message}`);
+        throw new BadRequestException(`Erro ao buscar endereço.`);
     }
 }
 
