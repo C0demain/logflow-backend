@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsIn } from 'class-validator';
+import { IsString, IsNotEmpty, IsIn, IsOptional } from 'class-validator';
 
 export class AddressDto {
     @IsString()
@@ -6,23 +6,27 @@ export class AddressDto {
     zipCode: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo 'Estado' não pode estar vazio." })
-    @IsIn(['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 
-        'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 
-        'RR', 'SC', 'SP', 'SE', 'TO'], 
-        { message: "O campo 'Estado' deve ser uma sigla de estado válida" })
+    @IsOptional()
     state: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo 'Cidade' não pode estar vazio." })
+    @IsOptional()
     city: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo 'Bairro' não pode estar vazio." })
+    @IsOptional()
     neighborhood: string;
 
     @IsString()
-    @IsNotEmpty({ message: "O campo 'Rua' não pode estar vazio." })
+    @IsOptional()
+    @IsIn(
+        [
+            'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 
+            'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 
+            'RR', 'SC', 'SP', 'SE', 'TO'
+        ],
+        { message: "O campo 'Estado' deve ser uma sigla de estado válida" }
+    )
     street: string;
 
     @IsString()
