@@ -47,6 +47,15 @@ export class UserService {
       where.sector = filters.sector
     }
 
+    if(filters?.roleId){
+      const role = await this.roleRepository.findOneBy({id: filters.roleId})
+      if(!role){
+        throw new NotFoundException(`Role com id ${filters.roleId} não encontrada`)
+      }
+
+      where.role = role
+    }
+
     const usersSaved = await this.userRepository.find({where})
     const usersList = usersSaved.map(
       (user) => new ListUsersDTO(user.id, user.name, user.role.name, user.deactivatedAt, user.email, user.sector),
