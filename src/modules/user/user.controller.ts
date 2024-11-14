@@ -15,7 +15,8 @@ import { UserService } from './user.service';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { AuthenticationGuard } from '../auth/authentication.guard';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserQueryFilters } from 'src/modules/user/dto/user-query-filters';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -60,9 +61,8 @@ export class UserController {
     summary: 'Listar todos os usuários',
     description: 'Rota acessível apenas para administradores',
   })
-  @ApiQuery({name: 'active', required: false})
-  async listUsers(@Query('active') activeUsers?: boolean) {
-    const usersSaved = await this.userService.listUsers(activeUsers);
+  async listUsers(@Query() filters?: UserQueryFilters) {
+    const usersSaved = await this.userService.listUsers(filters);
 
     return {
       message: 'Usuários obtidos com sucesso.',

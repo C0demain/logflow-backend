@@ -7,6 +7,7 @@ import { ListUsersDTO } from './dto/ListUser.dto';
 import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { FindOptionsWhere } from 'typeorm'
 import { RoleEntity } from '../roles/roles.entity';
+import { UserQueryFilters } from 'src/modules/user/dto/user-query-filters';
 
 @Injectable()
 export class UserService {
@@ -35,9 +36,14 @@ export class UserService {
     return this.userRepository.save(userEntity);
   }
 
-  async listUsers(isActive?: boolean) {
+  async listUsers(filters?: UserQueryFilters) {
     const where: FindOptionsWhere<UserEntity> = {}
-    where.isActive = isActive === undefined ? true : isActive
+    where.isActive = filters?.activeUsers !== undefined ? filters?.activeUsers : true
+
+    if(filters?.sector){
+      where.sector = filters.sector
+    }
+
     const usersSaved = await this.userRepository.find({where})
     const usersList = usersSaved.map(
       (user) => new ListUsersDTO(user.id, user.name, user.role.name, user.isActive, user.email, user.sector),
