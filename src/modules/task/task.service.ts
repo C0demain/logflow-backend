@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,11 +21,13 @@ import { CreateTemplateTaskDto } from 'src/modules/task/dto/create-template-task
 import { ProcessService } from 'src/modules/process/process.service';
 import { Address } from 'src/modules/client/entities/address.entity';
 import { RolesService } from 'src/modules/roles/roles.service';
+import { Vehicle } from '../vehicles/entities/vehicle.entity';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
+    @InjectRepository(Vehicle) private readonly vehicleRepository: Repository<Vehicle>,
     private readonly serviceOrderService: ServiceOrderService,
     private readonly userService: UserService,
     private readonly processService: ProcessService,
@@ -339,6 +341,30 @@ export class TaskService {
     }
     task.dueDate = dueDate;
     return this.taskRepository.save(task);
+  }
+
+  async assignVehicleToTask(taskId: string, vehicleId: string) {
+    const task = await this.taskRepository.findOne({ where: { id: taskId } });
+    if (!task) {
+      throw new NotFoundException('Tarefa não encontrada.');
+    }
+
+    const vehicle = await this.vehicleRepository.findOne({ where: { id: vehicleId } });
+    if (!vehicle) {
+      throw new NotFoundException('Veículo não encontrado.');
+    }
+
+    if (vehicle.status === 'em uso') {
+      throw new BadRequestException('Veículo já está em uso.');
+    }
+
+    vehicle.status = 'em uso';
+    task.vehicle = vehicle;
+
+    await this.vehicleRepository.save(vehicle);
+    await this.taskRepository.save(task);
+
+    return task;
   }
 
   async remove(id: string) {
