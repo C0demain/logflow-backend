@@ -10,7 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useWebSocketAdapter(new IoAdapter(app));
-  console.log('WebSocket Server is running...');
+  console.log('WebSocket Server está em execução...');
 
   const seeder = app.get(SeederService);
   try {
@@ -29,7 +29,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: "*",
+    origin: "http://localhost:3000",
   });
 
   const config = new DocumentBuilder()
