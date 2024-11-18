@@ -19,6 +19,7 @@ import { RolesModule } from './modules/roles/roles.module';
 import { FileModule } from './modules/file/file.module';
 import { ProcessModule } from './modules/process/process.module';
 import { VehiclesModule } from './modules/vehicles/vehicles.module';
+import { ChatModule } from './modules/chat/chat.module';
 
 
 @Module({
@@ -40,6 +41,7 @@ import { VehiclesModule } from './modules/vehicles/vehicles.module';
     FileModule,
     ProcessModule,
     VehiclesModule,
+    ChatModule
   ],
   controllers: [RedirectController],
   providers: [

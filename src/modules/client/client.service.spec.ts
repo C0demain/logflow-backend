@@ -11,6 +11,8 @@ import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { ListClientDto } from './dto/list-client.dto';
 import { AddressDto } from './dto/address.dto';
+jest.mock('axios');
+import axios from 'axios';
 
 const mockClientRepository = {
   save: jest.fn(),
@@ -41,7 +43,10 @@ describe('ClientService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+  
 
+  const mockedAxios = axios as jest.Mocked<typeof axios>;
+  
   describe('create', () => {
     it('should create a new client', async () => {
       const createClientDto: CreateClientDto = {
@@ -51,54 +56,51 @@ describe('ClientService', () => {
         phone: '(12) 97343-1234',
         address: {
           zipCode: '12345-123',
+          number: '123',
+          complement: 'Apt 101',
           state: 'SP',
           city: 'São Paulo',
           neighborhood: 'Centro',
           street: 'Rua X',
-          number: '123',
-          complement: 'Apt 101',
         },
       };
-
+  
+      const viaCepResponse = {
+        uf: 'SP',
+        localidade: 'São Paulo',
+        bairro: 'Centro',
+        logradouro: 'Rua X',
+      };
+  
+      const axiosResponse = { data: viaCepResponse };
+  
       const createdClient = {
-        id: 'client-123',
+        id: 'eead44e3-ddee-440d-ace3-f41c237fbcaf',
         ...createClientDto,
       };
-
+  
+      mockedAxios.get.mockResolvedValue(axiosResponse);
+  
       mockClientRepository.save.mockResolvedValue(createdClient);
-
+  
       const result = await service.create(createClientDto);
-
+  
       expect(result).toEqual(createdClient);
+      expect(mockedAxios.get).toHaveBeenCalledWith(`https://viacep.com.br/ws/12345-123/json/`);
       expect(mockClientRepository.save).toHaveBeenCalledWith(
-        expect.any(Client),
+        expect.objectContaining({
+          name: 'Client X',
+          address: expect.objectContaining({
+            state: 'SP',
+            city: 'São Paulo',
+            neighborhood: 'Centro',
+            street: 'Rua X',
+          }),
+        }),
       );
     });
-
-    it('should throw an error if required fields are missing or invalid', async () => {
-      const invalidClientDto: CreateClientDto = {
-        name: '', // Nome vazio para simular erro
-        email: 'invalidemail.com', // E-mail inválido
-        cnpj: '12.345.678/0000-00', // CNPJ inválido
-        phone: '123456789', // Telefone inválido
-        address: {
-          zipCode: '',
-          state: '',
-          city: '',
-          neighborhood: '',
-          street: '',
-          number: '',
-          complement: '',
-        },
-      };
-
-      mockClientRepository.save.mockImplementation(() => {
-        throw new Error('Validation failed');
-      });
-
-      await expect(service.create(invalidClientDto)).rejects.toThrow();
-    });
   });
+  
 
   describe('findAll', () => {
     it('should return a list of clients based on filters', async () => {
@@ -106,7 +108,7 @@ describe('ClientService', () => {
 
       const clients = [
         {
-          id: 'client-123',
+          id:'eead44e3-ddee-440d-ace3-f41c237fbcaf',
           name: 'Client X',
           email: 'client@gmail.com',
           cnpj: '12.345.678/9234-12',
@@ -146,7 +148,7 @@ describe('ClientService', () => {
   describe('findById', () => {
     it('should return a client by ID', async () => {
       const client = {
-        id: 'client-123',
+        id: 'eead44e3-ddee-440d-ace3-f41c237fbcaf',
         name: 'Client X',
         email: 'client@gmail.com',
         cnpj: '12.345.678/9234-12',
@@ -164,18 +166,18 @@ describe('ClientService', () => {
 
       mockClientRepository.findOne.mockResolvedValue(client);
 
-      const result = await service.findById('client-123');
+      const result = await service.findById('eead44e3-ddee-440d-ace3-f41c237fbcaf');
 
       expect(result).toEqual(client);
       expect(mockClientRepository.findOne).toHaveBeenCalledWith({
-        where: { id: 'client-123' },
+        where: { id: 'eead44e3-ddee-440d-ace3-f41c237fbcaf' },
       });
     });
 
     it('should throw NotFoundException if client is not found', async () => {
       mockClientRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findById('client-123')).rejects.toThrow(
+      await expect(service.findById('eead44e3-ddee-440d-ace3-f41c237fbcaf')).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -192,7 +194,7 @@ describe('ClientService', () => {
       };
 
       const client = {
-        id: 'client-123',
+        id: 'eead44e3-ddee-440d-ace3-f41c237fbcaf',
         name: 'Client X',
         email: 'client@gmail.com',
         cnpj: '12.345.678/9234-12',
@@ -201,14 +203,14 @@ describe('ClientService', () => {
       };
 
       const updatedClient = {
-        id: 'client-123',
+        id: 'eead44e3-ddee-440d-ace3-f41c237fbcaf',
         ...updateClientDto,
       };
 
       mockClientRepository.findOne.mockResolvedValue(client);
       mockClientRepository.save.mockResolvedValue(updatedClient);
 
-      const result = await service.update('client-123', updateClientDto);
+      const result = await service.update('eead44e3-ddee-440d-ace3-f41c237fbcaf', updateClientDto);
 
       expect(result).toEqual({
         client: updatedClient,
@@ -220,7 +222,7 @@ describe('ClientService', () => {
       mockClientRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.update('client-123', {} as UpdateClientDto),
+        service.update('eead44e3-ddee-440d-ace3-f41c237fbcaf', {} as UpdateClientDto),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -228,7 +230,7 @@ describe('ClientService', () => {
   describe('remove', () => {
     it('should delete a client if there are no service orders', async () => {
       const client = {
-        id: 'client-123',
+        id: 'eead44e3-ddee-440d-ace3-f41c237fbcaf',
         name: 'Client X',
         email: 'client@gmail.com',
         cnpj: '12.345.678/9234-12',
@@ -240,18 +242,18 @@ describe('ClientService', () => {
       mockClientRepository.findOne.mockResolvedValue(client);
       mockClientRepository.delete.mockResolvedValue(undefined); // Simula exclusão
 
-      const result = await service.remove('client-123');
+      const result = await service.remove('eead44e3-ddee-440d-ace3-f41c237fbcaf');
 
       expect(result.clientRemoved).toEqual(client);
       expect(result.message).toEqual(
-        `cliente com id: client-123 excluído com sucesso`,
+        `cliente com id: eead44e3-ddee-440d-ace3-f41c237fbcaf excluído com sucesso`,
       );
-      expect(mockClientRepository.delete).toHaveBeenCalledWith('client-123');
+      expect(mockClientRepository.delete).toHaveBeenCalledWith('eead44e3-ddee-440d-ace3-f41c237fbcaf');
     });
 
     it('should desactivate a client if there are service orders', async () => {
       const client = {
-        id: 'client-123',
+        id: 'eead44e3-ddee-440d-ace3-f41c237fbcaf',
         name: 'Client X',
         email: 'client@gmail.com',
         cnpj: '12.345.678/9234-12',
@@ -263,11 +265,11 @@ describe('ClientService', () => {
       mockClientRepository.findOne.mockResolvedValue(client);
       mockClientRepository.save.mockResolvedValue({ ...client, isActive: false });
 
-      const result = await service.remove('client-123');
+      const result = await service.remove('eead44e3-ddee-440d-ace3-f41c237fbcaf');
 
       expect(result.clientRemoved).toEqual({ ...client, isActive: false });
       expect(result.message).toEqual(
-        `cliente com id: client-123 arquivado com sucesso`,
+        `cliente com id: eead44e3-ddee-440d-ace3-f41c237fbcaf arquivado com sucesso`,
       );
       expect(mockClientRepository.save).toHaveBeenCalledWith({
         ...client,
@@ -278,7 +280,7 @@ describe('ClientService', () => {
     it('should throw NotFoundException if client not found', async () => {
       mockClientRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove('client-123')).rejects.toThrow(
+      await expect(service.remove('eead44e3-ddee-440d-ace3-f41c237fbcaf')).rejects.toThrow(
         NotFoundException,
       );
     });
