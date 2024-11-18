@@ -49,7 +49,8 @@ describe('ServiceOrderController', () => {
         sector: Sector.OPERACIONAL,
         userId: 'user-123',
         description: 'anything',
-        value: 100
+        value: 100,
+        processId: 'process 1'
       };
 
       const result = {
