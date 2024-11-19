@@ -186,6 +186,41 @@ export class ServiceOrderController {
     return this.serviceOrderService.calculateValues(filters);
   }
 
+  @Get('dashboard/monthly')
+  @ApiOperation({
+    summary: 'Calcular totais mensais das ordens de serviço e tarefas',
+    description: 'Rota acessível apenas para administradores',
+  })
+  @ApiQuery({ name: 'id', required: false, type: String })
+  @ApiQuery({ name: 'title', required: false, type: String })
+  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'sector', required: false, type: String })
+  @ApiQuery({ name: 'active', required: false, type: Boolean })
+  @ApiQuery({ name: 'dateFrom', required: false, type: Date })
+  @ApiQuery({ name: 'dateTo', required: false, type: Date })
+  async calculateMonthlyTotals(
+    @Query('id') id?: string,
+    @Query('title') title?: string,
+    @Query('status') status?: string,
+    @Query('sector') sector?: string,
+    @Query('active') active?: boolean,
+    @Query('dateFrom') dateFrom?: string,
+    @Query('dateTo') dateTo?: string,
+  ) {
+    const filters = {
+      id,
+      title,
+      status,
+      sector,
+      active,
+      dateFrom: dateFrom ? new Date(dateFrom) : undefined,
+      dateTo: dateTo ? new Date(dateTo) : undefined,
+    };
+
+    return this.serviceOrderService.calculateMonthlyValues(filters);
+}
+
+
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar uma ordem de serviço' })
   async update(

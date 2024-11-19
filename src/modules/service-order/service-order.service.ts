@@ -303,4 +303,72 @@ export class ServiceOrderService {
       profit: profit.toFixed(2),
     };
     }
+
+  async calculateMonthlyValues(filters: { 
+    id?: string;
+    title?: string;
+    status?: string;
+    sector?: string;
+    active?: boolean;
+    dateFrom?: Date;
+    dateTo?: Date;
+  }) {
+    const where: FindOptionsWhere<ServiceOrder> = {};
+  
+    if (filters.id) where.id = filters.id;
+    if (filters.title) where.title = filters.title;
+    if (filters.status) where.status = filters.status as Status;
+    if (filters.sector) where.sector = filters.sector as Sector;
+    if (filters.dateFrom && filters.dateTo) {
+      where.creationDate = Between(filters.dateFrom, filters.dateTo);
+    } else if (filters.dateFrom) {
+      where.creationDate = MoreThanOrEqual(filters.dateFrom);
+    } else if (filters.dateTo) {
+      where.creationDate = LessThanOrEqual(filters.dateTo);
+    }
+  
+    if (filters.active === undefined) {
+      where.deactivatedAt = IsNull();
+    } else {
+      where.deactivatedAt = filters.active ? IsNull() : Not(IsNull());
+    }
+  
+    const orders = await this.serviceOrderRepository.find({ where, relations: ['tasks'] });
+  
+    if (!orders || orders.length === 0) {
+      throw new InternalServerErrorException('Nenhuma ordem de serviço encontrada.');
+    }
+  
+    const monthlyData = orders.reduce((acc, order) => {
+      const creationDate = new Date(order.creationDate);
+      const month = creationDate.getMonth() + 1;
+      const year = creationDate.getFullYear();
+      const key = `${year}-${month}`;
+  
+      if (!acc[key]) {
+        acc[key] = {
+          totalValue: 0,
+          totalTaskCost: 0,
+          ordersCount: 0,
+        };
+      }
+  
+      acc[key].totalValue += Number(order.value || 0);
+      acc[key].totalTaskCost += order.tasks.reduce((taskSum, task) => taskSum + Number(task.taskCost || 0), 0);
+      acc[key].ordersCount += 1;
+  
+      return acc;
+    }, {} as Record<string, { totalValue: number; totalTaskCost: number; ordersCount: number }>);
+  
+    const result = Object.entries(monthlyData).map(([key, data]) => ({
+      month: key,
+      totalValue: data.totalValue.toFixed(2),
+      averageValue: (data.totalValue / data.ordersCount).toFixed(2),
+      totalTaskCost: data.totalTaskCost.toFixed(2),
+      profit: (data.totalValue - data.totalTaskCost).toFixed(2),
+    }));
+  
+    return result;
+  }
+          
 }
