@@ -336,7 +336,7 @@ export class ServiceOrderService {
     const orders = await this.serviceOrderRepository.find({ where, relations: ['tasks'] });
   
     if (!orders || orders.length === 0) {
-      throw new InternalServerErrorException('Nenhuma ordem de serviço encontrada.');
+      return []
     }
   
     const monthlyData = orders.reduce((acc, order) => {
