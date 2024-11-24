@@ -22,7 +22,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly chatService: ChatService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   private userSocketMap = new Map<string, { socketId: string; name: string }>(); // Map de userId -> { socketId, name }
 
@@ -65,7 +65,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('getConnectedUsers')
   handleGetConnectedUsers(@ConnectedSocket() socket: Socket) {
     const connectedUsers = Array.from(this.userSocketMap.entries()).map(([userId, { name }]) => ({
-      userId,
+      id: userId,
       name,
     }));
     socket.emit('connectedUsers', connectedUsers);
@@ -73,81 +73,84 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // Enviar mensagens em grupo
   @SubscribeMessage('sendMessage')
-async handleSendMessage(
-  @MessageBody() data: { groupName: string; message: string },
-  @ConnectedSocket() socket: Socket,
-) {
-  const { groupName, message } = data;
+  async handleSendMessage(
+    @MessageBody() data: { groupName: string; message: string },
+    @ConnectedSocket() socket: Socket,
+  ) {
+    const { groupName, message } = data;
 
-  if (!groupName || !message) {
-    console.log('Group name or message content is missing');
-    return;
+    if (!groupName || !message) {
+      console.log('Group name or message content is missing');
+      return;
+    }
+
+    const sender = [...this.userSocketMap.entries()]
+      .find(([, value]) => value.socketId === socket.id)?.[1];
+    const senderName = sender?.name || 'Unknown User';
+
+    const savedMessage = await this.chatService.saveRoomMessage(socket.id, groupName, message);
+
+    const formattedMessage = {
+      sender: senderName, // Nome do remetente
+      content: message,
+      createdAt: savedMessage.createdAt,
+    };
+
+    console.log(`Message from ${senderName} to group ${groupName}: ${message}`);
+    socket.to(groupName).emit('message', formattedMessage);
   }
-
-  const sender = [...this.userSocketMap.entries()]
-    .find(([, value]) => value.socketId === socket.id)?.[1];
-  const senderName = sender?.name || 'Unknown User';
-
-  const savedMessage = await this.chatService.saveRoomMessage(socket.id, groupName, message);
-
-  const formattedMessage = {
-    sender: senderName, // Nome do remetente
-    content: message,
-    createdAt: savedMessage.createdAt,
-  };
-
-  console.log(`Message from ${senderName} to group ${groupName}: ${message}`);
-  socket.to(groupName).emit('message', formattedMessage);
-}
 
 
   @SubscribeMessage('privateMessage')
-async handlePrivateMessage(
-  @MessageBody() data: { toUserId: string; message: string },
-  @ConnectedSocket() socket: Socket,
-) {
-  const { toUserId, message } = data;
-
-  if (!toUserId || !message) {
-    console.log('Recipient userId or message content is missing');
-    return;
-  }
-
-  // Obter o remetente
-  const sender = [...this.userSocketMap.entries()]
-    .find(([, value]) => value.socketId === socket.id)?.[1];
-  if (!sender) {
-    console.log(`Sender not found for socket ID: ${socket.id}`);
-    return;
-  }
-
-  const senderName = sender.name || 'Unknown Sender';
-
-  // Obter o destinatário
-  const toUser = this.userSocketMap.get(toUserId);
-  if (!toUser) {
-    console.log(`Recipient not found for user ID: ${toUserId}`);
-    return;
-  }
-
-  const recipientName = toUser.name || 'Unknown Recipient';
-
-  // Formatar a mensagem
-  const formattedMessage = {
-    sender: senderName, // Nome do remetente
-    recipient: recipientName, // Nome do destinatário
-    content: message,
-    createdAt: new Date().toISOString(),
-  };
-
-  // Enviar a mensagem para o destinatário
-  socket.to(toUser.socketId).emit('privateMessage', formattedMessage);
-  console.log(
-    `Private message from ${senderName} to ${recipientName}: ${message}`
-  );
-}
-
+  async handlePrivateMessage(
+    @MessageBody() data: { toUserId: string; message: string },
+    @ConnectedSocket() socket: Socket,
+  ) {
+    const { toUserId, message } = data;
   
+    if (!toUserId || !message) {
+      console.log('Recipient userId or message content is missing');
+      return;
+    }
+  
+    // Obter o remetente pelo socket ID
+    const senderEntry = [...this.userSocketMap.entries()]
+      .find(([, value]) => value.socketId === socket.id);
+  
+    if (!senderEntry) {
+      console.log(`Sender not found for socket ID: ${socket.id}`);
+      return;
+    }
+  
+    const [senderId, senderData] = senderEntry;
+    const senderName = senderData.name || 'Unknown Sender';
+  
+    // Obter o destinatário pelo ID do usuário
+    const toUser = this.userSocketMap.get(toUserId);
+    if (!toUser) {
+      console.log(`Recipient not found for user ID: ${toUserId}`);
+      return;
+    }
+  
+    const recipientSocketId = toUser.socketId;
+    const recipientName = toUser.name || 'Unknown Recipient';
+  
+    // Formatar a mensagem
+    const formattedMessage = {
+      sender: senderName,
+      recipient: recipientName,
+      content: message,
+      createdAt: new Date().toISOString(),
+    };
+  
+    // Enviar a mensagem diretamente ao destinatário
+    socket.to(recipientSocketId).emit('privateMessage', formattedMessage);
+    console.log(`Private message from ${senderName} to ${recipientName}: ${message}`);
+  }
+  
+  
+
+
   // Entrar em um grupo
   @SubscribeMessage('joinGroup')
   async handleJoinGroup(
