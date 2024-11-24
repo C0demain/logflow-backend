@@ -24,7 +24,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly jwtService: JwtService,
   ) { }
 
-  private userSocketMap = new Map<string, { socketId: string; name: string }>(); // Map de userId -> { socketId, name }
+  private userSocketMap = new Map<string, { socketId: string; name: string }>();
 
   // Valida e registra o usuário na conexão
   async handleConnection(socket: Socket) {
@@ -37,11 +37,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     try {
-      const payload = this.jwtService.verify(token.replace('Bearer ', '')); // Decodificar o token
+      const payload = this.jwtService.verify(token.replace('Bearer ', ''));
       const userId = payload.sub;
       const userName = payload.username;
 
-      // Mapear o socket com o nome do usuário
+      // Salva o userId no mapa
       this.userSocketMap.set(userId, { socketId: socket.id, name: userName });
       console.log(`User ${userName} (${userId}) connected with socket ${socket.id}`);
     } catch (error) {
@@ -62,29 +62,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   // Recupera usuários conectados
-  // Recupera usuários conectados
-@SubscribeMessage('getConnectedUsers')
-handleGetConnectedUsers(@ConnectedSocket() socket: Socket) {
-  const currentUserEntry = [...this.userSocketMap.entries()]
-    .find(([, value]) => value.socketId === socket.id);
+  @SubscribeMessage('getConnectedUsers')
+  handleGetConnectedUsers(@ConnectedSocket() socket: Socket) {
+    const currentUserEntry = [...this.userSocketMap.entries()]
+      .find(([, value]) => value.socketId === socket.id);
 
-  if (!currentUserEntry) {
-    console.log('Current user not found in userSocketMap');
-    return;
+    if (!currentUserEntry) {
+      console.log('Current user not found in userSocketMap');
+      return;
+    }
+
+    const currentUserId = currentUserEntry[0];
+
+    const connectedUsers = Array.from(this.userSocketMap.entries())
+      .filter(([userId]) => userId !== currentUserId) // Filtra o próprio usuário
+      .map(([userId, { name }]) => ({
+        id: userId,
+        name,
+      }));
+
+    socket.emit('connectedUsers', connectedUsers);
   }
-
-  const currentUserId = currentUserEntry[0];
-
-  const connectedUsers = Array.from(this.userSocketMap.entries())
-    .filter(([userId]) => userId !== currentUserId) // Filtra o próprio usuário
-    .map(([userId, { name }]) => ({
-      id: userId,
-      name,
-    }));
-
-  socket.emit('connectedUsers', connectedUsers);
-}
-
 
   // Enviar mensagens em grupo
   @SubscribeMessage('sendMessage')
@@ -99,22 +97,27 @@ handleGetConnectedUsers(@ConnectedSocket() socket: Socket) {
       return;
     }
 
-    const sender = [...this.userSocketMap.entries()]
-      .find(([, value]) => value.socketId === socket.id)?.[1];
-    const senderName = sender?.name || 'Unknown User';
+    const senderEntry = [...this.userSocketMap.entries()]
+      .find(([, value]) => value.socketId === socket.id);
 
-    const savedMessage = await this.chatService.saveRoomMessage(socket.id, groupName, message);
+    if (!senderEntry) {
+      console.log(`Sender not found for socket ID: ${socket.id}`);
+      return;
+    }
+
+    const [userId, sender] = senderEntry;
+
+    const savedMessage = await this.chatService.saveRoomMessage(userId, groupName, message);
 
     const formattedMessage = {
-      sender: senderName, // Nome do remetente
+      sender: sender.name, // Nome do remetente
       content: message,
       createdAt: savedMessage.createdAt,
     };
 
-    console.log(`Message from ${senderName} to group ${groupName}: ${message}`);
+    console.log(`Message from ${sender.name} (${userId}) to group ${groupName}: ${message}`);
     socket.to(groupName).emit('message', formattedMessage);
   }
-
 
   @SubscribeMessage('privateMessage')
   async handlePrivateMessage(
@@ -122,49 +125,41 @@ handleGetConnectedUsers(@ConnectedSocket() socket: Socket) {
     @ConnectedSocket() socket: Socket,
   ) {
     const { toUserId, message } = data;
-  
+
     if (!toUserId || !message) {
       console.log('Recipient userId or message content is missing');
       return;
     }
-  
-    // Obter o remetente pelo socket ID
+
     const senderEntry = [...this.userSocketMap.entries()]
       .find(([, value]) => value.socketId === socket.id);
-  
+
     if (!senderEntry) {
       console.log(`Sender not found for socket ID: ${socket.id}`);
       return;
     }
-  
-    const [senderId, senderData] = senderEntry;
-    const senderName = senderData.name || 'Unknown Sender';
-  
-    // Obter o destinatário pelo ID do usuário
-    const toUser = this.userSocketMap.get(toUserId);
-    if (!toUser) {
+
+    const [senderId, sender] = senderEntry;
+
+    const recipient = this.userSocketMap.get(toUserId);
+    if (!recipient) {
       console.log(`Recipient not found for user ID: ${toUserId}`);
       return;
     }
-  
-    const recipientSocketId = toUser.socketId;
-    const recipientName = toUser.name || 'Unknown Recipient';
-  
-    // Formatar a mensagem
+
     const formattedMessage = {
-      sender: senderName,
-      recipient: recipientName,
+      sender: sender.name,
+      recipient: recipient.name,
       content: message,
       createdAt: new Date().toISOString(),
     };
-  
-    // Enviar a mensagem diretamente ao destinatário
-    socket.to(recipientSocketId).emit('privateMessage', formattedMessage);
-    console.log(`Private message from ${senderName} to ${recipientName}: ${message}`);
-  }
-  
-  
 
+    // Salva a mensagem no banco de dados
+    await this.chatService.savePrivateMessage(senderId, toUserId, message);
+
+    socket.to(recipient.socketId).emit('privateMessage', formattedMessage);
+    console.log(`Private message from ${sender.name} to ${recipient.name}: ${message}`);
+  }
 
   // Entrar em um grupo
   @SubscribeMessage('joinGroup')
@@ -177,8 +172,18 @@ handleGetConnectedUsers(@ConnectedSocket() socket: Socket) {
       return;
     }
 
+    const senderEntry = [...this.userSocketMap.entries()]
+      .find(([, value]) => value.socketId === socket.id);
+
+    if (!senderEntry) {
+      console.log(`Sender not found for socket ID: ${socket.id}`);
+      return;
+    }
+
+    const [userId] = senderEntry;
+
     socket.join(groupName);
-    console.log(`Socket ${socket.id} joined group ${groupName}`);
+    console.log(`User ${userId} joined group ${groupName}`);
 
     const previousMessages = await this.chatService.getRoomMessages(groupName);
     socket.emit('previousMessages', previousMessages);

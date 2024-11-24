@@ -11,7 +11,7 @@ export class ChatService {
     private privateMessageRepository: Repository<PrivateMessage>,
     @InjectRepository(RoomMessage)
     private roomMessageRepository: Repository<RoomMessage>,
-  ) {}
+  ) { }
 
   async savePrivateMessage(senderId: string, recipientId: string, content: string) {
     const message = this.privateMessageRepository.create({
