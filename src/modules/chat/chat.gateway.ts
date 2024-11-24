@@ -62,14 +62,29 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   // Recupera usuários conectados
-  @SubscribeMessage('getConnectedUsers')
-  handleGetConnectedUsers(@ConnectedSocket() socket: Socket) {
-    const connectedUsers = Array.from(this.userSocketMap.entries()).map(([userId, { name }]) => ({
+  // Recupera usuários conectados
+@SubscribeMessage('getConnectedUsers')
+handleGetConnectedUsers(@ConnectedSocket() socket: Socket) {
+  const currentUserEntry = [...this.userSocketMap.entries()]
+    .find(([, value]) => value.socketId === socket.id);
+
+  if (!currentUserEntry) {
+    console.log('Current user not found in userSocketMap');
+    return;
+  }
+
+  const currentUserId = currentUserEntry[0];
+
+  const connectedUsers = Array.from(this.userSocketMap.entries())
+    .filter(([userId]) => userId !== currentUserId) // Filtra o próprio usuário
+    .map(([userId, { name }]) => ({
       id: userId,
       name,
     }));
-    socket.emit('connectedUsers', connectedUsers);
-  }
+
+  socket.emit('connectedUsers', connectedUsers);
+}
+
 
   // Enviar mensagens em grupo
   @SubscribeMessage('sendMessage')
