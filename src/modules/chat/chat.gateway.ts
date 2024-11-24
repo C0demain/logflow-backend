@@ -3,132 +3,151 @@ import {
   SubscribeMessage,
   MessageBody,
   ConnectedSocket,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { ChatService } from './chat.service';
+import { JwtService } from '@nestjs/jwt';
 
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST'],
-    allowedHeaders: ['content-type'],
+    allowedHeaders: ['content-type', 'Authorization'],
     credentials: true,
   },
 })
-export class ChatGateway {
-  constructor(private chatService: ChatService) {}
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   private userSocketMap = new Map<string, { socketId: string; name: string }>(); // Map de userId -> { socketId, name }
 
-  // Registrar o usuário no mapa
-  @SubscribeMessage('register')
-  async handleRegister(
-    @MessageBody() data: { userId: string; name: string },
-    @ConnectedSocket() socket: Socket,
-  ) {
-    if (!data.userId || !data.name) {
-      console.log('Invalid registration data');
+  // Valida e registra o usuário na conexão
+  async handleConnection(socket: Socket) {
+    const token = socket.handshake.auth.token || socket.handshake.headers.authorization;
+
+    if (!token) {
+      console.log('Connection refused: Token is missing');
+      socket.disconnect();
       return;
     }
 
-    this.userSocketMap.set(data.userId, { socketId: socket.id, name: data.name });
-    console.log(`User ${data.name} (${data.userId}) connected with socket ${socket.id}`);
+    try {
+      const payload = this.jwtService.verify(token.replace('Bearer ', '')); // Decodificar o token
+      const userId = payload.sub;
+      const userName = payload.username;
+
+      // Mapear o socket com o nome do usuário
+      this.userSocketMap.set(userId, { socketId: socket.id, name: userName });
+      console.log(`User ${userName} (${userId}) connected with socket ${socket.id}`);
+    } catch (error) {
+      console.log('Connection refused: Invalid token', error.message);
+      socket.disconnect();
+    }
   }
 
-  // Lidar com a desconexão de usuários
-  handleConnection(@ConnectedSocket() socket: Socket) {
-    console.log(`Socket ${socket.id} connected`);
+  // Remove o usuário no disconnect
+  handleDisconnect(socket: Socket) {
+    const userId = [...this.userSocketMap.entries()]
+      .find(([, value]) => value.socketId === socket.id)?.[0];
 
-    socket.on('disconnect', () => {
-      const userId = [...this.userSocketMap.entries()]
-        .find(([, value]) => value.socketId === socket.id)?.[0];
-      if (userId) {
-        this.userSocketMap.delete(userId);
-        console.log(`User ${userId} disconnected`);
-      }
-    });
+    if (userId) {
+      this.userSocketMap.delete(userId);
+      console.log(`User ${userId} disconnected`);
+    }
   }
 
-  // Enviar mensagem para um grupo
+  // Recupera usuários conectados
+  @SubscribeMessage('getConnectedUsers')
+  handleGetConnectedUsers(@ConnectedSocket() socket: Socket) {
+    const connectedUsers = Array.from(this.userSocketMap.entries()).map(([userId, { name }]) => ({
+      userId,
+      name,
+    }));
+    socket.emit('connectedUsers', connectedUsers);
+  }
+
+  // Enviar mensagens em grupo
   @SubscribeMessage('sendMessage')
-  async handleSendMessage(
-    @MessageBody() data: { groupName: string; message: string },
-    @ConnectedSocket() socket: Socket,
-  ) {
-    const { groupName, message } = data;
+async handleSendMessage(
+  @MessageBody() data: { groupName: string; message: string },
+  @ConnectedSocket() socket: Socket,
+) {
+  const { groupName, message } = data;
 
-    if (!groupName || !message) {
-      console.log('Group name or message content is missing');
-      return;
-    }
-
-    // Obter o nome do usuário pelo socketId
-    const user = [...this.userSocketMap.entries()]
-      .find(([, value]) => value.socketId === socket.id)?.[1];
-    const userName = user?.name || 'Unknown User';
-
-    // Salvar a mensagem no banco de dados
-    const savedMessage = await this.chatService.saveRoomMessage(
-      socket.id,
-      groupName,
-      message,
-    );
-
-    // Formatar a mensagem antes de enviá-la
-    const formattedMessage = {
-      sender: socket.id,
-      name: userName,
-      content: message,
-      createdAt: savedMessage.createdAt,
-    };
-
-    console.log(`Socket ${socket.id} (${userName}) sent a message to group ${groupName}: ${message}`);
-
-    // Enviar a mensagem para todos no grupo, exceto o remetente
-    socket.to(groupName).emit('message', formattedMessage);
+  if (!groupName || !message) {
+    console.log('Group name or message content is missing');
+    return;
   }
 
-  // Enviar mensagem privada
+  const sender = [...this.userSocketMap.entries()]
+    .find(([, value]) => value.socketId === socket.id)?.[1];
+  const senderName = sender?.name || 'Unknown User';
+
+  const savedMessage = await this.chatService.saveRoomMessage(socket.id, groupName, message);
+
+  const formattedMessage = {
+    sender: senderName, // Nome do remetente
+    content: message,
+    createdAt: savedMessage.createdAt,
+  };
+
+  console.log(`Message from ${senderName} to group ${groupName}: ${message}`);
+  socket.to(groupName).emit('message', formattedMessage);
+}
+
+
   @SubscribeMessage('privateMessage')
-  async handlePrivateMessage(
-    @MessageBody() data: { toUserId: string; message: string },
-    @ConnectedSocket() socket: Socket,
-  ) {
-    const { toUserId, message } = data;
+async handlePrivateMessage(
+  @MessageBody() data: { toUserId: string; message: string },
+  @ConnectedSocket() socket: Socket,
+) {
+  const { toUserId, message } = data;
 
-    if (!toUserId || !message) {
-      console.log('Recipient userId or message content is missing');
-      return;
-    }
-
-    const toUser = this.userSocketMap.get(toUserId);
-    const sender = [...this.userSocketMap.entries()]
-      .find(([, value]) => value.socketId === socket.id)?.[1];
-    const senderName = sender?.name || 'Unknown User';
-
-    if (toUser) {
-      // Salvar mensagem privada no banco de dados
-      const savedMessage = await this.chatService.savePrivateMessage(
-        socket.id,
-        toUserId,
-        message,
-      );
-
-      // Formatar a mensagem antes de enviá-la
-      const formattedMessage = {
-        sender: socket.id,
-        name: senderName,
-        content: message,
-        createdAt: savedMessage.createdAt,
-      };
-
-      socket.to(toUser.socketId).emit('privateMessage', formattedMessage);
-      console.log(`Private message sent from ${socket.id} (${senderName}) to ${toUserId}: ${message}`);
-    } else {
-      console.log(`User ${toUserId} is not connected`);
-    }
+  if (!toUserId || !message) {
+    console.log('Recipient userId or message content is missing');
+    return;
   }
 
+  // Obter o remetente
+  const sender = [...this.userSocketMap.entries()]
+    .find(([, value]) => value.socketId === socket.id)?.[1];
+  if (!sender) {
+    console.log(`Sender not found for socket ID: ${socket.id}`);
+    return;
+  }
+
+  const senderName = sender.name || 'Unknown Sender';
+
+  // Obter o destinatário
+  const toUser = this.userSocketMap.get(toUserId);
+  if (!toUser) {
+    console.log(`Recipient not found for user ID: ${toUserId}`);
+    return;
+  }
+
+  const recipientName = toUser.name || 'Unknown Recipient';
+
+  // Formatar a mensagem
+  const formattedMessage = {
+    sender: senderName, // Nome do remetente
+    recipient: recipientName, // Nome do destinatário
+    content: message,
+    createdAt: new Date().toISOString(),
+  };
+
+  // Enviar a mensagem para o destinatário
+  socket.to(toUser.socketId).emit('privateMessage', formattedMessage);
+  console.log(
+    `Private message from ${senderName} to ${recipientName}: ${message}`
+  );
+}
+
+  
   // Entrar em um grupo
   @SubscribeMessage('joinGroup')
   async handleJoinGroup(
@@ -140,19 +159,16 @@ export class ChatGateway {
       return;
     }
 
-    socket.join(groupName); // Registrar o socket no grupo
+    socket.join(groupName);
     console.log(`Socket ${socket.id} joined group ${groupName}`);
 
-    // Recuperar mensagens anteriores do grupo para sincronizar com o novo usuário
     const previousMessages = await this.chatService.getRoomMessages(groupName);
-
-    // Enviar mensagens anteriores apenas para o usuário que acabou de entrar
     socket.emit('previousMessages', previousMessages);
   }
 
   // Sair de um grupo
   @SubscribeMessage('leaveGroup')
-  handleLeaveGroup(
+  async handleLeaveGroup(
     @MessageBody() groupName: string,
     @ConnectedSocket() socket: Socket,
   ) {
@@ -161,7 +177,7 @@ export class ChatGateway {
       return;
     }
 
-    socket.leave(groupName); // Remover o socket do grupo
+    socket.leave(groupName);
     console.log(`Socket ${socket.id} left group ${groupName}`);
   }
 }
