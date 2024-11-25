@@ -342,7 +342,7 @@ export class ServiceOrderService {
       const current = new Date(dateFrom);
       while (current <= dateTo) {
         const year = current.getFullYear();
-        const month = current.getMonth() + 1;
+        const month = current.getMonth() + 1; // getMonth() retorna 0-11
         allMonths.push(`${year}-${month}`);
         current.setMonth(current.getMonth() + 1);
       }
@@ -359,6 +359,7 @@ export class ServiceOrderService {
             totalTaskCost: 0,
             ordersCount: 0,
             completedTasks: 0,
+            completedOrders: 0,
           };
         }
     
@@ -366,6 +367,7 @@ export class ServiceOrderService {
         acc[key].totalTaskCost += order.tasks.reduce((taskSum, task) => taskSum + Number(task.taskCost || 0), 0);
         acc[key].ordersCount += 1;
     
+        // Contando tarefas concluídas no período
         const completedTasks = order.tasks.filter(task => 
           task.completedAt && 
           (!filters.dateFrom || task.completedAt >= filters.dateFrom) &&
@@ -374,15 +376,21 @@ export class ServiceOrderService {
     
         acc[key].completedTasks += completedTasks;
     
-        return acc;
-      }, {} as Record<string, { totalValue: number; totalTaskCost: number; ordersCount: number; completedTasks: number }>);
+        if (order.status === Status.FINALIZADO) {
+          acc[key].completedOrders += 1;
+        }
     
+        return acc;
+      }, {} as Record<string, { totalValue: number; totalTaskCost: number; ordersCount: number; completedTasks: number; completedOrders: number }>);
+    
+      // Preencher meses ausentes com valores zerados
       const result = allMonths.map(month => {
         const data = monthlyData[month] || {
           totalValue: 0,
           totalTaskCost: 0,
           ordersCount: 0,
           completedTasks: 0,
+          completedOrders: 0,
         };
     
         return {
@@ -392,6 +400,7 @@ export class ServiceOrderService {
           totalTaskCost: data.totalTaskCost.toFixed(2),
           profit: (data.totalValue - data.totalTaskCost).toFixed(2),
           completedTasks: data.completedTasks,
+          completedOrders: data.completedOrders,
         };
       });
     
