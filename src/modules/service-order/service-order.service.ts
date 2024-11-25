@@ -304,7 +304,7 @@ export class ServiceOrderService {
     };
     }
 
-    async calculateMonthlyValues(filters: {
+    async calculateMonthlyValues(filters: { 
       id?: string;
       title?: string;
       status?: string;
@@ -335,17 +335,30 @@ export class ServiceOrderService {
     
       const orders = await this.serviceOrderRepository.find({ where, relations: ['tasks'] });
     
+      const dateFrom = filters.dateFrom ? new Date(filters.dateFrom) : new Date(Math.min(...orders.map(o => +new Date(o.creationDate))));
+      const dateTo = filters.dateTo ? new Date(filters.dateTo) : new Date(Math.max(...orders.map(o => +new Date(o.creationDate))));
+      
+      const allMonths = [];
+      const current = new Date(dateFrom);
+      while (current <= dateTo) {
+        const year = current.getFullYear();
+        const month = current.getMonth() + 1;
+        allMonths.push(`${year}-${month}`);
+        current.setMonth(current.getMonth() + 1);
+      }
+    
       const monthlyData = orders.reduce((acc, order) => {
         const creationDate = new Date(order.creationDate);
         const month = creationDate.getMonth() + 1;
         const year = creationDate.getFullYear();
-        const key = `${year}-${month.toString().padStart(2, '0')}`;
+        const key = `${year}-${month}`;
     
         if (!acc[key]) {
           acc[key] = {
             totalValue: 0,
             totalTaskCost: 0,
             ordersCount: 0,
+            completedTasks: 0,
           };
         }
     
@@ -353,40 +366,37 @@ export class ServiceOrderService {
         acc[key].totalTaskCost += order.tasks.reduce((taskSum, task) => taskSum + Number(task.taskCost || 0), 0);
         acc[key].ordersCount += 1;
     
+        const completedTasks = order.tasks.filter(task => 
+          task.completedAt && 
+          (!filters.dateFrom || task.completedAt >= filters.dateFrom) &&
+          (!filters.dateTo || task.completedAt <= filters.dateTo)
+        ).length;
+    
+        acc[key].completedTasks += completedTasks;
+    
         return acc;
-      }, {} as Record<string, { totalValue: number; totalTaskCost: number; ordersCount: number }>);
-    
-      const startDate = filters.dateFrom || new Date(Math.min(...orders.map(o => +new Date(o.creationDate))));
-      const endDate = filters.dateTo || new Date(Math.max(...orders.map(o => +new Date(o.creationDate))));
-    
-      const allMonths = [];
-      let currentDate = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-    
-      while (currentDate <= endDate) {
-        const month = currentDate.getMonth() + 1;
-        const year = currentDate.getFullYear();
-        const key = `${year}-${month.toString().padStart(2, '0')}`;
-        allMonths.push(key);
-        currentDate.setMonth(currentDate.getMonth() + 1);
-      }
+      }, {} as Record<string, { totalValue: number; totalTaskCost: number; ordersCount: number; completedTasks: number }>);
     
       const result = allMonths.map(month => {
         const data = monthlyData[month] || {
           totalValue: 0,
           totalTaskCost: 0,
           ordersCount: 0,
+          completedTasks: 0,
         };
+    
         return {
           month,
           totalValue: data.totalValue.toFixed(2),
-          averageValue: data.ordersCount > 0 ? (data.totalValue / data.ordersCount).toFixed(2) : '0.00',
+          averageValue: data.ordersCount ? (data.totalValue / data.ordersCount).toFixed(2) : "0.00",
           totalTaskCost: data.totalTaskCost.toFixed(2),
           profit: (data.totalValue - data.totalTaskCost).toFixed(2),
+          completedTasks: data.completedTasks,
         };
       });
     
       return result;
     }
     
-          
+              
 }
