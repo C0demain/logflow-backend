@@ -1,8 +1,6 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthenticationGuard } from '../auth/authentication.guard';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CalendarService } from './calendar.service';
-import { IsUUID } from 'class-validator';
 import { CreateEventDTO } from './dto/create-event.dto';
 
 @ApiTags('calendar')
@@ -17,14 +15,14 @@ export class CalendarController {
     summary: 'Buscar eventos',
     description: 'Rota acessível apenas para usuários autenticados',
   })
-  async getEvents() {
-    const events = await this.calendarService.getEvents();
+  async getEvents(@Body() { userId }: { userId: string }) {
+    const events = await this.calendarService.getEvents(userId);
     return {
       message: 'Eventos encontrados.',
       calendar: events,
     };
   }
-  
+
   @Post()
   @ApiOperation({
     summary: 'Adicionar evento',
@@ -38,7 +36,7 @@ export class CalendarController {
     };
   }
 
-  @Post('/:taskId')
+  @Post('/task/:taskId')
   @ApiOperation({
     summary: 'Adicionar evento',
     description: 'Rota acessível apenas para usuários autenticados',
@@ -48,6 +46,21 @@ export class CalendarController {
     return {
       message: 'Evento adicionado com sucesso.',
       event: response,
+    };
+  }
+
+  @Post('/callback')
+  @ApiOperation({
+    summary: 'Callback de autenticação do Google',
+    description: 'Rota acessível apenas para usuários autenticados',
+  })
+  async handleOAuthCallback(
+    @Body() { code, id }: { code: string; id: string },
+  ) {
+    const accessToken = await this.calendarService.handleOAuthCallback(code, id);
+    return {
+      message: 'Refresh token salvo com sucesso.',
+      accessToken,
     };
   }
 }

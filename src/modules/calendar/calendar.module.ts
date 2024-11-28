@@ -4,9 +4,10 @@ import { ServiceOrder } from '../service-order/entities/service-order.entity';
 import { Task } from '../task/entities/task.entity';
 import { CalendarController } from './calendar.controller';
 import { CalendarService } from './calendar.service';
+import { UserEntity } from '../user/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Task, ServiceOrder])],
+  imports: [TypeOrmModule.forFeature([UserEntity, Task, ServiceOrder])],
   controllers: [CalendarController],
   providers: [CalendarService],
 })

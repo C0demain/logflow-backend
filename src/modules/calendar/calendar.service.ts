@@ -5,26 +5,58 @@ import { calendar_v3, google } from 'googleapis';
 import { Repository } from 'typeorm';
 import { ServiceOrder } from '../service-order/entities/service-order.entity';
 import { Task } from '../task/entities/task.entity';
+import { UserEntity } from '../user/entities/user.entity';
 import { CreateEventDTO } from './dto/create-event.dto';
 
 @Injectable()
 export class CalendarService {
   constructor(
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(ServiceOrder)
-    readonly serviceOrderRepository: Repository<ServiceOrder>,
+    private readonly serviceOrderRepository: Repository<ServiceOrder>,
     @InjectRepository(Task)
-    readonly taskRepository: Repository<Task>,
+    private readonly taskRepository: Repository<Task>,
   ) {}
 
-  client = new google.auth.OAuth2(
+  private readonly client = new google.auth.OAuth2(
     process.env.CLIENT_ID,
     process.env.CLIENT_SECRET,
     process.env.REDIRECT_URI,
   );
 
-  async getEvents() {
-    this.client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
+  async handleOAuthCallback(code: string, userId: string) {
+    try {
+      const { tokens } = await this.client.getToken(code);
+      console.log(tokens);
+      if (!tokens.refresh_token) {
+        throw new Error('No refresh token received from Google.');
+      }
+
+      const user = await this.userRepository.findOneBy({ id: userId });
+      if (!user) {
+        throw new NotFoundException(`User with id ${userId} not found.`);
+      }
+
+      user.refreshToken = tokens.refresh_token;
+      await this.userRepository.save(user);
+      return tokens.access_token;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getEvents(userId: string): Promise<string[]> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user || !user.refreshToken) {
+      throw new NotFoundException(
+        `User with id ${userId} not found or not authenticated.`,
+      );
+    }
+
+    this.client.setCredentials({ refresh_token: user.refreshToken });
     const calendar = google.calendar({ version: 'v3', auth: this.client });
+
     const res = await calendar.events.list({
       calendarId: 'primary',
       timeMin: new Date().toISOString(),
@@ -32,25 +64,29 @@ export class CalendarService {
       singleEvents: true,
       orderBy: 'startTime',
     });
+
     const events = res.data.items;
     if (!events || events.length === 0) {
-      console.log('No upcoming events found.');
-      return;
+      return ['No upcoming events found.'];
     }
-    console.log('Upcoming 10 events:');
-    const eventsList = events.map((event, i) => {
-      const start = event.start
-        ? event.start.dateTime || event.start.date
-        : 'No start time';
+
+    return events.map((event) => {
+      const start =
+        event.start?.dateTime || event.start?.date || 'No start time';
       return `${start} - ${event.summary}`;
     });
-    return eventsList;
   }
 
-  async addEvent(body: CreateEventDTO){
-    console.log(body);
-    this.client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
+  async addEvent(body: CreateEventDTO) {
+    const userId = body.userId;
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user || !user.refreshToken) {
+      throw new NotFoundException(
+        `User with id ${userId} not found or not authenticated.`,
+      );
+    }
 
+    this.client.setCredentials({ refresh_token: user.refreshToken });
     const calendar = google.calendar({ version: 'v3', auth: this.client });
 
     const event: calendar_v3.Schema$Event = {
@@ -64,7 +100,7 @@ export class CalendarService {
       },
     };
 
-    calendar.events.insert({
+    await calendar.events.insert({
       calendarId: 'primary',
       requestBody: event,
     });
@@ -75,7 +111,6 @@ export class CalendarService {
     if (!task) {
       throw new NotFoundException(`Task com id ${taskId} não encontrada.`);
     }
-    this.client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
     const calendar = google.calendar({ version: 'v3', auth: this.client });
 
