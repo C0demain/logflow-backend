@@ -49,6 +49,9 @@ export class UserEntity {
   @OneToMany(() => FileEntity, (file) => file.user)
   files: FileEntity[];
 
+  @Column({name: 'refresh_token', type: 'text', nullable: true})
+  refreshToken: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
