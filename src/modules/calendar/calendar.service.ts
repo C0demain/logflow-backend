@@ -25,32 +25,11 @@ export class CalendarService {
     process.env.REDIRECT_URI,
   );
 
-  async handleOAuthCallback(code: string, userId: string) {
-    try {
-      const { tokens } = await this.client.getToken(code);
-      console.log(tokens);
-      if (!tokens.refresh_token) {
-        throw new Error('No refresh token received from Google.');
-      }
-
-      const user = await this.userRepository.findOneBy({ id: userId });
-      if (!user) {
-        throw new NotFoundException(`User with id ${userId} not found.`);
-      }
-
-      user.refreshToken = tokens.refresh_token;
-      await this.userRepository.save(user);
-      return tokens.access_token;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async getEvents(userId: string): Promise<string[]> {
+  async getEvents(userId: string): Promise<calendar_v3.Schema$Event[]> {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user || !user.refreshToken) {
       throw new NotFoundException(
-        `User with id ${userId} not found or not authenticated.`,
+        `Usuário com id ${userId} não encontrado ou não autenticado.`,
       );
     }
 
@@ -60,21 +39,17 @@ export class CalendarService {
     const res = await calendar.events.list({
       calendarId: 'primary',
       timeMin: new Date().toISOString(),
-      maxResults: 10,
+      maxResults: 50,
       singleEvents: true,
       orderBy: 'startTime',
     });
 
     const events = res.data.items;
     if (!events || events.length === 0) {
-      return ['No upcoming events found.'];
+      return [];
     }
 
-    return events.map((event) => {
-      const start =
-        event.start?.dateTime || event.start?.date || 'No start time';
-      return `${start} - ${event.summary}`;
-    });
+    return events;
   }
 
   async addEvent(body: CreateEventDTO) {
@@ -92,6 +67,7 @@ export class CalendarService {
     const event: calendar_v3.Schema$Event = {
       summary: body.title,
       description: body.description,
+      location: body.location,
       start: {
         dateTime: body.start,
       },
@@ -131,5 +107,26 @@ export class CalendarService {
     });
 
     return event;
+  }
+
+  async handleOAuthCallback(code: string, userId: string) {
+    try {
+      const { tokens } = await this.client.getToken(code);
+      console.log(tokens);
+      if (!tokens.refresh_token) {
+        throw new Error('No refresh token received from Google.');
+      }
+
+      const user = await this.userRepository.findOneBy({ id: userId });
+      if (!user) {
+        throw new NotFoundException(`User with id ${userId} not found.`);
+      }
+
+      user.refreshToken = tokens.refresh_token;
+      await this.userRepository.save(user);
+      return tokens.access_token;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

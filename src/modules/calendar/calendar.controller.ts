@@ -10,12 +10,12 @@ import { CreateEventDTO } from './dto/create-event.dto';
 export class CalendarController {
   constructor(private calendarService: CalendarService) {}
 
-  @Get()
+  @Get(':userId')
   @ApiOperation({
-    summary: 'Buscar eventos',
+    summary: 'Listar eventos de um usuário',
     description: 'Rota acessível apenas para usuários autenticados',
   })
-  async getEvents(@Body() { userId }: { userId: string }) {
+  async getEvents(@Param('userId') userId: string) {
     const events = await this.calendarService.getEvents(userId);
     return {
       message: 'Eventos encontrados.',

@@ -22,4 +22,9 @@ export class CreateEventDTO {
   @ApiProperty({ name: 'end', required: true })
   @IsDateString()
   end: string;
+
+  @ApiProperty({ name: 'location', required: false })
+  @IsString()
+  @IsOptional()
+  location?: string;
 }
