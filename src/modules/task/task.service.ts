@@ -174,13 +174,13 @@ export class TaskService {
     query.leftJoinAndSelect('task.process', 'process').andWhere('process.id IS NULL') // Ignora tarefas template
 
     query.andWhere('task.dueDate IS NOT NULL')
-    query.leftJoinAndSelect('task.serviceOrder', 'serviceOrder').andWhere('serviceOrder.isActive IS true')
+    query.leftJoinAndSelect('task.serviceOrder', 'serviceOrder').andWhere('serviceOrder.deactivatedAt IS NULL')
     if (filters.startedAt) {
       //Busca tarefas que estão atrasadas filtrando pela data de início
       query.andWhere(
         'task.completedAt > task.dueDate AND task.startedAt >= :startedAt',
         { startedAt: filters.startedAt },
-      );
+      ); 
     }
 
     if (filters.dueDate) {
