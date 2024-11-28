@@ -126,9 +126,7 @@ export class ServiceOrderService {
     });
 
     if (!orders || orders.length === 0) {
-      throw new InternalServerErrorException(
-        'Nenhuma ordem de serviço encontrada.',
-      );
+      return []
     }
 
     const ordersList = orders.map((serviceOrder) => {
@@ -286,7 +284,12 @@ export class ServiceOrderService {
     const orders = await this.serviceOrderRepository.find({ where, relations: ['tasks'] });
 
     if (!orders || orders.length === 0) {
-      throw new InternalServerErrorException('Nenhuma ordem de serviço encontrada.');
+      return {
+        totalValue: 0,
+        averageValue: 0,
+        totalTaskCost: 0,
+        profit: 0,
+      }
     }
 
     const totalValue = orders.reduce((sum, order) => sum + Number(order.value || 0), 0);
