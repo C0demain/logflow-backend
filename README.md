@@ -21,19 +21,25 @@ Respositório backend do projeto Logflow
 4. **Configure a tela de consentimento OAuth**:
    - No menu de navegação, vá para "APIs e Serviços" > "Tela de consentimento OAuth".
    - Escolha "Externo" e clique em "Criar".
-   - Preencha as informações necessárias, como nome do aplicativo, e-mail de suporte, e adicione os escopos necessários. Exemplo: `https://www.googleapis.com/auth/calendar`.
+   - Preencha os campos com o nome do aplicativo, e-mail de teste (o email que será usado para fazer o login), e adicione os escopos:
+     - `https://www.googleapis.com/auth/userinfo.email`
+     - `https://www.googleapis.com/auth/userinfo.profile`
+     - `https://www.googleapis.com/openid`
+     - `https://www.googleapis.com/auth/calendar`
    - Clique em "Salvar e continuar".
 
 5. **Crie credenciais OAuth2**:
    - No menu de navegação, vá para "APIs e Serviços" > "Credenciais".
    - Clique em "Criar credenciais" e selecione "ID do cliente OAuth".
    - Selecione "Aplicativo da Web" como tipo de aplicativo.
-   - Adicione os URIs de redirecionamento autorizados (por exemplo, `http://localhost:3000`).
+   - Adicione as Origens JavaScript autorizadas como `http://localhost:3000` e `http://localhost:3000`.
+   - Adicione os URIs de redirecionamento autorizados como `http://localhost:3000` e `http://localhost:3000/auth/calendar`.
    - Clique em "Criar".
 
 6. **Obtenha as credenciais**:
    - Após criar as credenciais, você verá o `CLIENT_ID` e o `CLIENT_SECRET`.
    - Copie esses valores e adicione ao seu arquivo `.env`
+   - Adicione também o mesmo URI que foi adicionado no Google Console em `REDIRECT_URI`.
 
 ## Variáveis de ambiente Localhost
 
