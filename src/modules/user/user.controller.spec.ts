@@ -29,7 +29,6 @@ describe('UserController', () => {
     orders: [],
     tasks: [],
     files: [],
-    refreshToken: "refreshToken",
   };
 
   // CreateUserDTO mantém role como string

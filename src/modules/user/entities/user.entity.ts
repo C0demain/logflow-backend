@@ -50,7 +50,7 @@ export class UserEntity {
   files: FileEntity[];
 
   @Column({name: 'refresh_token', type: 'text', nullable: true})
-  refreshToken: string;
+  refreshToken?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -33,7 +33,6 @@ describe('UserService', () => {
     orders: [],
     tasks: [],
     files: [],
-    refreshToken: 'refresh',
   };
 
   const createUserMock: CreateUserDTO = {
