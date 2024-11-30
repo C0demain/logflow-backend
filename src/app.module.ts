@@ -20,6 +20,9 @@ import { FileModule } from './modules/file/file.module';
 import { ProcessModule } from './modules/process/process.module';
 import { VehiclesModule } from './modules/vehicles/vehicles.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { CalendarController } from './modules/calendar/calendar.controller';
+import { CalendarService } from './modules/calendar/calendar.service';
+import { CalendarModule } from './modules/calendar/calendar.module';
 
 
 @Module({
@@ -41,7 +44,8 @@ import { ChatModule } from './modules/chat/chat.module';
     FileModule,
     ProcessModule,
     VehiclesModule,
-    ChatModule
+    ChatModule,
+    CalendarModule
   ],
   controllers: [RedirectController],
   providers: [
