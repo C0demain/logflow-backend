@@ -24,8 +24,8 @@ export class ServiceOrderLog {
   @Exclude()
   serviceOrder: ServiceOrder;
 
-  @Column({ name: 'changedTo', enum: Sector, nullable: false })
-  changedTo: Sector;
+  @Column({nullable: false })
+  action: string;
 
   @CreateDateColumn({ name: 'creationDate', type: 'timestamp' })
   creationDate: Date;

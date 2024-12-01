@@ -215,7 +215,6 @@ export class ServiceOrderService {
   async getLogs(filters: {
     id?: string;
     serviceOrderId?: string;
-    changedTo?: Sector;
   }) {
     const where: FindOptionsWhere<ServiceOrderLog> = {};
 
@@ -227,22 +226,18 @@ export class ServiceOrderService {
       where.serviceOrder = { id: filters.serviceOrderId };
     }
 
-    if (filters.changedTo) {
-      where.changedTo = filters.changedTo;
-    }
-
     const logs = await this.logsRepository.find({
       where,
       relations: ['serviceOrder'],
     });
 
     if (logs.length === 0) {
-      throw new NotFoundException('Nenhum log de ordem de serviço encontrado.');
+      return []
     }
 
     return logs.map((log) => ({
       id: log.id,
-      changedTo: log.changedTo,
+      action: log.action,
       creationDate: log.creationDate,
     }));
   }

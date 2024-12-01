@@ -126,16 +126,13 @@ export class ServiceOrderController {
   })
   @ApiQuery({ name: 'id', required: false, type: String })
   @ApiQuery({ name: 'serviceOrderId', required: false, type: String })
-  @ApiQuery({ name: 'changedTo', required: false, enum: Sector })
   async findAllLogs(
     @Query('id') id?: string,
     @Query('serviceOrderId') serviceOrderId?: string,
-    @Query('changedTo') changedTo?: Sector,
   ) {
     const logs = await this.serviceOrderService.getLogs({
       id,
       serviceOrderId,
-      changedTo,
     });
   
     if (!logs || logs.length === 0) {

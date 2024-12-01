@@ -21,50 +21,68 @@ export class ServiceOrderSubscriber implements EntitySubscriberInterface<Task> {
   }
 
   async afterUpdate(event: UpdateEvent<Task>) {
+    const { entity, databaseEntity, updatedColumns } = event;
+
+    if(!databaseEntity.serviceOrder) return;
+
+    const currentServiceOrder = databaseEntity.serviceOrder
+    const createdAt = new Date();
+
+    if (!entity || !updatedColumns) return;
+    const logEntries: ServiceOrderLog[] = []
+    
+    let message: string = `Tarefa ${databaseEntity.title} atualizada`;
     try {
-      const updatedTask = event.entity as Task;
-      const oldTask = event.databaseEntity as Task;
-      if (
-        updatedTask.completedAt &&
-        !oldTask.completedAt &&
-        updatedTask &&
-        updatedTask.serviceOrder &&
-        updatedTask.sector
-      ) {
-        const serviceOrder = await event.manager.findOneOrFail(ServiceOrder, {
-          where: { id: updatedTask.serviceOrder.id },
-          relations: {
-            serviceOrderLogs: true,
-            tasks: true,
-          },
-        });
-        const tasks = await event.manager.find(Task, {
-          where: {
-            serviceOrder: { id: updatedTask.serviceOrder.id },
-            sector: updatedTask.sector,
-          },
-        });
-
-        console.log(tasks.length);
-        const isSectorFinished = tasks.every(
-          (task) => task.completedAt !== null,
-        );
-
-        const isServiceOrderFinished = serviceOrder.tasks.every(
-          (task) => task.completedAt !== null,
-        );
-
-        if (isSectorFinished) {
-          const serviceOrderLog = new ServiceOrderLog();
-          serviceOrderLog.changedTo = updatedTask.sector;
-          serviceOrder.serviceOrderLogs.push(serviceOrderLog);
-          await event.manager.save(ServiceOrder, serviceOrder);
-          if (isServiceOrderFinished) {
-            serviceOrder.status = Status.FINALIZADO;
-            await event.manager.save(ServiceOrder, serviceOrder);
-          }
+      if(updatedColumns.some(col => col.propertyName === 'dueDate')){
+        if(!databaseEntity.dueDate && entity.dueDate){
+          message = `Prazo ${entity.dueDate} adicionado à tarefa ${databaseEntity.title}`
+        }else if(databaseEntity.dueDate && !entity.dueDate){
+          message = `Prazo removido da tarefa ${databaseEntity.title}`
+        }else{
+          message = `Prazo ${databaseEntity.dueDate} alterado para ${entity.dueDate} na tarefa ${databaseEntity.title}`
         }
+
+        const log = new ServiceOrderLog()
+        log.serviceOrder = currentServiceOrder
+        log.creationDate = createdAt
+        log.action = message
+        logEntries.push(log)
       }
+
+      if(updatedColumns.some(col => col.propertyName === 'completedAt')){
+        if(!databaseEntity.completedAt && entity.completedAt){
+          message = `Tarefa ${databaseEntity.title} concluída`
+        }else if(databaseEntity.completedAt && !entity.completedAt){
+          message = `Tarefa ${databaseEntity.title} marcada como não concluída`
+        }
+
+        const log = new ServiceOrderLog()
+        log.serviceOrder = currentServiceOrder
+        log.creationDate = createdAt
+        log.action = message
+        logEntries.push(log)
+      }
+
+      if(updatedColumns.some(col => col.propertyName === 'taskCost')){
+        if(!databaseEntity.taskCost && entity.taskCost){
+          message = `Custo ${entity.taskCost} adicionado à tarefa ${databaseEntity.title}`
+        }else if(databaseEntity.taskCost && !entity.taskCost){
+          message = `Custo removido da tarefa ${databaseEntity.title}`
+        }else{
+          message = `Custo ${databaseEntity.taskCost} alterado para ${entity.taskCost} na tarefa ${databaseEntity.title}`
+        }
+
+        const log = new ServiceOrderLog()
+        log.serviceOrder = currentServiceOrder
+        log.creationDate = createdAt
+        log.action = message
+        logEntries.push(log)
+      }
+
+      if (logEntries.length > 0) {
+        await event.manager.save(ServiceOrderLog, logEntries);
+      }
+      
     } catch (error) {
       throw new Error(error);
     }
