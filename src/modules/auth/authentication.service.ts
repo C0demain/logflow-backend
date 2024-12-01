@@ -39,7 +39,7 @@ export class AuthenticationService {
       sector: user.sector
     };
 
-    const hasGoogleAccount = user.refreshToken !== undefined
+    const hasGoogleAccount = user.refreshToken !== undefined && user.refreshToken !== null
 
     return {
       id: user.id,
