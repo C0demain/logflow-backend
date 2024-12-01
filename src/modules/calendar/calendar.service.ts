@@ -66,7 +66,7 @@ export class CalendarService {
 
     const event: calendar_v3.Schema$Event = {
       summary: body.title,
-      description: body.description,
+      description: String(body.description) + '\n\nCriado através de Logflow',
       location: body.location,
       start: {
         dateTime: body.start,
