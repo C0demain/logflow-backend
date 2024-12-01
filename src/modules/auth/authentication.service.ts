@@ -39,11 +39,14 @@ export class AuthenticationService {
       sector: user.sector
     };
 
+    const hasGoogleAccount = user.refreshToken !== undefined
+
     return {
       id: user.id,
       token: await this.jwtService.signAsync(payload),
       sector: user.sector,
-      role: user.role.name
+      role: user.role.name,
+      hasGoogleAccount
     };
   }
 }
