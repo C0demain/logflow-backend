@@ -50,7 +50,7 @@ describe('TaskService', () => {
 
   const mockedServiceOrder = {
     id: 'order1',
-    title: 'Order1',
+    code: 'Order1',
   };
 
   const mockServiceOrderService = {

@@ -28,6 +28,8 @@ import { TaskStage } from '../task/enums/task.stage.enum';
 import { Process } from 'src/modules/process/entities/process.entity';
 import { TaskService } from 'src/modules/task/task.service';
 import { ProcessService } from 'src/modules/process/process.service';
+import { createHash } from 'node:crypto';
+import {v4 as uuidv4} from 'uuid'
 
 @Injectable()
 export class ServiceOrderService {
@@ -58,7 +60,11 @@ export class ServiceOrderService {
       createServiceOrderDto.processId,
     );
 
-    serviceDb.title = createServiceOrderDto.title;
+    // Gera código identificador
+    const uuid = uuidv4();
+    const hash = createHash('sha256').update(uuid).digest('hex');
+    const code = hash.substring(0, 8).toUpperCase();
+    serviceDb.code = code;
     serviceDb.client = client;
     serviceDb.status = createServiceOrderDto.status;
     serviceDb.sector = createServiceOrderDto.sector;
@@ -96,7 +102,7 @@ export class ServiceOrderService {
 
   async findAll(filters: {
     id?: string;
-    title?: string;
+    code?: string;
     status?: string;
     sector?: string;
     active?: boolean;
@@ -110,8 +116,8 @@ export class ServiceOrderService {
       where.id = filters.id;
     }
 
-    if (filters.title) {
-      where.title = filters.title;
+    if (filters.code) {
+      where.code = filters.code;
     }
 
     if (filters.status) {
@@ -149,7 +155,7 @@ export class ServiceOrderService {
       const client = serviceOrder.client;
       return new ListServiceOrderDto(
         serviceOrder.id,
-        serviceOrder.title,
+        serviceOrder.code,
         {
           clientId: client.id,
           clientName: client.name,
@@ -260,7 +266,7 @@ export class ServiceOrderService {
 
   async calculateValues(filters: {
     id?: string;
-    title?: string;
+    code?: string;
     status?: string;
     sector?: string;
     active?: boolean;
@@ -270,7 +276,7 @@ export class ServiceOrderService {
     const where: FindOptionsWhere<ServiceOrder> = {};
 
     if (filters.id) where.id = filters.id;
-    if (filters.title) where.title = filters.title;
+    if (filters.code) where.code = filters.code;
     if (filters.status) where.status = filters.status as Status;
     if (filters.sector) where.sector = filters.sector as Sector;
     if (filters.dateFrom && filters.dateTo) {
@@ -327,7 +333,7 @@ export class ServiceOrderService {
 
   async calculateMonthlyValues(filters: {
     id?: string;
-    title?: string;
+    code?: string;
     status?: string;
     sector?: string;
     active?: boolean;
@@ -337,7 +343,7 @@ export class ServiceOrderService {
     const where: FindOptionsWhere<ServiceOrder> = {};
 
     if (filters.id) where.id = filters.id;
-    if (filters.title) where.title = filters.title;
+    if (filters.code) where.code = filters.code;
     if (filters.status) where.status = filters.status as Status;
     if (filters.sector) where.sector = filters.sector as Sector;
     if (filters.dateFrom && filters.dateTo) {

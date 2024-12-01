@@ -50,7 +50,7 @@ const mockProcessService = {
 const orders = [
   {
     id: 'order-1',
-    title: 'Test Order 1',
+    code: 'Test Order 1',
     status: Status.PENDENTE,
     sector: Sector.OPERACIONAL,
     client: {
@@ -74,7 +74,7 @@ const orders = [
   },
   {
     id: 'order-2',
-    title: 'Test Order 2',
+    code: 'Test Order 2',
     status: Status.PENDENTE,
     sector: Sector.FINANCEIRO,
     client: {
@@ -220,12 +220,12 @@ describe('ServiceOrderService', () => {
   describe('update', () => {
     it('should update a service order', async () => {
       const updateServiceOrderDto: UpdateServiceOrderDto = {
-        title: 'Updated Order',
+        description: 'Updated Order',
         status: Status.FINALIZADO,
       };
       const existingOrder = {
         id: 'order-123',
-        title: 'Test Order',
+        code: 'Test Order',
         status: Status.PENDENTE,
       };
 
@@ -237,7 +237,7 @@ describe('ServiceOrderService', () => {
 
       const result = await service.update('order-123', updateServiceOrderDto);
 
-      expect(result.title).toEqual('Updated Order');
+      expect(result.description).toEqual('Updated Order');
       expect(result.status).toEqual(Status.FINALIZADO);
     });
 
@@ -245,7 +245,7 @@ describe('ServiceOrderService', () => {
       mockServiceOrderRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.update('invalid-id', { title: 'Updated Order' }),
+        service.update('invalid-id', { description: 'Updated Order' }),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -289,7 +289,7 @@ describe('ServiceOrderService', () => {
     it('should deactivate a service order', async () => {
       const orderToDeactivate = {
         id: 'order-123',
-        title: 'Order 1',
+        code: 'Order 1',
       };
   
       const deactivatedOrder = {

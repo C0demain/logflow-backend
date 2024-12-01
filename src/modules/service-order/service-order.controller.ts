@@ -32,10 +32,9 @@ export class ServiceOrderController {
   @Post()
   @ApiOperation({ summary: 'Criar ordem de serviço' })
   async create(@Body() createServiceOrderDto: CreateServiceOrderDto) {
-    const { title, clientId, status, processId, sector, userId, description, value } = createServiceOrderDto;
+    const { clientId, status, processId, sector, userId, description, value } = createServiceOrderDto;
 
     const orderCreated = await this.serviceOrderService.create({
-      title,
       clientId,
       processId,
       status,
@@ -49,7 +48,7 @@ export class ServiceOrderController {
       message: 'Ordem de serviço cadastrada.',
       serviceOrder: new ListServiceOrderDto(
         orderCreated.id,
-        orderCreated.title,
+        orderCreated.code,
         {
           clientId: orderCreated.client.id,
           clientName: orderCreated.client.name,
@@ -76,7 +75,7 @@ export class ServiceOrderController {
     description: 'Rota acessível apenas para administradores',
   })
   @ApiQuery({ name: 'id', required: false, type: String })
-  @ApiQuery({ name: 'title', required: false, type: String })
+  @ApiQuery({ name: 'code', required: false, type: String })
   @ApiQuery({ name: 'clientRelated', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, type: String })
   @ApiQuery({ name: 'active', required: false, type: Boolean })
@@ -84,7 +83,7 @@ export class ServiceOrderController {
   @ApiQuery({name: 'createdTo', required: false, type: Date})
   async findAllOrders(
     @Query('id') id?: string,
-    @Query('title') title?: string,
+    @Query('code') code?: string,
     @Query('status') status?: string,
     @Query('active') active?: boolean,
     @Query('createdFrom') createdFrom?: Date,
@@ -93,7 +92,7 @@ export class ServiceOrderController {
     try {
       const orders = await this.serviceOrderService.findAll({
         id,
-        title,
+        code,
         status,
         active,
         createdFrom,
@@ -158,7 +157,7 @@ export class ServiceOrderController {
     description: 'Rota acessível apenas para administradores',
   })
   @ApiQuery({ name: 'id', required: false, type: String })
-  @ApiQuery({ name: 'title', required: false, type: String })
+  @ApiQuery({ name: 'code', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, type: String })
   @ApiQuery({ name: 'sector', required: false, type: String })
   @ApiQuery({ name: 'active', required: false, type: Boolean })
@@ -166,7 +165,7 @@ export class ServiceOrderController {
   @ApiQuery({ name: 'dateTo', required: false, type: Date })
   async calculateTotals(
     @Query('id') id?: string,
-    @Query('title') title?: string,
+    @Query('code') code?: string,
     @Query('status') status?: string,
     @Query('sector') sector?: string,
     @Query('active') active?: boolean,
@@ -175,7 +174,7 @@ export class ServiceOrderController {
   ) {
     const filters = {
       id,
-      title,
+      code,
       status,
       sector,
       active,
@@ -192,7 +191,7 @@ export class ServiceOrderController {
     description: 'Rota acessível apenas para administradores',
   })
   @ApiQuery({ name: 'id', required: false, type: String })
-  @ApiQuery({ name: 'title', required: false, type: String })
+  @ApiQuery({ name: 'code', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, type: String })
   @ApiQuery({ name: 'sector', required: false, type: String })
   @ApiQuery({ name: 'active', required: false, type: Boolean })
@@ -200,7 +199,7 @@ export class ServiceOrderController {
   @ApiQuery({ name: 'dateTo', required: false, type: Date })
   async calculateMonthlyTotals(
     @Query('id') id?: string,
-    @Query('title') title?: string,
+    @Query('code') code?: string,
     @Query('status') status?: string,
     @Query('sector') sector?: string,
     @Query('active') active?: boolean,
@@ -209,7 +208,7 @@ export class ServiceOrderController {
   ) {
     const filters = {
       id,
-      title,
+      code,
       status,
       sector,
       active,

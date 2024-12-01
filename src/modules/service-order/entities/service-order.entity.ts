@@ -21,8 +21,8 @@ export class ServiceOrder {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'title', length: 50, nullable: false })
-  title: string;
+  @Column({ length: 50, nullable: false, unique: true })
+  code: string;
 
   @ManyToOne(() => UserEntity, (user) => user.orders, { eager: true })
   user: UserEntity;

@@ -13,7 +13,7 @@ export class GetTaskDto {
     readonly taskCost: number | null;
     readonly serviceOrder?: {
         id: string,
-        title: string
+        code: string
     };
     readonly assignedUser?: {
         id: string,
@@ -55,7 +55,7 @@ export class GetTaskDto {
         },
         serviceOrder?: {
             id: string,
-            title: string
+            code: string
         },
         address?: {
             zipCode: string,
@@ -96,7 +96,7 @@ export class GetTaskDto {
 export function parseToGetTaskDTO(task: Task): GetTaskDto {
     const serviceOrder = task.serviceOrder ? {
         id: task.serviceOrder.id,
-        title: task.serviceOrder.title,
+        code: task.serviceOrder.code,
     } : undefined;
 
     const assignedUser = task.assignedUser ? {

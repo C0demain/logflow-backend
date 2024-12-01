@@ -4,7 +4,7 @@ import { Status } from '../enums/status.enum';
 export class ListServiceOrderDto {
   constructor(
     readonly id: string,
-    readonly title: string,
+    readonly code: string,
     readonly client: {
       clientId: string;
       clientName: string;
