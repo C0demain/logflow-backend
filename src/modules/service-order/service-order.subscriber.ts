@@ -61,6 +61,31 @@ export class ServiceOrderSubscriber implements EntitySubscriberInterface<Task> {
         log.creationDate = createdAt
         log.action = message
         logEntries.push(log)
+
+        // Atualizando status baseado nas tarefas
+        const taskRepository = event.manager.getRepository(Task);
+        const serviceOrderRepository = event.manager.getRepository(ServiceOrder);
+
+        const relatedTasks = await taskRepository.find({
+          where: { serviceOrder: { id: entity.serviceOrder.id } },
+        });
+
+        const all = relatedTasks.every(t => t.completedAt !== null)
+        const some = relatedTasks.some(t => t.completedAt !== null)
+        let newStatus: Status
+        if(all){
+          newStatus = Status.FINALIZADO
+        }else if(some){
+          newStatus = Status.ATIVO
+        }else{
+          newStatus = Status.PENDENTE
+        }
+
+        await serviceOrderRepository.update(
+          { id: entity.serviceOrder.id },
+          { status: newStatus },
+        );
+
       }
 
       if(updatedColumns.some(col => col.propertyName === 'taskCost')){
