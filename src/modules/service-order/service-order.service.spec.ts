@@ -254,23 +254,21 @@ describe('ServiceOrderService', () => {
     it('should return the service order logs', async () => {
       const log = {
         id: '1',
-        changedTo: Sector.OPERACIONAL,
+        action: 'action',
         creationDate: new Date(),
-        serviceOrder: { id: '2' },
-      } as ServiceOrderLog;
+      }
 
       mockServiceOrderLogRepository.find.mockResolvedValue([log]);
 
       const result = await service.getLogs({
         id: '1',
-        serviceOrderId: '2',
-        changedTo: Sector.OPERACIONAL,
+        serviceOrderId: '2'
       });
 
       expect(result).toEqual([
         {
           id: '1',
-          changedTo: Sector.OPERACIONAL,
+          action: 'action',
           creationDate: log.creationDate,
         },
       ]);
