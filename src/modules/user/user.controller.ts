@@ -16,6 +16,8 @@ import { UpdateUserDTO } from './dto/UpdateUser.dto';
 import { HashPasswordPipe } from 'src/resources/pipes/hashPassword';
 import { AuthenticationGuard } from '../auth/authentication.guard';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { UserQueryFilters } from 'src/modules/user/dto/user-query-filters';
+import { start } from 'repl';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -30,7 +32,7 @@ export class UserController {
     description: 'Rota acessível apenas para administradores',
   })
   async createUser(
-    @Body() { name, email, role, sector, isActive }: CreateUserDTO,
+    @Body() { name, email, role, sector }: CreateUserDTO,
     @Body('password', HashPasswordPipe) hashedPassword: string,
   ) {
     const userCreated = await this.userService.createUser({
@@ -39,7 +41,6 @@ export class UserController {
       password: hashedPassword,
       role: role,
       sector: sector,
-      isActive: isActive,
     });
 
     return {
@@ -48,7 +49,7 @@ export class UserController {
         userCreated.id,
         userCreated.name,
         userCreated.role.name,
-        userCreated.isActive,
+        userCreated.deactivatedAt,
         userCreated.email,
         userCreated.sector
       ),
@@ -60,14 +61,32 @@ export class UserController {
     summary: 'Listar todos os usuários',
     description: 'Rota acessível apenas para administradores',
   })
-  @ApiQuery({name: 'active', required: false})
-  async listUsers(@Query('active') activeUsers?: boolean) {
-    const usersSaved = await this.userService.listUsers(activeUsers);
+  async listUsers(@Query() filters?: UserQueryFilters) {
+    const usersSaved = await this.userService.listUsers(filters);
 
     return {
       message: 'Usuários obtidos com sucesso.',
       users: usersSaved,
     };
+  }
+
+  @Get('/turnover')
+  @ApiOperation({
+    summary: 'Obter taxa de turnover',
+    description: 'Rota acessível apenas para administradores',
+  })
+  @ApiQuery({ name: 'startDate', required: true })
+  @ApiQuery({ name: 'endDate', required: true })
+  async getTurnover(
+    @Query('startDate') startDate?: Date,
+    @Query('endDate') endDate?: Date,
+  ) {
+    const turnover = await this.userService.getTurnover({startDate, endDate});
+
+    return {
+      message: 'Taxa de turnover obtida com sucesso.',
+      turnover
+    }
   }
 
   @Put('/:id')

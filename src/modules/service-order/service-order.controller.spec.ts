@@ -43,18 +43,18 @@ describe('ServiceOrderController', () => {
   describe('create', () => {
     it('should create a new service order', async () => {
       const createServiceOrderDto: CreateServiceOrderDto = {
-        title: 'Test Order',
         clientId: 'Client X',
         status: Status.PENDENTE,
         sector: Sector.OPERACIONAL,
         userId: 'user-123',
         description: 'anything',
-        value: 100
+        value: 100,
+        processId: 'process 1'
       };
 
       const result = {
         id: 'order-123',
-        title: 'Test Order',
+        code: 'Test Order',
         client: {
           id: "client-123",
           name: 'Client X',
@@ -79,7 +79,7 @@ describe('ServiceOrderController', () => {
       expect(response.serviceOrder).toEqual(
         new ListServiceOrderDto(
           result.id,
-          result.title,
+          result.code,
           {
             clientId: result.client.id,
             clientName: result.client.name,
@@ -171,14 +171,14 @@ describe('ServiceOrderController', () => {
   describe('update', () => {
     it('should update the service order and return it', async () => {
       const updateServiceOrderDto: UpdateServiceOrderDto = {
-        title: 'Updated Order',
+        description: 'Updated Order',
         clientId: 'Client B',
         status: Status.FINALIZADO,
       };
 
       const updatedOrder = {
         id: 'uuid',
-        title: 'Updated Order',
+        description: 'Updated Order',
         client: {
           clientName: 'Client X',
           clientEmail: 'client@gmail.com',
@@ -235,20 +235,19 @@ describe('ServiceOrderController', () => {
       const logs = [
         {
           id: 'log-1',
-          changedTo: Sector.OPERACIONAL,
+          action: 'action',
           creationDate: new Date(),
         },
       ];
 
       mockServiceOrderService.getLogs.mockResolvedValue(logs);
 
-      const response = await controller.findAllLogs('log-1', 'order-123', Sector.OPERACIONAL);
+      const response = await controller.findAllLogs('log-1', 'order-123');
 
       expect(response.logs).toEqual(logs);
       expect(mockServiceOrderService.getLogs).toHaveBeenCalledWith({
         id: 'log-1',
-        serviceOrderId: 'order-123',
-        changedTo: Sector.OPERACIONAL,
+        serviceOrderId: 'order-123'
       });
     });
   })
@@ -257,7 +256,7 @@ describe('ServiceOrderController', () => {
     it('should delete the service order and return it', async () => {
       const orderToRemove = {
         id: 'uuid',
-        title: 'Order 1',
+        code: 'Order 1',
         client: {
           clientName: 'Client X',
           clientEmail: 'client@gmail.com',

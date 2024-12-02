@@ -5,7 +5,7 @@ export class ListUsersDTO {
     readonly id: string,
     readonly name: string,
     readonly role: string,
-    readonly isActive: boolean,
+    readonly deactivatedAt: Date | null,
     readonly email: string,
     readonly sector: string
   ) {}

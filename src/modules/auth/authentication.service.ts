@@ -28,7 +28,7 @@ export class AuthenticationService {
       throw new UnauthorizedException('O email ou a senha estão incorretos.');
     }
 
-    if (user.isActive === false) {
+    if (user.deactivatedAt !== null) {
       throw new UnauthorizedException('O usuário deve ser ativo no sistema.');
     }
 
@@ -39,11 +39,14 @@ export class AuthenticationService {
       sector: user.sector
     };
 
+    const hasGoogleAccount = user.refreshToken !== undefined && user.refreshToken !== null
+
     return {
       id: user.id,
       token: await this.jwtService.signAsync(payload),
       sector: user.sector,
-      role: user.role.name
+      role: user.role.name,
+      hasGoogleAccount
     };
   }
 }

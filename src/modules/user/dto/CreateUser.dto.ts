@@ -35,8 +35,4 @@ export class CreateUserDTO {
     message: "O campo 'Setor' precisa estar dentro dos padrôes estabelecidos.",
   })
   sector: Sector;
-
-  @IsOptional()
-  @IsBoolean({ message: "O campo 'Ativo' precisa ser Verdadeiro ou Falso." })
-  isActive: boolean;
 }

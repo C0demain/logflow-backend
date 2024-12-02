@@ -22,10 +22,10 @@ describe('UserController', () => {
     name: 'test-username',
     email: 'testuser@gmail.com',
     password: '123456',
-    createdAt: '2024-01-01',
+    createdAt: new Date('2024-01-01'),
     role: { id: 'uuid-role', name: roleMockName } as RoleEntity, // A role está como objeto completo
     sector: Sector.OPERACIONAL,
-    isActive: true,
+    deactivatedAt : null,
     orders: [],
     tasks: [],
     files: [],
@@ -38,7 +38,6 @@ describe('UserController', () => {
     password: '123456',
     role: roleMockName,  // Role é string
     sector: Sector.OPERACIONAL,
-    isActive: true,
   };
 
   // Service Mock

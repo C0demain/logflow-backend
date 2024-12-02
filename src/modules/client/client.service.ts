@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -9,7 +10,8 @@ import { FindOptionsWhere, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client } from './entities/client.entity';
 import { ListClientDto } from './dto/list-client.dto';
-
+import { isValidUUID } from '../../resources/validations/isValidUUID';
+import fetchAddressByCep from './validations/viaCepValidator';
 @Injectable()
 export class ClientService {
   constructor(
@@ -20,12 +22,10 @@ export class ClientService {
   async create(createClientDto: CreateClientDto) {
     const clientCreated = new Client();
 
+    const address = await fetchAddressByCep(createClientDto.address.zipCode);
+
     clientCreated.address = {
-      zipCode: createClientDto.address.zipCode,
-      state: createClientDto.address.state,
-      city: createClientDto.address.city,
-      neighborhood: createClientDto.address.neighborhood,
-      street: createClientDto.address.street,
+      ...address,
       number: createClientDto.address.number,
       complement: createClientDto.address.complement,
     };
@@ -102,33 +102,45 @@ export class ClientService {
 
     return clientFound;
   }
-
+  
   async update(id: string, updateClientDto: UpdateClientDto) {
-    const clientFound = await this.clientRepository.findOne({ where: { id } });
+    if (!isValidUUID(id)) {
+      throw new BadRequestException(`O id fornecido (${id}) não é um UUID válido.`);
+    }
 
+    const clientFound = await this.clientRepository.findOne({ where: { id } });
+    
     if (!clientFound) {
       throw new NotFoundException(`Cliente com id ${id} não encontrado.`);
     }
 
     const updatedClient = new Client();
-
-    // Atribuição de valores obrigatórios
-    updatedClient.id = clientFound.id; // Mantém o ID do cliente existente
-    updatedClient.name = updateClientDto.name || clientFound.name; // Usa o valor atual se não fornecido
+    updatedClient.id = clientFound.id;
+    updatedClient.name = updateClientDto.name || clientFound.name;
     updatedClient.phone = updateClientDto.phone || clientFound.phone;
     updatedClient.cnpj = updateClientDto.cnpj || clientFound.cnpj;
     updatedClient.email = updateClientDto.email || clientFound.email;
 
-    // Atribuição do endereço
-    updatedClient.address = {
-      zipCode: updateClientDto.address?.zipCode || clientFound.address.zipCode,
-      state: updateClientDto.address?.state || clientFound.address.state,
-      city: updateClientDto.address?.city || clientFound.address.city,
-      neighborhood: updateClientDto.address?.neighborhood || clientFound.address.neighborhood,
-      street: updateClientDto.address?.street || clientFound.address.street,
-      number: updateClientDto.address?.number || clientFound.address.number,
-      complement: updateClientDto.address?.complement || clientFound.address.complement,
-    };
+    // Verifica se o CEP foi atualizado
+    if (updateClientDto.address?.zipCode && updateClientDto.address.zipCode !== clientFound.address.zipCode) {
+      const newAddress = await fetchAddressByCep(updateClientDto.address.zipCode);
+      updatedClient.address = {
+        ...newAddress,
+        number: updateClientDto.address.number || clientFound.address.number,
+        complement: updateClientDto.address.complement || clientFound.address.complement,
+      };
+    } else {
+      // Se o CEP não mudou, mantém o endereço atual
+      updatedClient.address = {
+        zipCode: clientFound.address.zipCode,
+        state: clientFound.address.state,
+        city: clientFound.address.city,
+        neighborhood: clientFound.address.neighborhood,
+        street: clientFound.address.street,
+        number: updateClientDto.address?.number || clientFound.address.number,
+        complement: updateClientDto.address?.complement || clientFound.address.complement,
+      };
+    }
 
     const savedClient = await this.clientRepository.save(updatedClient);
 
@@ -143,7 +155,6 @@ export class ClientService {
       },
     };
   }
-
 
   async remove(id: string) {
     const clientFound = await this.clientRepository.findOne({

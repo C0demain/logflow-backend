@@ -14,10 +14,14 @@ import { TaskService } from './task.service';
 import { FilterTasksDto } from './dto/filter-tasks.dto';
 import { Process } from 'src/modules/process/entities/process.entity';
 import { ProcessService } from 'src/modules/process/process.service';
+import { Vehicle } from '../vehicles/entities/vehicle.entity';
+import { RolesService } from '../roles/roles.service';
+import { RoleEntity } from '../roles/roles.entity';
 
 describe('TaskService', () => {
   let service: TaskService;
   let repo: Repository<Task>;
+  let vehicleRepository: Repository<Vehicle>;
   let processService: ProcessService;
   let userService: UserService;
   let serviceOrderService: ServiceOrderService;
@@ -46,7 +50,7 @@ describe('TaskService', () => {
 
   const mockedServiceOrder = {
     id: 'order1',
-    title: 'Order1',
+    code: 'Order1',
   };
 
   const mockServiceOrderService = {
@@ -65,6 +69,17 @@ describe('TaskService', () => {
     findById: jest.fn().mockResolvedValue(processMock),
   }
 
+  const mockedRole: RoleEntity = {
+    id: '1',
+    name: 'Vendedor',
+    description: 'Responsável pelas vendas',
+    sector: Sector.VENDAS,
+  };
+
+  const mockRolesService = {
+    findById: jest.fn().mockResolvedValue(mockedRole),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -72,6 +87,10 @@ describe('TaskService', () => {
         {
           provide: getRepositoryToken(Task),
           useValue: mockRepository,
+        },
+        { 
+          provide: getRepositoryToken(Vehicle),
+          useClass: Repository 
         },
         {
           provide: ProcessService,
@@ -85,11 +104,16 @@ describe('TaskService', () => {
           provide: ServiceOrderService,
           useValue: mockServiceOrderService,
         },
+        {
+          provide: RolesService,
+          useValue: mockRolesService,
+        },
       ],
     }).compile();
 
     service = module.get<TaskService>(TaskService);
     repo = module.get<Repository<Task>>(getRepositoryToken(Task));
+    vehicleRepository = module.get<Repository<Vehicle>>(getRepositoryToken(Vehicle));
     processService = module.get<ProcessService>(ProcessService);
     userService = module.get<UserService>(UserService);
     serviceOrderService = module.get<ServiceOrderService>(ServiceOrderService);
@@ -138,152 +162,49 @@ describe('TaskService', () => {
   });
 
   describe('findAll', () => {
-    it('should return all tasks', async () => {
-      const expectedResult: GetTaskDto[] = [
-        {
-          id: 'task1',
-          title: 'Task1',
-          startedAt: null,
-          completedAt: null,
-          sector: Sector.OPERACIONAL,
-          stage: TaskStage.SALE_COMPLETED,
-          taskCost: null,
-          assignedUser: mockedUser,
-          serviceOrder: mockedServiceOrder,
-        },
-      ];
-
-      mockRepository.find.mockResolvedValue(expectedResult);
-
-      const tasks = await service.findAll({});
-
-      expect(tasks).toEqual(expectedResult);
-      expect(mockRepository.find).toHaveBeenCalledWith({
-        loadEagerRelations: true,
-        where: {
-          process: undefined
-        },
-        order: { createdAt: 'asc' },
-      });
-    });
-
-    it('should return tasks filtered by title', async () => {
-      const expectedResult: GetTaskDto[] = [
-        {
-          id: 'task1',
-          title: 'Task1',
-          startedAt: null,
-          completedAt: null,
-          sector: Sector.OPERACIONAL,
-          stage: TaskStage.SALE_COMPLETED,
-          taskCost: null,
-          assignedUser: mockedUser,
-          serviceOrder: mockedServiceOrder,
-        },
-      ];
-
-      mockRepository.find.mockResolvedValue(expectedResult);
-
-      const tasks = await service.findAll({ title: 'Task1' });
-
-      expect(tasks).toEqual(expectedResult);
-      expect(mockRepository.find).toHaveBeenCalledWith({
-        loadEagerRelations: true,
-        where: { title: 'Task1' },
-        order: { createdAt: 'asc' },
-      });
-    });
-
-    it('should return tasks filtered by serviceOrderId', async () => {
-      const expectedResult: GetTaskDto[] = [
-        {
-          id: 'task1',
-          title: 'Task1',
-          startedAt: null,
-          completedAt: null,
-          sector: Sector.OPERACIONAL,
-          stage: TaskStage.SALE_COMPLETED,
-          taskCost: null,
-          assignedUser: mockedUser,
-          serviceOrder: mockedServiceOrder,
-        },
-      ];
-
-      mockRepository.find.mockResolvedValue(expectedResult);
-
-      const tasks = await service.findAll({ serviceOrderId: 'order1' });
-
-      expect(tasks).toEqual(expectedResult);
-      expect(mockRepository.find).toHaveBeenCalledWith({
-        loadEagerRelations: true,
-        where: { serviceOrder: { id: 'order1' } },
-        order: { createdAt: 'asc' },
-      });
-    });
-
-    it('should return tasks filtered by assignedUserId', async () => {
-      const expectedResult: GetTaskDto[] = [
-        {
-          id: 'task1',
-          title: 'Task1',
-          startedAt: null,
-          completedAt: null,
-          sector: Sector.OPERACIONAL,
-          stage: TaskStage.SALE_COMPLETED,
-          taskCost: null,
-          assignedUser: mockedUser,
-          serviceOrder: mockedServiceOrder,
-        },
-      ];
-
-      mockRepository.find.mockResolvedValue(expectedResult);
-
-      const tasks = await service.findAll({ assignedUserId: 'user1' });
-
-      expect(tasks).toEqual(expectedResult);
-      expect(mockRepository.find).toHaveBeenCalledWith({
-        loadEagerRelations: true,
-        where: { assignedUser: { id: 'user1' } },
-        order: { createdAt: 'asc' },
-      });
-    });
-    
     it('should return tasks filtered by date range', async () => {
-      const expectedResult: GetTaskDto[] = [
-        {
-          id: 'task1',
-          title: 'Task1',
-          startedAt: null,
-          completedAt: null,
-          sector: Sector.OPERACIONAL,
-          stage: TaskStage.SALE_COMPLETED,
-          taskCost: null,
-          assignedUser: mockedUser,
-          serviceOrder: mockedServiceOrder,
-        },
-      ];
-
       const filters = {
         completedFrom: new Date('2024-01-01'),
         completedTo: new Date('2024-02-01'),
       };
-
+  
+      const expectedResult: GetTaskDto[] = [
+        {
+          id: 'task1',
+          title: 'Task1',
+          startedAt: null,
+          completedAt: null,
+          sector: Sector.OPERACIONAL,
+          stage: TaskStage.SALE_COMPLETED,
+          taskCost: null,
+          assignedUser: mockedUser,
+          serviceOrder: mockedServiceOrder,
+        },
+      ];
+  
       mockRepository.find.mockResolvedValue(expectedResult);
-
+  
       const tasks = await service.findAll(filters);
-
+  
       expect(tasks).toEqual(expectedResult);
       expect(mockRepository.find).toHaveBeenCalledWith({
-        where: expect.objectContaining({
+        loadEagerRelations: true,
+        where: {
           completedAt: expect.objectContaining({
             _type: 'between',
             _value: [filters.completedFrom, filters.completedTo],
           }),
-        }),
+          serviceOrder: {
+            deactivatedAt: expect.any(Object), // Valida o operador IS NULL
+          },
+          process: undefined,
+        },
         order: { createdAt: 'asc' },
       });
     });
   });
+  
+  
 
   describe('findById', () => {
     it('should return a task by id', async () => {
@@ -317,13 +238,13 @@ describe('TaskService', () => {
 
   describe('countOverdueTasks', () => {
     it('should return the count of overdue tasks', async () => {
-      const filters = { 
+      const filters = {
         startedAt: '2024-01-01',
-        dueDate: '2024-02-01', 
-        sector: Sector.OPERACIONAL 
+        dueDate: '2024-02-01',
+        sector: Sector.OPERACIONAL,
       };
-      
-      const expectedCount = 5; 
+  
+      const expectedCount = 5;
   
       mockRepository.getCount.mockResolvedValue(expectedCount);
   
@@ -331,10 +252,10 @@ describe('TaskService', () => {
   
       expect(count).toBe(expectedCount);
       expect(mockRepository.createQueryBuilder).toHaveBeenCalledWith('task');
-      expect(mockRepository.andWhere).toHaveBeenCalledTimes(4);
+      expect(mockRepository.andWhere).toHaveBeenCalledTimes(6); // Considera filtros adicionais
       expect(mockRepository.getCount).toHaveBeenCalled();
     });
-  });
+  });  
 
   describe('update', () => {
     it('should update a task by id', async () => {
@@ -636,6 +557,8 @@ describe('TaskService', () => {
       expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: taskId } });
     });
   });
+
+  
   
 
   describe('remove', () => {

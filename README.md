@@ -4,10 +4,47 @@
 
 Respositório backend do projeto Logflow
 
-# Executando o projeto
+# Configurações iniciais
+
+1. **Acesse o Google Cloud Console**:
+   - Vá para [Google Cloud Console](https://console.cloud.google.com/).
+
+2. **Crie um novo projeto**:
+   - Clique no menu suspenso do projeto no topo da página.
+   - Selecione "Novo Projeto".
+   - Dê um nome ao seu projeto e clique em "Criar".
+
+3. **Ative a API do Google**:
+   - No menu de navegação, vá para "APIs e Serviços" > "Biblioteca".
+   - Pesquise por "Google Calendar API" e clique em "Ativar".
+
+4. **Configure a tela de consentimento OAuth**:
+   - No menu de navegação, vá para "APIs e Serviços" > "Tela de consentimento OAuth".
+   - Escolha "Externo" e clique em "Criar".
+   - Preencha os campos com o nome do aplicativo, e-mail de teste (o email que será usado para fazer o login), e adicione os escopos:
+     - `https://www.googleapis.com/auth/userinfo.email`
+     - `https://www.googleapis.com/auth/userinfo.profile`
+     - `https://www.googleapis.com/openid`
+     - `https://www.googleapis.com/auth/calendar`
+   - Clique em "Salvar e continuar".
+
+5. **Crie credenciais OAuth2**:
+   - No menu de navegação, vá para "APIs e Serviços" > "Credenciais".
+   - Clique em "Criar credenciais" e selecione "ID do cliente OAuth".
+   - Selecione "Aplicativo da Web" como tipo de aplicativo.
+   - Adicione as Origens JavaScript autorizadas como `http://localhost:3000` e `http://localhost:3000`.
+   - Adicione os URIs de redirecionamento autorizados como `http://localhost:3000` e `http://localhost:3000/auth/calendar`.
+   - Clique em "Criar".
+
+6. **Obtenha as credenciais**:
+   - Após criar as credenciais, você verá o `CLIENT_ID` e o `CLIENT_SECRET`.
+   - Copie esses valores e adicione ao seu arquivo `.env`
+   - Adicione também o mesmo URI que foi adicionado no Google Console em `REDIRECT_URI`.
 
 ## Variáveis de ambiente Localhost
+
 Cria um arquivo .env e preencha com as informações necessárias conforme o exemplo abaixo:
+
 ```bash
 DB_HOST=localhost
 DB_PORT=5432
@@ -17,10 +54,16 @@ DB_PASSWORD=postgres
 DB_NAME=logflowdb
 
 SECRET_JWT=logflowbackend
+
+CLIENT_ID=847748011399-****.apps.googleusercontent.com
+CLIENT_SECRET=GOCSPX-**-******
+REDIRECT_URI=http://localhost:3000
 ```
 
 ## Variáveis de ambiente Docker
+
 Cria um arquivo .env e preencha com as informações necessárias conforme o exemplo abaixo:
+
 ```bash
 DB_HOST=postgres
 DB_PORT=5433
@@ -33,12 +76,15 @@ SECRET_JWT=logflowbackend
 ```
 
 ### Executando manualmente
+
 #### Instalação
+
 ```bash
-$ npm install
+npm install
 ```
 
 #### Executar o projeto
+
 ```bash
 # development
 $ npm run start
@@ -51,11 +97,13 @@ $ npm run start:prod
 ```
 
 ### Executando com docker
+
 ```bash
-$ docker compose up
+docker compose up
 ```
 
 ## Prefixo para executar comandos dentro do container do backend
+
 ```bash
-$ docker compose exec backend "comando"
+docker compose exec backend "comando"
 ```

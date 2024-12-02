@@ -11,10 +11,6 @@ import { Status } from '../enums/status.enum';
 import { Sector } from '../enums/sector.enum';
 
 export class CreateServiceOrderDto {
-  @IsString()
-  @IsNotEmpty({ message: "O campo 'Título' não pode estar vazio." })
-  title: string;
-
   @IsUUID()
   @IsNotEmpty({ message: "O campo com o ID do Cliente é obrigatório." })
   clientId: string;

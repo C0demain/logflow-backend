@@ -44,6 +44,9 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       SECRET_JWT: ${SECRET_JWT}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      REDIRECT_URI: ${CLIENT_REDIRECT_URI}
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules

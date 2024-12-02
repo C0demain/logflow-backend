@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +10,8 @@ import {
   MoreThanOrEqual,
   Between,
   LessThanOrEqual,
+  IsNull,
+  Not,
 } from 'typeorm';
 import { ServiceOrderService } from 'src/modules/service-order/service-order.service';
 import { UserService } from 'src/modules/user/user.service';
@@ -21,11 +23,13 @@ import { CreateTemplateTaskDto } from 'src/modules/task/dto/create-template-task
 import { ProcessService } from 'src/modules/process/process.service';
 import { Address } from 'src/modules/client/entities/address.entity';
 import { RolesService } from 'src/modules/roles/roles.service';
+import { Vehicle } from '../vehicles/entities/vehicle.entity';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectRepository(Task) private readonly taskRepository: Repository<Task>,
+    @InjectRepository(Vehicle) private readonly vehicleRepository: Repository<Vehicle>,
     private readonly serviceOrderService: ServiceOrderService,
     private readonly userService: UserService,
     private readonly processService: ProcessService,
@@ -134,9 +138,9 @@ export class TaskService {
     }
 
     if (filters.serviceOrderId) {
-      where.serviceOrder = { id: filters.serviceOrderId, isActive: true };
+      where.serviceOrder = { id: filters.serviceOrderId, deactivatedAt: IsNull() };
     } else {
-      where.serviceOrder = { isActive: true };
+      where.serviceOrder = { deactivatedAt: IsNull() };
     }
 
     if (filters.stage) {
@@ -170,13 +174,13 @@ export class TaskService {
     query.leftJoinAndSelect('task.process', 'process').andWhere('process.id IS NULL') // Ignora tarefas template
 
     query.andWhere('task.dueDate IS NOT NULL')
-    query.leftJoinAndSelect('task.serviceOrder', 'serviceOrder').andWhere('serviceOrder.isActive IS true')
+    query.leftJoinAndSelect('task.serviceOrder', 'serviceOrder').andWhere('serviceOrder.deactivatedAt IS NULL')
     if (filters.startedAt) {
       //Busca tarefas que estão atrasadas filtrando pela data de início
       query.andWhere(
         'task.completedAt > task.dueDate AND task.startedAt >= :startedAt',
         { startedAt: filters.startedAt },
-      );
+      ); 
     }
 
     if (filters.dueDate) {
@@ -339,6 +343,30 @@ export class TaskService {
     }
     task.dueDate = dueDate;
     return this.taskRepository.save(task);
+  }
+
+  async assignVehicleToTask(taskId: string, vehicleId: string) {
+    const task = await this.taskRepository.findOne({ where: { id: taskId } });
+    if (!task) {
+      throw new NotFoundException('Tarefa não encontrada.');
+    }
+
+    const vehicle = await this.vehicleRepository.findOne({ where: { id: vehicleId } });
+    if (!vehicle) {
+      throw new NotFoundException('Veículo não encontrado.');
+    }
+
+    if (vehicle.status === 'em uso') {
+      throw new BadRequestException('Veículo já está em uso.');
+    }
+
+    vehicle.status = 'em uso';
+    task.vehicle = vehicle;
+
+    await this.vehicleRepository.save(vehicle);
+    await this.taskRepository.save(task);
+
+    return task;
   }
 
   async remove(id: string) {

@@ -32,7 +32,7 @@ describe('TaskController', () => {
 
   const mockedServiceOrder = {
     id: 'order1',
-    title: 'Order1',
+    code: 'Order1',
   };
 
   const mockTaskService = {
@@ -97,7 +97,7 @@ describe('TaskController', () => {
         },
         {
           id: 'order1',
-          title: 'Order1',
+          code: 'Order1',
         },
       );
       mockTaskService.create.mockResolvedValue(expectedResult);
@@ -199,7 +199,7 @@ describe('TaskController', () => {
         },
         {
           id: 'order1',
-          title: 'Order1',
+          code: 'Order1',
         },
         {
           zipCode: '12345-678',

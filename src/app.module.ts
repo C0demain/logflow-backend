@@ -18,6 +18,11 @@ import { TaskModule } from './modules/task/task.module';
 import { RolesModule } from './modules/roles/roles.module'; 
 import { FileModule } from './modules/file/file.module';
 import { ProcessModule } from './modules/process/process.module';
+import { VehiclesModule } from './modules/vehicles/vehicles.module';
+import { ChatModule } from './modules/chat/chat.module';
+import { CalendarController } from './modules/calendar/calendar.controller';
+import { CalendarService } from './modules/calendar/calendar.service';
+import { CalendarModule } from './modules/calendar/calendar.module';
 
 
 @Module({
@@ -38,6 +43,9 @@ import { ProcessModule } from './modules/process/process.module';
     RolesModule,
     FileModule,
     ProcessModule,
+    VehiclesModule,
+    ChatModule,
+    CalendarModule
   ],
   controllers: [RedirectController],
   providers: [

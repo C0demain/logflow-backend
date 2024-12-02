@@ -4,9 +4,13 @@ import { useContainer } from "class-validator";
 import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { SeederService } from "./db/seeds/seeder.service";
+import { IoAdapter } from "@nestjs/platform-socket.io";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.useWebSocketAdapter(new IoAdapter(app));
+  console.log('WebSocket Server está em execução...');
 
   const seeder = app.get(SeederService);
   try {
