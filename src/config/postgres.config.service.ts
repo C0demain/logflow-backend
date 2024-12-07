@@ -16,7 +16,7 @@ export class PostgresConfigService implements TypeOrmOptionsFactory {
       database: this.configService.get<string>("DB_NAME"),
       entities: [__dirname + "/../**/*.entity.{js,ts}"],
       subscribers: [__dirname + "/../**/*.subscriber.{js,ts}"],
-      synchronize: true,
+      synchronize: false,
       logging: false
     };
   }
